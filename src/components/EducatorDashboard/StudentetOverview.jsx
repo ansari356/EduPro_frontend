@@ -62,6 +62,7 @@ export default function StudentEngagementOverview() {
 
   return (
     <>
+    <div id="student-engagement" className="mb-5">
       <h4 className="fw-bold mb-4 " style={{ color: "#1a3967" }}>Student Engagement Overview</h4>
       <Card className="mb-4 shadow-sm border-1" style={{ borderRadius: "1.5rem" }}>
         <Card.Body>
@@ -73,6 +74,7 @@ export default function StudentEngagementOverview() {
           <Bar data={data} options={options} height={100} />
         </Card.Body>
       </Card>
+      </div>
     </>
   );
 }

@@ -20,27 +20,44 @@ export default function ActiveCourses() {
   ];
   return (
     <>
-      <h4 className="fw-bold mb-4" style={{ color: "#1a3967" }}>Active Courses</h4>
-      <Row className="g-4">
-        {courses.map((course, idx) => (
-          <Col md={4} key={idx}>
-            <Card className="h-100 shadow-sm" style={{ borderRadius: "1.2rem" }}>
-              <Card.Img
-                variant="top"
-                src={course.image}
-                alt={course.title}
-                style={{ borderTopLeftRadius: "1.2rem", borderTopRightRadius: "1.2rem" }}
-              />
-              <Card.Body>
-                <Card.Title style={{ color: "#1a3967" }}>{course.title}</Card.Title>
-                <Card.Text className="text-primary">
-                  {course.description || "No description available."}
-                </Card.Text>
-              </Card.Body>
-            </Card>
-          </Col>
-        ))}
-      </Row>
+      <div style={{ height: "1px" }}></div>
+      <section
+        id="active-courses"
+        tabIndex={-1}
+        style={{ scrollMarginTop: "100px" }}
+      >
+        <h4 className="fw-bold mb-4" style={{ color: "#1a3967" }}>
+          Active Courses
+        </h4>
+        <Row className="g-4">
+          {courses.map((course, idx) => (
+            <Col xs={12} md={4} key={idx}>
+              <Card
+                className="h-100 shadow-sm"
+                style={{ borderRadius: "1.2rem" }}
+              >
+                <Card.Img
+                  variant="top"
+                  src={course.image}
+                  alt={course.title}
+                  style={{
+                    borderTopLeftRadius: "1.2rem",
+                    borderTopRightRadius: "1.2rem",
+                  }}
+                />
+                <Card.Body>
+                  <Card.Title style={{ color: "#1a3967" }}>
+                    {course.title}
+                  </Card.Title>
+                  <Card.Text className="text-primary">
+                    {course.description || "No description available."}
+                  </Card.Text>
+                </Card.Body>
+              </Card>
+            </Col>
+          ))}
+        </Row>
+      </section>
     </>
   );
 }

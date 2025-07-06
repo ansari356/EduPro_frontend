@@ -25,7 +25,7 @@ export default function CourseManagementTools() {
   ];
 
   return (
-    <div className="course-management-section">
+    <div id="course-management" className="course-management-section">
       <h4 className="fw-bold mb-4" style={{ color: "#1a3967" }}>
         Course Management Tools
       </h4>
