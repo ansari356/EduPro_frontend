@@ -1,0 +1,174 @@
+.dashboard-container {
+  padding: 1.5rem;
+  margin-left: 10%;
+}
+.search-bar-wrapper .position-relative {
+  width: 100%;
+}
+
+.search-icon {
+  position: absolute;
+  top: 50%;
+  left: 16px;
+  transform: translateY(-50%);
+  color: #1a3967; 
+  font-size: 1.2rem;
+  pointer-events: none;
+  z-index: 2;
+}
+
+.custom-search-input {
+  background: #e3f0fd !important;         
+  color: #1a3967 !important;              
+  border: none;
+  box-shadow: 0 2px 8px rgba(51, 144, 236, 0.08);
+  transition: box-shadow 0.2s;
+}
+
+.custom-search-input::placeholder {
+  color: #1a3967 !important;              
+  opacity: 1;
+  font-weight: 500;
+}
+
+/* Calendar styles */
+.react-calendar {
+  width: 350px;
+  max-width: 100%;
+  background: #f8f9fa; 
+  border-radius: 1.5rem;
+  border: 2px solid #3390ec; 
+  font-family: 'Inter', 'Arial', 'Helvetica', sans-serif;
+  box-shadow: 0 4px 24px rgba(51, 144, 236, 0.06);
+  padding: 1.2rem;
+}
+
+/* Navigation bar */
+.react-calendar__navigation {
+  display: flex;
+  height: 44px;
+  margin-bottom: 1em;
+  border-radius: 1.2rem 1.2rem 0 0;
+  background: transparent;
+}
+
+.react-calendar__navigation button {
+  min-width: 44px;
+  font-size: 1.1em;
+  color: #1a3967;
+  font-weight: 600;
+  border-radius: 8px;
+  transition: background 0.2s;
+  background: none;
+}
+
+.react-calendar__navigation button:enabled:hover,
+.react-calendar__navigation button:enabled:focus {
+  background-color: #e3f0fd;
+}
+
+/* Weekdays header */
+.react-calendar__month-view__weekdays {
+  text-align: center;
+  text-transform: uppercase;
+  font-size: 0.78em;
+  font-weight: 700;
+  color: #3390ec;
+  background: none;
+  border: none;
+}
+
+.react-calendar__month-view__weekdays__weekday {
+  padding: 0.5em 0;
+  letter-spacing: 0.04em;
+}
+
+/* Days grid */
+.react-calendar__tile {
+  max-width: 100%;
+  padding: 10px 0;
+  background: none;
+  border-radius: 50%; /* Make all day cells round */
+  text-align: center;
+  font-size: 1em;
+  color: #1a3967;
+  transition: background 0.15s, color 0.15s;
+  aspect-ratio: 1/1; 
+  margin: 2px;
+}
+
+.react-calendar__tile:disabled {
+  color: #bfc9d1;
+  background: none;
+}
+
+.react-calendar__tile:enabled:hover,
+.react-calendar__tile:enabled:focus {
+  background: #e3f0fd;
+  color: #006edc;
+  border-radius: 50%;
+}
+
+/* Today (blue circle) */
+.react-calendar__tile--now {
+  background: #3390ec !important;
+  color: #fff !important;
+  font-weight: 600;
+  border-radius: 50% !important;
+  box-shadow: 0 2px 8px rgba(51, 144, 236, 0.12);
+}
+
+/* Active date (selected day) */
+.react-calendar__tile--active {
+  background: #1a3967 !important;
+  color: #fff !important;
+  font-weight: 700;
+  border-radius: 50% !important;
+  box-shadow: 0 2px 8px rgba(51, 144, 236, 0.12);
+}
+
+/* Range selection */
+.react-calendar--selectRange .react-calendar__tile--hover {
+  background: #e3f0fd;
+  border-radius: 50%;
+}
+
+/* Neighboring month days */
+.react-calendar__month-view__days__day--neighboringMonth {
+  color: #bfc9d1;
+}
+
+/* Weekend days */
+.react-calendar__month-view__days__day--weekend {
+  color: #ff6b6b;
+}
+
+/* Remove default border on focus */
+.react-calendar__tile:focus {
+  outline: none;
+  box-shadow: none;
+}
+.course-management-section {
+  border-radius: 1.5rem;
+}
+
+.tool-card {
+  border-radius: 1.2rem;
+  border-color: #bfc9d1;
+  background: #c8e4ff;
+  transition: box-shadow 0.2s, transform 0.2s;
+}
+
+.tool-card:hover {
+  box-shadow: 0 6px 24px rgba(51, 144, 236, 0.12);
+  transform: translateY(-4px) scale(1.02);
+}
+
+.tool-icon {
+  font-size: 2.5rem;
+  color: #3390ec;
+  background: #fff;
+  border-radius: 1rem;
+  padding: 0.7rem;
+  box-shadow: 0 2px 8px rgba(51, 144, 236, 0.08);
+}

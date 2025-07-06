@@ -1,0 +1,14 @@
+import Calendar from 'react-calendar';
+import 'react-calendar/dist/Calendar.css';
+import "./Dashboard.css";
+
+export default function UpcomingSessions() {
+  return (
+    <div>
+      <h4 className="fw-bold mb-4" style={{ color: "#1a3967" }}>Upcoming Sessions</h4>
+      <div className='d-flex justify-content-center'>
+      <Calendar />
+      </div>
+    </div>
+  );
+}
