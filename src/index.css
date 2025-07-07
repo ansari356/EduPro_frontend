@@ -1,0 +1,20 @@
+:root{
+	--primary-color: #1a3967;
+	--secondary-color: #3390ec;
+	--muted-color:#d1bfbf;
+	scroll-behavior: smooth;
+}
+
+.primary-text{
+	color: var(--primary-color);
+}
+.secondary-text{
+	color: var(--secondary-color);
+}
+::placeholder{
+	color: var(--muted-color)  !important;
+} 
+
+.muted-bg{
+	background-color: var(--muted-color) !important;
+}

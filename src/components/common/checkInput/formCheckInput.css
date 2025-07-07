@@ -1,0 +1,14 @@
+.check-input-box{
+	display: flex !important;
+	gap: 10px;
+	align-items: center ! important;
+	margin-bottom: 10px;
+	border-radius: 0.75rem;
+	border:2px solid var(--bs-border-color);
+	padding: 10px;
+	cursor: pointer;
+}
+
+.check-input-box:hover{
+	border-color: var(--primary-color);
+}

@@ -1,0 +1,72 @@
+import { Button, Col, Row } from "react-bootstrap";
+import FormTextareaInput from "../../common/formTextareaInput";
+import FormTextInput from "../../common/formTextInput";
+import FormUploadFilesInput from "../../common/uploadFilesInput/formUploadFilesInput";
+import FormCheckInput from "../../common/checkInput/formCheckInput";
+FormCheckInput
+
+export default function CreateCourseForm({className}) {
+	return (
+		<form action="" method="post" className={className}>
+			<Row className="my-5">
+				<Col md={8} lg={6} xl={4}>
+					<FormTextInput
+						type="text"
+						label="Course Title"
+						placeholder="Enter course name"
+					/>
+					<FormTextareaInput
+						label="Course Description"
+						placeholder="Enter course description"
+					/>
+					<FormTextInput
+						type="text"
+						label="Topic"
+						placeholder="Enter cours topic"
+					/>
+					<FormTextInput
+						label={"Price"}
+						placeholder={"Enter course price"}
+						type={"number"}
+					/>
+				</Col>
+			</Row>
+			<Row className="my-5">
+				<Col lg={10} xl={8}>
+					<FormUploadFilesInput
+						placeholder={"Upload Course Image"}
+						label="Course Image"
+					/>
+					<div>
+						<h5 className="fw-bold mt-5">Course Type</h5>
+						<FormCheckInput
+							type={"radio"}
+							label={"Free Course"}
+							name={"paid"}
+							value={"free"}
+							helpText={"Free courses are accessible to all users."}
+						/>
+						<FormCheckInput
+							type={"radio"}
+							label={"Paid Course"}
+							name={"paid"}
+							value={"paid"}
+							helpText={"Paid courses require payment to access."}
+						/>
+					</div>
+				</Col>
+			</Row>
+			<Row className="my-5">
+				<Col lg={10} xl={8} className="d-flex gap-3 justify-content-end">
+					{/* Buttons go here */}
+					<Button className="fw-bold shadow-sm" variant="light" >
+						Save as Draft
+					</Button>
+					<Button className="fw-bold shadow-sm" variant="primary" type="submit">
+						Create Course
+					</Button>
+				</Col>
+			</Row>
+		</form>
+	);
+}

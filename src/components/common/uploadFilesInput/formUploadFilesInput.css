@@ -1,0 +1,31 @@
+
+
+.form-upload-dropzone {
+  border: 2px dashed var(--bs-border-color);
+  border-radius: 0.75rem;
+  padding: 1.5rem;
+  text-align: center;
+  transition: border-color 0.2s;
+  cursor: pointer;
+}
+.form-upload-dropzone:focus,
+.form-upload-dropzone:hover {
+  border-color: var(--primary-color);
+}
+.form-upload-files-list {
+  margin-top: 1rem;
+  padding-left: 0;
+  list-style: none;
+}
+.form-upload-file-item {
+  color: var(--secondary-color);
+  background: #fff;
+  border-radius: 0.5rem;
+  padding: 0.5rem 1rem;
+  margin-bottom: 0.5rem;
+  box-shadow: 0 1px 4px rgba(51, 144, 236, 0.08);
+  font-size: 0.95rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
