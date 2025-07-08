@@ -7,6 +7,7 @@ export default function FormCheckInput({
 	label,
 	className,
 	name,
+	checked,
 	helpText,
 	isError,
 	value
@@ -27,6 +28,7 @@ export default function FormCheckInput({
 						</Form.Text>
 					</Form.Label>
 				}
+				checked={checked}
 				value={value}
 				name={name}
 				type={type || "radio"}

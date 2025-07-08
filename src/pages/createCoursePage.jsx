@@ -1,4 +1,4 @@
-import { Col, Container, Row } from "react-bootstrap";
+import { Container } from "react-bootstrap";
 import MainTitle from "../components/common/mainTitle";
 import CreateCourseForm from "../components/forms/createCourseForm/createCourseForm";
 

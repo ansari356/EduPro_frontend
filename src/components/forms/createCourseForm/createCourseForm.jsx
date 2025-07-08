@@ -38,20 +38,20 @@ export default function CreateCourseForm({className}) {
 						label="Course Image"
 					/>
 					<div>
-						<h5 className="fw-bold mt-5">Course Type</h5>
+						<h5 className="fw-bold mt-5">Course State</h5>
 						<FormCheckInput
 							type={"radio"}
-							label={"Free Course"}
-							name={"paid"}
-							value={"free"}
-							helpText={"Free courses are accessible to all users."}
+							label={"Published Course"}
+							name={"published"}
+							value={true}
+							helpText={"This course is published, All students can access it"}
 						/>
 						<FormCheckInput
 							type={"radio"}
-							label={"Paid Course"}
-							name={"paid"}
-							value={"paid"}
-							helpText={"Paid courses require payment to access."}
+							label={"Hidden Course"}
+							name={"published"}
+							value={false}
+							helpText={"This course is hidden, Only you can access it"}
 						/>
 					</div>
 				</Col>
@@ -59,7 +59,7 @@ export default function CreateCourseForm({className}) {
 			<Row className="my-5">
 				<Col lg={10} xl={8} className="d-flex gap-3 justify-content-end">
 					{/* Buttons go here */}
-					<Button className="fw-bold shadow-sm" variant="light" >
+					<Button className="fw-bold shadow-sm" variant="light">
 						Save as Draft
 					</Button>
 					<Button className="fw-bold shadow-sm" variant="primary" type="submit">
