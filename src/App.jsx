@@ -1,5 +1,5 @@
 import { Route, Routes } from "react-router-dom";
-import Dashboard from "./components/EducatorDashboard/Dashboard";
+import Dashboard from "./components/EducatorDashboard/Dashboard Main/Dashboard";
 import NavbarLayout from "./components/layout/navbarLayout";
 import CreateCoursePage from "./pages/createCoursePage";
 import ManageCoursePage from "./pages/manageCoursePage";
