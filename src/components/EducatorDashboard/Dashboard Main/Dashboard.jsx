@@ -1,9 +1,9 @@
 import { Container, Row, Col } from "react-bootstrap";
-import CourseManagement from "./CourseManagement.jsx";
-import ActiveCourses from "./ActiveCourses.jsx";
-import UpcomingSessions from "./UpcomingSessions.jsx";
-import StudentetOverview from "./StudentetOverview.jsx";
-import SideBar from "./SideBar.jsx";
+import CourseManagement from "../Course Management/CourseManagement.jsx";
+import ActiveCourses from "../Active Courses/ActiveCourses.jsx";
+import UpcomingSessions from "../Upcoming Sessions/UpcomingSessions.jsx";
+import StudentetOverview from "../Student Overview/StudentetOverview.jsx";
+import SideBar from "../Sidebar/SideBar.jsx";
 import "./Dashboard.css";
 
 export default function Dashboard() {

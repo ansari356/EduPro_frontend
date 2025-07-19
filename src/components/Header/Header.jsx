@@ -1,5 +1,5 @@
 import { Navbar, Nav, Form, Dropdown } from "react-bootstrap";
-import "../components/EducatorDashboard/Dashboard.css";
+import "./Header.css";
 import { NavLink } from "react-router-dom";
 
 export default function Header() {

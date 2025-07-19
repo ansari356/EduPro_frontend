@@ -1,6 +1,6 @@
 import Scrollspy from 'react-scrollspy';
 import { BsBook, BsCalendarEvent, BsBarChartLine, BsGear } from 'react-icons/bs';
-import './Dashboard.css';
+import '../Sidebar/SideBar.css'; // Assuming you have a CSS file for styling
 
 const HEADER_HEIGHT = 80;
 

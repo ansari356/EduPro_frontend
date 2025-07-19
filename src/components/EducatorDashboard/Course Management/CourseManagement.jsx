@@ -1,6 +1,6 @@
 import { Card, Row, Col } from "react-bootstrap";
 import { BsPlusSquare, BsPencilSquare, BsChatDots } from "react-icons/bs";
-import "./Dashboard.css";
+import "../Course Management/CourseManagement.css";
 
 export default function CourseManagementTools() {
   const tools = [

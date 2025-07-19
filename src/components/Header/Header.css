@@ -1,0 +1,21 @@
+.search-bar-wrapper {
+  flex: 1;
+  max-width: 320px;
+}
+
+.search-icon {
+  position: absolute;
+  top: 50%;
+  left: 16px;
+  transform: translateY(-50%);
+  color: #1a3967;
+  font-size: 1.1rem;
+}
+
+.custom-search-input {
+  padding-left: 2.5rem;
+  background-color: #e3f0fd !important;
+  color: #1a3967 !important;
+  border: none;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+}
