@@ -3,7 +3,7 @@ import { Eye, EyeOff, User, Lock, Sun, Moon } from 'lucide-react';
 import { useNavigate } from "react-router-dom";
 
 export default function EducatorLoginPage() {
-  const [username, setUsername] = useState('');
+  const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [isDarkMode, setIsDarkMode] = useState(false);
@@ -55,14 +55,14 @@ export default function EducatorLoginPage() {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    if (!username || !password) {
-      alert('Please enter both username and password');
+    if (!email || !password) {
+      alert('Please enter both email and password');
       return;
     }
     setLoading(true);
     setTimeout(() => {
       setLoading(false);
-      alert(`Welcome, ${username}!`);
+      alert(`Welcome, ${email}!`);
       // navigate('/educator-dashboard'); // Uncomment when dashboard exists
     }, 1000);
   };
@@ -133,15 +133,15 @@ export default function EducatorLoginPage() {
                 <form onSubmit={handleSubmit}>
                   <div className="mb-4">
                     <label className={`form-label ${isDarkMode ? 'text-light' : 'text-dark'}`}>
-                      Username
+                      Email
                     </label>
                     <div className="position-relative">
                       <input
-                        type="text"
+                        type="email"
                         className={`form-control form-control-lg ${isDarkMode ? 'bg-dark text-white border-secondary' : ''}`}
-                        value={username}
-                        onChange={(e) => setUsername(e.target.value)}
-                        placeholder="Enter your username"
+                        value={email}
+                        onChange={(e) => setEmail(e.target.value)}
+                        placeholder="Enter your email"
                         disabled={loading}
                       />
                       <User className="position-absolute top-50 translate-middle-y text-muted" style={{ right: '12px' }} size={20} />
