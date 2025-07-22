@@ -1,7 +1,7 @@
 import { Container } from "react-bootstrap";
 import MainTitle from "../components/common/mainTitle";
 import SessionsAndStudentsTabs from "../components/sections/sessionsStudentsTabList";
-import CourseDetails from "../components/sections/course/coursDetails";
+import CourseDetails from "../components/sections/course/courseDetails";
 
 export default function ManageCoursePage() {
 	return (
