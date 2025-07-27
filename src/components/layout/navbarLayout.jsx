@@ -1,10 +1,10 @@
 import { Outlet } from "react-router-dom";
-import Header from "../Header/Header";
+import StudentHeader from "../Student Header/StudentHeader";
 
 export default function NavbarLayout() {
 	return (
 		<div>
-			<Header/>
+			<StudentHeader/>
 			<Outlet/>
 		</div>
 	);

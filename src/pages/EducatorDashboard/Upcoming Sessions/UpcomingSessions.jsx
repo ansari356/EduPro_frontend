@@ -1,6 +1,6 @@
 import Calendar from 'react-calendar';
 import 'react-calendar/dist/Calendar.css';
-import "../Upcoming Sessions/UpcomingSessions.css";
+import "./UpcomingSessions.css";
 
 export default function UpcomingSessions() {
   return (
