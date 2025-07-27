@@ -8,7 +8,7 @@ FormCheckInput
 export default function CreateCourseForm({className}) {
 	return (
 		<form action="" method="post" className={className}>
-			<Row className="my-5">
+			<Row>
 				<Col md={8} lg={6} xl={4}>
 					<FormTextInput
 						type="text"

@@ -6,7 +6,7 @@ export default function CourseDetails() {
 		<div className="my-5">
 			<Row
 				className="mb-4 overflow-hidden rounded"
-				style={{ maxHeight: "30vh" }}
+				style={{ maxHeight: "40vh" }}
 			>
 				<Col lg={8}>
 					<Card.Img
@@ -17,16 +17,9 @@ export default function CourseDetails() {
 			</Row>
 			<Row>
 				<Col lg={8}>
-					<SectionHeader
-						title="Introduction to Data Analysis"
-						buttonTitle={
-							<>
-								<i className="bi bi-pencil-square me-2"></i>
-								Edit
-							</>
-						}
-						buttonActionFunction={() => console.log("edit")}
-					/>
+					<h5 className="fw-bold mb-4 primary-text">
+						Introduction to Data Analysis
+					</h5>
 				</Col>
 			</Row>
 			<Row className="g-4">

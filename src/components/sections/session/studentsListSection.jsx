@@ -13,13 +13,6 @@ export default function StudentsListSection() {
 		<div className="my-5">
 			<SectionHeader
 				title="Students"
-				buttonTitle={
-					<>
-						<i className="bi bi-plus-lg me-2"></i>
-						Add Student
-					</>
-				}
-				buttonActionFunction={() => console.log("add Student")}
 			/>
 			<ListTable headerElements={studentsHeader} listOfRows={studentsRows} />
 		</div>

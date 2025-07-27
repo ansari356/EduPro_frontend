@@ -1,6 +1,7 @@
 :root{
 	--primary-color: #1a3967;
 	--secondary-color: #3390ec;
+	--transparent-color: rgba(51, 144, 236, 0.08);
 	--muted-color:#d1bfbf;
 	--main-gray: #f8f9fa;
 	scroll-behavior: smooth;
