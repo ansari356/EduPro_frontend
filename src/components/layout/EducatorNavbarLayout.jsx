@@ -1,5 +1,5 @@
 import { Outlet } from "react-router-dom";
-import EducatorHeader from "../Educator Header/EducatorHeader";
+import EducatorHeader from "../common/Headers/EducatorHeader";
 
 export default function EducatorNavbarLayout() {
     return (

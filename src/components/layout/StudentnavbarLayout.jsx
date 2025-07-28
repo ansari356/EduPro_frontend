@@ -1,5 +1,5 @@
 import { Outlet } from "react-router-dom";
-import StudentHeader from "../Student Header/StudentHeader";
+import StudentHeader from "../common/Headers/StudentHeader";
 
 export default function NavbarLayout() {
 	return (

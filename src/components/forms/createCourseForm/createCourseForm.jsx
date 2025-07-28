@@ -59,12 +59,12 @@ export default function CreateCourseForm({className}) {
 			<Row className="my-5">
 				<Col lg={10} xl={8} className="d-flex gap-3 justify-content-end">
 					{/* Buttons go here */}
-					<Button className="fw-bold shadow-sm" variant="light">
+					<button className="btn-edit-profile">
 						Save as Draft
-					</Button>
-					<Button className="fw-bold shadow-sm" variant="primary" type="submit">
+					</button>
+					<button className="btn-edit-profile">
 						Create Course
-					</Button>
+					</button>
 				</Col>
 			</Row>
 		</form>

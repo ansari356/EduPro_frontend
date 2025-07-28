@@ -1,6 +1,5 @@
 import { Navbar, Nav, Dropdown, Container } from "react-bootstrap";
 import { NavLink } from "react-router-dom";
-import "./StudentHeader.css";
 
 export default function StudentHeader() {
   return (

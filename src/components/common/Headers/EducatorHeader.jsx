@@ -1,6 +1,5 @@
 import { Navbar, Nav, Dropdown, Container } from "react-bootstrap";
 import { NavLink } from "react-router-dom";
-import "./EducatorHeader.css";
 
 export default function EducatorHeader() {
   return (

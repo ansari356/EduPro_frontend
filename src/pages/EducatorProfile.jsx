@@ -73,11 +73,10 @@ function EducatorProfile() {
   return (
     <div
       className="min-vh-100 profile-root p-4"
-      style={{ backgroundColor: "#f5f5f5" }}
     >
       {showEditForm && (
-        <div className="container">
-          <div className="mt-4 w-100">
+        <div className="container w-75 d-flex justify-content-center">
+          <div className="mt-4 card card-body ">
             <h5 className="fw-bold mb-3 section-title">Edit Profile</h5>
 
             <form onSubmit={handleSubmitRequest}>
@@ -86,7 +85,7 @@ function EducatorProfile() {
                 <label className="form-label about-subtitle fw-medium">Full Name</label>
                 <input
                   type="text"
-                  className="form-control border border-primary"
+                  className="form-control"
                   name="name"
                   value={formData.name}
                   onChange={handleInputChange}
@@ -99,7 +98,7 @@ function EducatorProfile() {
                 <label className="form-label about-subtitle fw-medium">Institution</label>
                 <input
                   type="text"
-                  className="form-control border border-primary"
+                  className="form-control"
                   name="institution"
                   value={formData.institution}
                   onChange={handleInputChange}
@@ -111,7 +110,7 @@ function EducatorProfile() {
               <div className="mb-3">
                 <label className="form-label about-subtitle fw-medium">Bio</label>
                 <textarea
-                  className="form-control border border-primary"
+                  className="form-control"
                   name="bio"
                   rows="4"
                   value={formData.bio}
@@ -124,7 +123,7 @@ function EducatorProfile() {
                 <label className="form-label about-subtitle fw-medium">Email</label>
                 <input
                   type="email"
-                  className="form-control border border-primary"
+                  className="form-control"
                   name="email"
                   value={formData.email}
                   onChange={handleInputChange}
@@ -137,7 +136,7 @@ function EducatorProfile() {
                 <label className="form-label about-subtitle fw-medium">Phone</label>
                 <input
                   type="tel"
-                  className="form-control border border-primary"
+                  className="form-control"
                   name="phone"
                   value={formData.phone}
                   onChange={handleInputChange}
@@ -149,7 +148,7 @@ function EducatorProfile() {
                 <label className="form-label about-subtitle fw-medium">Profile Image</label>
                 <input
                   type="file"
-                  className="form-control border border-primary"
+                  className="form-control"
                   name="profileImage"
                   accept="image/*"
                   onChange={handleInputChange}
@@ -172,14 +171,14 @@ function EducatorProfile() {
               {/* Submit Button */}
               <button
                 type="submit"
-                className="btn btn-light px-4 btn-edit-profile"
+                className="px-4 btn-edit-profile"
               >
                 Update Profile
               </button>
               <button
                 type="button"
                 onClick={() => setShowEditForm(false)}
-                className="ms-2 btn btn-light px-4 btn-edit-profile"
+                className="ms-2 px-4 btn-edit-profile"
               >
                 Cancel
               </button>
@@ -197,7 +196,7 @@ function EducatorProfile() {
             </h2>
             <div className="d-flex align-items-center">
               <button
-                className="btn btn-light px-4 btn-edit-profile me-2"
+                className="px-4 btn-edit-profile me-2"
                 aria-label="Edit Profile"
                 onClick={() => setShowEditForm(true)}
               >
@@ -210,8 +209,8 @@ function EducatorProfile() {
           <div className="row g-4">
             {/* Profile Card */}
             <div className="col-lg-6">
-              <div className="card h-100 shadow-sm">
-                <div className="card-body p-4">
+              <div className="illustration-card shadow-sm">
+                <div className="container">
                   <div className="d-flex align-items-start mb-4">
                     <img
                       src={profileImageUrl}
@@ -224,50 +223,58 @@ function EducatorProfile() {
                       <h4 className="fw-bold mb-1 profile-main-title">
                         {formData.name}
                       </h4>
-                      <div className="text-accent small">Educator</div>
-                      <div className="text-accent small">Joined 2021</div>
+                      <div className=" small">Educator</div>
+                      <div className=" small">Joined 2021</div>
                     </div>
                   </div>
 
                   {/* About Section */}
-                  <h5 className="fw-bold section-title mb-3">About</h5>
+                  <h5 className="fw-bold  mb-3">About</h5>
                   <div className="row">
-                    <div className="col-8">
+                    <div className="col-xl-8">
                       <div className="d-flex flex-column gap-2">
-                        <div className="d-flex align-items-center px-3">
-                          <i className="bi bi-building me-2 text-primary"></i>
-                          <div>
-                            <strong className="me-2 about-subtitle">Institution:</strong>
-                            <span className="fw-medium">{formData.institution}</span>
+                        <div className="d-flex">
+                            <i className="bi bi-building text-primary"></i>
+                          <div className="d-flex flex-sm-row flex-column px-3">
+                              <strong className="me-2">Institution:</strong>
+                              <span className="text-light small">{formData.institution}</span>
                           </div>
                         </div>
-                        <div className="d-flex align-items-center px-3">
-                          <i className="bi bi-envelope me-2 text-primary"></i>
-                          <strong className="me-2 about-subtitle">Email:</strong>
-                          <span className="fw-medium">{formData.email}</span>
+                        <div className="d-flex">
+                            <i className="bi bi-envelope text-primary"></i>
+                          <div className="d-flex flex-sm-row flex-column px-3">
+                            <strong className="me-2 ">Email:</strong>
+                            <span className="small">{formData.email}</span>
+                          </div>
                         </div>
-                        <div className="d-flex align-items-center px-3">
-                          <i className="bi bi-telephone me-2 text-primary"></i>
-                          <strong className="me-2 about-subtitle">Phone:</strong>
-                          <span className="fw-medium">{formData.phone}</span>
+                        <div className="d-flex">
+                          <i className="bi bi-telephone text-primary"></i>
+                        <div className="d-flex flex-sm-row flex-column px-3">
+                          <strong className="me-2 ">Phone:</strong>
+                          <span className="small">{formData.phone}</span>
                         </div>
-                        <div className="d-flex align-items-center px-3">
-                          <i className="bi bi-calendar-event me-2 text-primary"></i>
-                          <strong className="me-2 about-subtitle">Experience:</strong>
-                          <span className="fw-medium">10+ Years</span>
                         </div>
-                        <div className="d-flex align-items-center px-3">
-                          <i className="bi bi-mortarboard me-2 text-primary"></i>
-                          <strong className="me-2 about-subtitle">Specialization:</strong>
-                          <span className="fw-medium">Psychology & Research</span>
+                        <div className="d-flex">
+                          <i className="bi bi-calendar-event text-primary"></i>
+                        <div className="d-flex flex-sm-row flex-column px-3">
+                          <strong className="me-2 ">Experience:</strong>
+                          <span className="small">10+ Years</span>
+                        </div>
+                        </div>
+                        <div className="d-flex">
+                          <i className="bi bi-mortarboard text-primary"></i>
+                        <div className="d-flex flex-sm-row flex-column px-3">
+                          <strong className="me-2 ">Specialization:</strong>
+                          <span className="small">Psychology & Research</span>
+                        </div>
                         </div>
                       </div>
                     </div>
 
                     {/* QR Code */}
-                    <div className="col-4 d-flex flex-column align-items-center justify-content-center">
+                    <div className="col-xl-4 d-flex flex-column mt-4 align-items-center justify-content-center">
                       <div className="text-center mb-2">
-                        <small className="fw-bold about-subtitle fw-medium">
+                        <small className="fw-bold fw-medium">
                           Educator QR
                         </small>
                       </div>
@@ -283,7 +290,7 @@ function EducatorProfile() {
 
                   {/* Bio Section */}
                   <div className="mt-4">
-                    <h6 className="fw-bold about-subtitle mb-2">Bio</h6>
+                    <h6 className="fw-bold mb-2">Bio</h6>
                     <div className="about-bubble px-3 py-2">
                       <p className="mb-0 fw-medium" style={{ fontSize: "0.9rem", lineHeight: "1.5" }}>
                         {formData.bio}
