@@ -1,17 +1,17 @@
 import { Route, Routes } from "react-router-dom";
-import NavbarLayout from "./components/layout/StudentnavbarLayout";
-import CreateCoursePage from "./pages/createCoursePage";
-import EducatorSignupPage from "./pages/educatorSignupPage";
-import EducatorLoginPage from "./pages/educatorLoginPage";
-import StudentSignupPage from "./pages/studentSignupPage";
-import StudentLoginPage from "./pages/studentLoginPage";
-import ManageCoursePage from "./pages/manageCoursePage";
-import CoursesManagementPage from "./pages/coursesManagementPage";
-import CourseDetailsSection from "./components/sections/course/courseDetailsSection";
-import EducatorProfile from "./pages/EducatorProfile";
-import StudentProfile from "./pages/StudentProfile";
+import CreateCoursePage from "./pages/Educator/createCoursePage";
+import EducatorSignupPage from "./pages/Educator/educatorSignupPage";
+import EducatorLoginPage from "./pages/Educator/educatorLoginPage";
+import StudentSignupPage from "./pages/Student/studentSignupPage";
+import StudentLoginPage from "./pages/Student/studentLoginPage";
+import EducatorProfile from "./pages/Educator/EducatorProfile";
+import StudentProfile from "./pages/Student/StudentProfile";
+import CoursesList from "./pages/Educator/CoursesList";
 import EducatorNavbarLayout from "./components/layout/EducatorNavbarLayout";
-
+import StudentnavbarLayout from "./components/layout/StudentnavbarLayout";
+import EducatorCourseDetailsPage from "./pages/Educator/EducatorCourseDetails";
+import StudentCourseDetailsPage from "./pages/Student/StudentCourseDetails";
+import EditCoursePage from "./pages/Educator/EducatorEditCoursePage";
 function App() {
   return (
     <Routes>
@@ -26,22 +26,25 @@ function App() {
         path="/:teacher-name/student-signup"
         element={<StudentSignupPage />}
       />
-				<Route path="courses" element={<CoursesManagementPage />}>
-					<Route path="create" element={<CreateCoursePage />} />
-					<Route path=":id" element={<CourseDetailsSection />} />
-				</Route>
       <Route>
         {/* Educator User Section */}
         <Route element={<EducatorNavbarLayout />}>
-        <Route path="educator-profile" element={<EducatorProfile />} />
+          <Route path="educator-profile" element={<EducatorProfile />} />
+          <Route path="courses">
+            <Route index element={<CoursesList />} />
+            <Route path=":id" element={<EducatorCourseDetailsPage />} />
+            <Route path="create" element={<CreateCoursePage />} />
+            <Route path="edit/:courseId" element={<EditCoursePage />} />
+          </Route>
         </Route>
         {/* Student User Section */}
-        <Route element={<NavbarLayout />}>
+        <Route element={<StudentnavbarLayout />}>
           <Route path="student-profile" element={<StudentProfile />} />
+          <Route path="student-courses">
+            <Route path=":id" element={<StudentCourseDetailsPage />} />
+          </Route>
         </Route>
       </Route>
-
-      
     </Routes>
   );
 }

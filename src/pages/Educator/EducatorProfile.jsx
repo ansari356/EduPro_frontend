@@ -2,6 +2,7 @@ import React from "react";
 import "bootstrap/dist/css/bootstrap.min.css";
 import "bootstrap-icons/font/bootstrap-icons.css";
 import { useState } from "react";
+import { Link } from "react-router-dom";
 
 function EducatorProfile() {
   const [showEditForm, setShowEditForm] = useState(false);
@@ -15,7 +16,9 @@ function EducatorProfile() {
   });
 
   // Add state for the profile image URL
-  const [profileImageUrl, setProfileImageUrl] = useState("https://placehold.co/120x120?text=Educator");
+  const [profileImageUrl, setProfileImageUrl] = useState(
+    "https://placehold.co/120x120?text=Educator"
+  );
 
   const handleInputChange = (e) => {
     const { name, value, type, files } = e.target;
@@ -36,7 +39,7 @@ function EducatorProfile() {
 
   const handleSubmitRequest = (e) => {
     e.preventDefault();
-    
+
     // Validation
     if (!formData.name.trim()) {
       alert("Please enter a valid name.");
@@ -56,24 +59,27 @@ function EducatorProfile() {
   };
 
   const courses = [
-    { name: 'Introduction to Psychology', students: 50, status: 'Active' },
-    { name: 'Advanced Research Methods', students: 25, status: 'Active' },
-    { name: 'Educational Psychology', students: 40, status: 'Inactive' },
-    { name: 'Cognitive Psychology', students: 35, status: 'Active' },
-    { name: 'Statistics for Psychology', students: 28, status: 'Active' },
+    { name: "Introduction to Psychology", students: 50, status: "Active" },
+    { name: "Advanced Research Methods", students: 25, status: "Active" },
+    { name: "Educational Psychology", students: 40, status: "Inactive" },
+    { name: "Cognitive Psychology", students: 35, status: "Active" },
+    { name: "Statistics for Psychology", students: 28, status: "Active" },
   ];
 
   const handleRowClick = (courseName) => {
     window.location.href = `/courses/${encodeURIComponent(courseName)}`;
   };
 
-  const totalStudents = courses.reduce((sum, course) => sum + course.students, 0);
-  const activeCourses = courses.filter(course => course.status === 'Active').length;
+  const totalStudents = courses.reduce(
+    (sum, course) => sum + course.students,
+    0
+  );
+  const activeCourses = courses.filter(
+    (course) => course.status === "Active"
+  ).length;
 
   return (
-    <div
-      className="min-vh-100 profile-root p-4"
-    >
+    <div className="min-vh-100 profile-root p-4">
       {showEditForm && (
         <div className="container w-75 d-flex justify-content-center">
           <div className="mt-4 card card-body ">
@@ -82,7 +88,9 @@ function EducatorProfile() {
             <form onSubmit={handleSubmitRequest}>
               {/* Name */}
               <div className="mb-3">
-                <label className="form-label about-subtitle fw-medium">Full Name</label>
+                <label className="form-label about-subtitle fw-medium">
+                  Full Name
+                </label>
                 <input
                   type="text"
                   className="form-control"
@@ -95,7 +103,9 @@ function EducatorProfile() {
 
               {/* Institution */}
               <div className="mb-3">
-                <label className="form-label about-subtitle fw-medium">Institution</label>
+                <label className="form-label about-subtitle fw-medium">
+                  Institution
+                </label>
                 <input
                   type="text"
                   className="form-control"
@@ -108,7 +118,9 @@ function EducatorProfile() {
 
               {/* Bio */}
               <div className="mb-3">
-                <label className="form-label about-subtitle fw-medium">Bio</label>
+                <label className="form-label about-subtitle fw-medium">
+                  Bio
+                </label>
                 <textarea
                   className="form-control"
                   name="bio"
@@ -120,7 +132,9 @@ function EducatorProfile() {
 
               {/* Email */}
               <div className="mb-3">
-                <label className="form-label about-subtitle fw-medium">Email</label>
+                <label className="form-label about-subtitle fw-medium">
+                  Email
+                </label>
                 <input
                   type="email"
                   className="form-control"
@@ -133,7 +147,9 @@ function EducatorProfile() {
 
               {/* Phone */}
               <div className="mb-3">
-                <label className="form-label about-subtitle fw-medium">Phone</label>
+                <label className="form-label about-subtitle fw-medium">
+                  Phone
+                </label>
                 <input
                   type="tel"
                   className="form-control"
@@ -145,7 +161,9 @@ function EducatorProfile() {
 
               {/* Profile Image Upload */}
               <div className="mb-3">
-                <label className="form-label about-subtitle fw-medium">Profile Image</label>
+                <label className="form-label about-subtitle fw-medium">
+                  Profile Image
+                </label>
                 <input
                   type="file"
                   className="form-control"
@@ -157,10 +175,14 @@ function EducatorProfile() {
                   <div className="mt-2">
                     <small className="text-muted">Preview:</small>
                     <div className="mt-1">
-                      <img 
-                        src={profileImageUrl} 
-                        alt="Profile preview" 
-                        style={{ width: "60px", height: "60px", objectFit: "cover" }}
+                      <img
+                        src={profileImageUrl}
+                        alt="Profile preview"
+                        style={{
+                          width: "60px",
+                          height: "60px",
+                          objectFit: "cover",
+                        }}
                         className="rounded-circle"
                       />
                     </div>
@@ -169,10 +191,7 @@ function EducatorProfile() {
               </div>
 
               {/* Submit Button */}
-              <button
-                type="submit"
-                className="px-4 btn-edit-profile"
-              >
+              <button type="submit" className="px-4 btn-edit-profile">
                 Update Profile
               </button>
               <button
@@ -191,7 +210,7 @@ function EducatorProfile() {
         <div className="container-fluid">
           {/* Header */}
           <div className="d-flex justify-content-between align-items-center mb-4">
-            <h2 className="fw-bold profile-main-title" tabIndex={0}>
+            <h2 className="fw-bold profile-main-title main-title" tabIndex={0}>
               Educator Profile
             </h2>
             <div className="d-flex align-items-center">
@@ -216,7 +235,11 @@ function EducatorProfile() {
                       src={profileImageUrl}
                       alt="avatar"
                       className="rounded-circle me-3"
-                      style={{ width: "100px", height: "100px", objectFit: "cover" }}
+                      style={{
+                        width: "100px",
+                        height: "100px",
+                        objectFit: "cover",
+                      }}
                       aria-label="Educator avatar"
                     />
                     <div>
@@ -234,14 +257,16 @@ function EducatorProfile() {
                     <div className="col-xl-8">
                       <div className="d-flex flex-column gap-2">
                         <div className="d-flex">
-                            <i className="bi bi-building text-primary"></i>
+                          <i className="bi bi-building text-primary"></i>
                           <div className="d-flex flex-sm-row flex-column px-3">
-                              <strong className="me-2">Institution:</strong>
-                              <span className="text-light small">{formData.institution}</span>
+                            <strong className="me-2">Institution:</strong>
+                            <span className="text-light small">
+                              {formData.institution}
+                            </span>
                           </div>
                         </div>
                         <div className="d-flex">
-                            <i className="bi bi-envelope text-primary"></i>
+                          <i className="bi bi-envelope text-primary"></i>
                           <div className="d-flex flex-sm-row flex-column px-3">
                             <strong className="me-2 ">Email:</strong>
                             <span className="small">{formData.email}</span>
@@ -249,24 +274,24 @@ function EducatorProfile() {
                         </div>
                         <div className="d-flex">
                           <i className="bi bi-telephone text-primary"></i>
-                        <div className="d-flex flex-sm-row flex-column px-3">
-                          <strong className="me-2 ">Phone:</strong>
-                          <span className="small">{formData.phone}</span>
-                        </div>
+                          <div className="d-flex flex-sm-row flex-column px-3">
+                            <strong className="me-2 ">Phone:</strong>
+                            <span className="small">{formData.phone}</span>
+                          </div>
                         </div>
                         <div className="d-flex">
                           <i className="bi bi-calendar-event text-primary"></i>
-                        <div className="d-flex flex-sm-row flex-column px-3">
-                          <strong className="me-2 ">Experience:</strong>
-                          <span className="small">10+ Years</span>
-                        </div>
+                          <div className="d-flex flex-sm-row flex-column px-3">
+                            <strong className="me-2 ">Experience:</strong>
+                            <span className="small">10+ Years</span>
+                          </div>
                         </div>
                         <div className="d-flex">
                           <i className="bi bi-mortarboard text-primary"></i>
-                        <div className="d-flex flex-sm-row flex-column px-3">
-                          <strong className="me-2 ">Specialization:</strong>
-                          <span className="small">Psychology & Research</span>
-                        </div>
+                          <div className="d-flex flex-sm-row flex-column px-3">
+                            <strong className="me-2 ">Specialization:</strong>
+                            <span className="small">Psychology & Research</span>
+                          </div>
                         </div>
                       </div>
                     </div>
@@ -274,13 +299,13 @@ function EducatorProfile() {
                     {/* QR Code */}
                     <div className="col-xl-4 d-flex flex-column mt-4 align-items-center justify-content-center">
                       <div className="text-center mb-2">
-                        <small className="fw-bold fw-medium">
-                          Educator QR
-                        </small>
+                        <small className="fw-bold fw-medium">Educator QR</small>
                       </div>
                       <div className="qr-container">
                         <img
-                          src={`https://api.qrserver.com/v1/create-qr-code/?size=120x120&data=EducatorProfile:${encodeURIComponent(formData.name)}`}
+                          src={`https://api.qrserver.com/v1/create-qr-code/?size=120x120&data=EducatorProfile:${encodeURIComponent(
+                            formData.name
+                          )}`}
                           alt="QR Code"
                           className="qr-code-img"
                         />
@@ -292,7 +317,10 @@ function EducatorProfile() {
                   <div className="mt-4">
                     <h6 className="fw-bold mb-2">Bio</h6>
                     <div className="about-bubble px-3 py-2">
-                      <p className="mb-0 fw-medium" style={{ fontSize: "0.9rem", lineHeight: "1.5" }}>
+                      <p
+                        className="mb-0 fw-medium"
+                        style={{ fontSize: "0.9rem", lineHeight: "1.5" }}
+                      >
                         {formData.bio}
                       </p>
                     </div>
@@ -301,30 +329,43 @@ function EducatorProfile() {
               </div>
             </div>
 
-            {/* Rest of your existing code for Stats and Performance Column remains the same */}
             <div className="col-lg-6">
               {/* Stats Card */}
               <div className="card shadow-sm mb-4">
                 <div className="card-body p-4">
-                  <h5 className="fw-bold section-title mb-3">Teaching Statistics</h5>
-                  
+                  <h5 className="fw-bold section-title mb-3">
+                    Teaching Statistics
+                  </h5>
+
                   <div className="row text-center">
                     <div className="col-4">
                       <div className="about-bubble p-3 text-center">
-                        <h4 className="fw-bold mb-1 text-primary">{courses.length}</h4>
-                        <small className="about-subtitle fw-medium">Total Courses</small>
+                        <h4 className="fw-bold mb-1 text-primary">
+                          {courses.length}
+                        </h4>
+                        <small className="about-subtitle fw-medium">
+                          Total Courses
+                        </small>
                       </div>
                     </div>
                     <div className="col-4">
                       <div className="about-bubble p-3 text-center">
-                        <h4 className="fw-bold mb-1 text-primary">{activeCourses}</h4>
-                        <small className="about-subtitle fw-medium">Active Courses</small>
+                        <h4 className="fw-bold mb-1 text-primary">
+                          {activeCourses}
+                        </h4>
+                        <small className="about-subtitle fw-medium">
+                          Active Courses
+                        </small>
                       </div>
                     </div>
                     <div className="col-4">
                       <div className="about-bubble p-3 text-center">
-                        <h4 className="fw-bold mb-1 text-primary">{totalStudents}</h4>
-                        <small className="about-subtitle fw-medium">Total Students</small>
+                        <h4 className="fw-bold mb-1 text-primary">
+                          {totalStudents}
+                        </h4>
+                        <small className="about-subtitle fw-medium">
+                          Total Students
+                        </small>
                       </div>
                     </div>
                   </div>
@@ -336,29 +377,43 @@ function EducatorProfile() {
                 <div className="card-body p-4">
                   <h5 className="fw-bold section-title mb-3">Quick Actions</h5>
                   <div className="d-flex flex-column gap-2">
-                    <div className="about-bubble px-3 py-2 d-flex align-items-center">
-                      <i className="bi bi-plus-circle me-3 text-primary" style={{ fontSize: "1.2rem" }}></i>
-                      <div className="flex-grow-1">
-                        <span className="fw-medium">Create New Course</span>
+                    <Link to="/courses-list/create" style={{textDecoration: "none"}}>
+                      <div className="about-bubble px-3 py-2 d-flex align-items-center">
+                        <i
+                          className="bi bi-plus-circle me-3 text-primary"
+                          style={{ fontSize: "1.2rem" }}
+                        ></i>
+                        <div className="flex-grow-1">
+                          <span className="fw-medium">Create New Course</span>
+                        </div>
+                        <i className="bi bi-chevron-right text-primary"></i>
                       </div>
-                      <i className="bi bi-chevron-right text-primary"></i>
-                    </div>
+                    </Link>
                     <div className="about-bubble px-3 py-2 d-flex align-items-center">
-                      <i className="bi bi-people me-3 text-primary" style={{ fontSize: "1.2rem" }}></i>
+                      <i
+                        className="bi bi-people me-3 text-primary"
+                        style={{ fontSize: "1.2rem" }}
+                      ></i>
                       <div className="flex-grow-1">
                         <span className="fw-medium">Manage Students</span>
                       </div>
                       <i className="bi bi-chevron-right text-primary"></i>
                     </div>
                     <div className="about-bubble px-3 py-2 d-flex align-items-center">
-                      <i className="bi bi-calendar-check me-3 text-primary" style={{ fontSize: "1.2rem" }}></i>
+                      <i
+                        className="bi bi-calendar-check me-3 text-primary"
+                        style={{ fontSize: "1.2rem" }}
+                      ></i>
                       <div className="flex-grow-1">
                         <span className="fw-medium">Schedule Classes</span>
                       </div>
                       <i className="bi bi-chevron-right text-primary"></i>
                     </div>
                     <div className="about-bubble px-3 py-2 d-flex align-items-center">
-                      <i className="bi bi-bar-chart me-3 text-primary" style={{ fontSize: "1.2rem" }}></i>
+                      <i
+                        className="bi bi-bar-chart me-3 text-primary"
+                        style={{ fontSize: "1.2rem" }}
+                      ></i>
                       <div className="flex-grow-1">
                         <span className="fw-medium">View Analytics</span>
                       </div>
@@ -385,43 +440,67 @@ function EducatorProfile() {
                       <table className="table table-borderless">
                         <thead>
                           <tr className="border-bottom">
-                            <th scope="col" className="fw-bold">Course Name</th>
-                            <th scope="col" className="fw-bold">Students</th>
-                            <th scope="col" className="fw-bold">Status</th>
-                            <th scope="col" className="fw-bold">Actions</th>
+                            <th scope="col" className="fw-bold">
+                              Course Name
+                            </th>
+                            <th scope="col" className="fw-bold">
+                              Students
+                            </th>
+                            <th scope="col" className="fw-bold">
+                              Status
+                            </th>
+                            <th scope="col" className="fw-bold">
+                              Actions
+                            </th>
                           </tr>
                         </thead>
                         <tbody>
                           {courses.map((course, idx) => (
-                            <tr 
-                              key={idx} 
+                            <tr
+                              key={idx}
                               className="border-bottom"
                               style={{ cursor: "pointer" }}
                               onClick={() => handleRowClick(course.name)}
                             >
-                              <td className="fw-medium text-primary">{course.name}</td>
+                              <td className="fw-medium text-primary">
+                                {course.name}
+                              </td>
                               <td className="fw-medium">{course.students}</td>
                               <td>
-                                <span className={`badge ${course.status === 'Active' ? 'bg-primary' : 'bg-secondary'}`}>
+                                <span
+                                  className={`badge ${
+                                    course.status === "Active"
+                                      ? "bg-primary"
+                                      : "bg-secondary"
+                                  }`}
+                                >
                                   {course.status}
                                 </span>
                               </td>
                               <td>
                                 <div className="d-flex gap-2">
-                                  <button className="btn btn-sm" style={{ 
-                                    backgroundColor: "var(--color-surface)", 
-                                    color: "var(--color-primary-light)",
-                                    border: "1px solid var(--color-border-light)",
-                                    borderRadius: "0.5rem"
-                                  }}>
+                                  <button
+                                    className="btn btn-sm"
+                                    style={{
+                                      backgroundColor: "var(--color-surface)",
+                                      color: "var(--color-primary-light)",
+                                      border:
+                                        "1px solid var(--color-border-light)",
+                                      borderRadius: "0.5rem",
+                                    }}
+                                  >
                                     <i className="bi bi-eye"></i>
                                   </button>
-                                  <button className="btn btn-sm" style={{ 
-                                    backgroundColor: "var(--color-surface)", 
-                                    color: "var(--color-primary-light)",
-                                    border: "1px solid var(--color-border-light)",
-                                    borderRadius: "0.5rem"
-                                  }}>
+                                  <button
+                                    className="btn btn-sm"
+                                    style={{
+                                      backgroundColor: "var(--color-surface)",
+                                      color: "var(--color-primary-light)",
+                                      border:
+                                        "1px solid var(--color-border-light)",
+                                      borderRadius: "0.5rem",
+                                    }}
+                                  >
                                     <i className="bi bi-pencil"></i>
                                   </button>
                                 </div>

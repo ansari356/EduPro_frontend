@@ -39,7 +39,7 @@ export default function StudentHeader() {
               <Dropdown.Toggle
                 variant="outline-primary"
                 id="dropdown-user"
-                className="user-dropdown-toggle"
+                className="dropdown-toggle"
                 aria-label="User menu"
               >
                 <div className="user-avatar">

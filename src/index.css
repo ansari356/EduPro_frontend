@@ -67,7 +67,7 @@ body {
   outline: none;
 }
 
-/* Card components - using CSS Grid for better layout performance */
+/* Card components*/
 .card {
   background-color: var(--color-card-background);
   border: 1px solid var(--color-border);
@@ -83,6 +83,14 @@ body {
 
 .card-body {
   padding: var(--spacing-xl);
+}
+.courses-card{
+  background-color: var(--color-card-background);
+  border: 1px solid var(--color-border);
+  border-radius: var(--border-radius-lg);
+  box-shadow: var(--shadow-light);
+  transition: box-shadow var(--transition-medium);
+  overflow: hidden;
 }
 
 /* Profile avatar - optimized for performance */
@@ -147,6 +155,7 @@ body {
 }
 
 /* Button system */
+/* Button 1 */
 .btn-edit-profile {
   background-color: var(--color-surface)!important;
   color: var(--color-primary-light);
@@ -168,8 +177,8 @@ body {
 .btn-edit-profile:hover,
 .btn-edit-profile:focus {
   background-color: #c2dbfa;
-  color: var(--color-primary-dark);
   outline: none;
+  color: var(--color-primary-dark);
   box-shadow: var(--shadow-focus);
   transform: translateY(-1px);
 }
@@ -177,6 +186,65 @@ body {
 .btn-edit-profile:active {
   transform: translateY(0);
 }
+/* Button 2: Secondary */
+.btn-secondary-action {
+  background-color: var(--color-primary-light) !important;
+  color: var(--color-card-background);
+  font-weight: 600;
+  border-radius: var(--border-radius-md);
+  padding: var(--spacing-sm) var(--spacing-xl);
+  border: 1px solid var(--color-border) !important;
+  cursor: pointer;
+  transition: all var(--transition-fast);
+  font-size: var(--font-size-base);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  text-decoration: none;
+  transform: translateY(0);
+}
+
+.btn-secondary-action:hover,
+.btn-secondary-action:focus {
+  outline: none;
+  box-shadow: var(--shadow-focus);
+  transform: translateY(-1px);
+}
+
+.btn-secondary-action:active {
+  transform: translateY(0);
+}
+
+/* Button 3: danger */
+.btn-secondary-danger {
+  background-color: rgba(255, 87, 87, 0.1) !important;
+  color: #d32f2f; 
+  font-weight: 600;
+  border-radius: var(--border-radius-md);
+  padding: var(--spacing-sm) var(--spacing-xl);
+  border: 1px solid var(--color-border) !important;
+  cursor: pointer;
+  transition: all var(--transition-fast);
+  font-size: var(--font-size-base);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  text-decoration: none;
+  transform: translateY(0);
+}
+
+.btn-secondary-danger:hover,
+.btn-secondary-danger:focus {
+  outline: none;
+  color: #b71c1c;
+  box-shadow: 0 0 0 0.27rem rgba(211, 47, 47, 0.25);
+  transform: translateY(-1px);
+}
+
+.btn-secondary-danger:active {
+  transform: translateY(0);
+}
+
 
 /* About section bubbles */
 .about-bubble {
@@ -426,16 +494,15 @@ form .form-check-input:checked {
 
 /* Avatar Components */
 .avatar-circle {
-  width: 80px;
-  height: 80px;
+ padding: 10px;
   border-radius: var(--border-radius-full);
   display: flex;
   align-items: center;
   justify-content: center;
   font-size: 2rem;
-  margin: 0 auto var(--spacing-md);
   background-color: var(--color-surface);
   border: 2px solid var(--color-border-light);
+  width: fit-content;
 }
 
 .header-avatar {
@@ -615,3 +682,88 @@ form .form-check-input:checked {
 .btn-link-custom:hover {
   text-decoration: underline;
 }
+/* Dropdown Toggle */
+.dropdown-toggle::after {
+  display: none !important;
+}
+
+.dropdown-toggle {
+  border: none !important;
+  padding: 0;
+  background: transparent !important;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 48px;  
+  height: 48px;  
+  border-radius: 50%; 
+  transition: background-color 0.2s ease;
+}
+
+.dropdown-toggle:hover,
+.dropdown-toggle:focus,
+.dropdown-toggle:active,
+.show > .dropdown-toggle {
+  background-color: var(--color-primary-dark); 
+}
+.user-avatar {
+  font-size: 24px;
+  color: var(--color-primary);
+}
+
+/* Clickable card variant */
+.card-hoverable {
+  cursor: pointer;
+  transition: all var(--transition-fast);
+  margin: 5px;
+}
+
+.card-hoverable:hover {
+  transform: translateY(-2px);
+  color: var(--color-primary-dark);
+  box-shadow: var(--shadow-focus);
+  transform: translateY(-1px);
+}
+
+.card-hoverable:active {
+  transform: translateY(0);
+}
+.card-hoverable img {
+  transition: transform var(--transition-fast);
+}
+
+.card-hoverable:hover img {
+  transform: scale(1.03);
+}
+
+/* Card image */
+.course-card-image {
+  width: 100%;
+  height: 180px;
+  object-fit: cover;
+}
+/* Course detail image */
+.course-detail-image {
+  width: 100%;
+  max-height: 350px;
+  object-fit: cover;
+  border-radius: var(--border-radius-lg);
+  border: 2px solid var(--color-border);
+  box-shadow: var(--shadow-light);
+}
+/* Loading spinner animation */
+.loading-spinner {
+  width: 2rem;
+  height: 2rem;
+  border: 3px solid var(--color-border);
+  border-top: 3px solid var(--color-accent);
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+  display: inline-block;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+

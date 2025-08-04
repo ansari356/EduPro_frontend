@@ -24,11 +24,11 @@ export default function EducatorHeader() {
               <i className="bi bi-person-badge me-2"></i>
               My Profile
             </Nav.Link>
-            <Nav.Link as={NavLink} to="/my-courses" className="nav-link-custom">
+            <Nav.Link as={NavLink} to="/courses" className="nav-link-custom">
               <i className="bi bi-book me-2"></i>
               My Courses
             </Nav.Link>
-            <Nav.Link as={NavLink} to="/create-course" className="nav-link-custom">
+            <Nav.Link as={NavLink} to="/courses-list/create" className="nav-link-custom">
               <i className="bi bi-plus-circle me-2"></i>
               Create Course
             </Nav.Link>
