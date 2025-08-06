@@ -4,24 +4,91 @@ import "bootstrap-icons/font/bootstrap-icons.css";
 import { useState } from "react";
 import { Link } from "react-router-dom";
 import useEducatorProfileData from "../../apis/hooks/educator/useEducatorProfileData";
+import updateEducatorProfile from "../../apis/actions/educator/updateEducatorProfile";
 import { pagePaths } from "../../pagePaths";
+import { QRCodeSVG } from "qrcode.react";
 
+// profile data:
+// {
+//     full_name: "",
+//     bio: "",
+//     profile_picture: null,
+//     date_of_birth: "",
+//     address: "",
+//     country: "",
+//     city: "",
+//     specialization: "",
+//     institution: "",
+//     experiance: "",
+//     gender: "",
+//     logo: null,
+//     primary_color: "",
+//     primary_color_light: "",
+//     primary_color_dark: "",
+//     secondary_color: "",
+//     accent_color: "",
+//     background_color: ""
+//   }
 function EducatorProfile() {
   const [showEditForm, setShowEditForm] = useState(false);
-  const {isLoading,data:educatorData,error} = useEducatorProfileData();
+  const {isLoading,data:educatorData,error,mutate} = useEducatorProfileData();
   const [formData, setFormData] = useState({
-    name: "Dr. Amelia Carter",
-    institution: "University of Springfield",
-    bio: "Dr. Carter is a dedicated educator with over 10 years of experience in higher education. She specializes in curriculum development and innovative teaching methods.",
-    email: "amelia.carter@springfield.edu",
-    phone: "01234567890",
-    profileImage: "",
+    full_name: educatorData?.full_name || "",
+    bio: educatorData?.bio || "",
+    profile_picture: null, // Will be set when a new file is selected
+    date_of_birth: educatorData?.date_of_birth || "",
+    address: educatorData?.address || "",
+    country: educatorData?.country || "",
+    city: educatorData?.city || "",
+    specialization: educatorData?.specialization || "",
+    institution: educatorData?.institution || "",
+    experiance: educatorData?.experiance || "",
+    gender: educatorData?.gender || "",
+    logo: null, // Will be set when a new file is selected
+    primary_color: educatorData?.primary_color ,
+    primary_color_light: educatorData?.primary_color_light ,
+    primary_color_dark: educatorData?.primary_color_dark ,
+    secondary_color: educatorData?.secondary_color ,
+    accent_color: educatorData?.accent_color,
+    background_color: educatorData?.background_color 
   });
 
   // Add state for the profile image URL
   const [profileImageUrl, setProfileImageUrl] = useState(
-    "https://placehold.co/120x120?text=Educator"
+    educatorData?.profile_picture || "https://placehold.co/120x120?text=Educator"
   );
+  const [logoImageUrl, setLogoImageUrl] = useState(
+    educatorData?.logo || null
+  );
+
+  // Effect to update formData and image previews when educatorData changes
+  React.useEffect(() => {
+    if (educatorData) {
+      setFormData({
+        full_name: educatorData.full_name || "",
+        bio: educatorData.bio || "",
+        profile_picture: null,
+        date_of_birth: educatorData.date_of_birth || "",
+        address: educatorData.address || "",
+        country: educatorData.country || "",
+        city: educatorData.city || "",
+        specialization: educatorData.specialization || "",
+        institution: educatorData.institution || "",
+        experiance: educatorData.experiance || "",
+        gender: educatorData.gender || "",
+        logo: null,
+        primary_color: educatorData.primary_color || "",
+        primary_color_light: educatorData.primary_color_light || "",
+        primary_color_dark: educatorData.primary_color_dark || "",
+        secondary_color: educatorData.secondary_color || "",
+        accent_color: educatorData.accent_color || "",
+        background_color: educatorData.background_color || ""
+      });
+      setProfileImageUrl(educatorData.profile_picture || "https://placehold.co/120x120?text=Educator");
+      setLogoImageUrl(educatorData.logo || null);
+    }
+  }, [educatorData]);
+
 
   const handleInputChange = (e) => {
     const { name, value, type, files } = e.target;
@@ -31,25 +98,31 @@ function EducatorProfile() {
     }));
 
     // Handle profile image preview
-    if (type === "file" && files[0]) {
+    if (name === "profile_picture" && files[0]) {
       const reader = new FileReader();
       reader.onloadend = () => {
         setProfileImageUrl(reader.result);
       };
       reader.readAsDataURL(files[0]);
+    } else if (name === "logo" && files[0]) {
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setLogoImageUrl(reader.result);
+      };
+      reader.readAsDataURL(files[0]);
     }
   };
 
-  const handleSubmitRequest = (e) => {
+  const handleSubmitRequest = async (e) => {
     e.preventDefault();
 
-    // Validation
-    if (!formData.name.trim()) {
-      alert("Please enter a valid name.");
+    // Basic Validation
+    if (!formData.full_name.trim()) {
+      alert("Please enter a valid full name.");
       return;
     }
-    if (!formData.email.trim()) {
-      alert("Please enter a valid email.");
+    if (!formData.specialization.trim()) {
+      alert("Please enter a valid specialization.");
       return;
     }
     if (!formData.institution.trim()) {
@@ -57,8 +130,27 @@ function EducatorProfile() {
       return;
     }
 
-    alert("Profile has been updated successfully.");
-    setShowEditForm(false);
+    const dataToSubmit = new FormData();
+    for (const key in formData) {
+      if (formData[key] !== null && formData[key] !== undefined && formData[key] !== "") {
+        dataToSubmit.append(key, formData[key]);
+      }
+    }
+
+    
+	  await updateEducatorProfile({ ...dataToSubmit, experiance: +educatorData?.experiance || "" })
+			.then((res) => {
+				console.log(res.data);
+				mutate();
+				setShowEditForm(false);
+			})
+			.catch((err) => {
+				console.error("Error updating profile:", err);
+				alert("Failed to update profile. Please try again.");
+			});
+      // Optionally, re-fetch profile data to ensure UI is updated
+      // useEducatorProfileData hook might have a re-fetch mechanism or you can trigger it
+    
   };
 
   const courses = [
@@ -73,13 +165,7 @@ function EducatorProfile() {
     window.location.href = `/courses/${encodeURIComponent(courseName)}`;
   };
 
-  const totalStudents = courses.reduce(
-    (sum, course) => sum + course.students,
-    0
-  );
-  const activeCourses = courses.filter(
-    (course) => course.status === "Active"
-  ).length;
+
 
   return (
 		<div className="min-vh-100 profile-root p-4">
@@ -89,7 +175,7 @@ function EducatorProfile() {
 						<h5 className="fw-bold mb-3 section-title">Edit Profile</h5>
 
 						<form onSubmit={handleSubmitRequest}>
-							{/* Name */}
+							{/* Full Name */}
 							<div className="mb-3">
 								<label className="form-label about-subtitle fw-medium">
 									Full Name
@@ -97,8 +183,155 @@ function EducatorProfile() {
 								<input
 									type="text"
 									className="form-control"
-									name="name"
-									value={formData.name}
+									name="full_name"
+									value={formData.full_name}
+									onChange={handleInputChange}
+									required
+								/>
+							</div>
+
+							{/* Bio */}
+							<div className="mb-3">
+								<label className="form-label about-subtitle fw-medium">
+									Bio
+								</label>
+								<textarea
+									className="form-control"
+									name="bio"
+									rows="4"
+									value={formData.bio}
+									onChange={handleInputChange}
+								/>
+							</div>
+
+							{/* Profile Picture and Logo Uploads */}
+							<div className="row mb-3">
+								<div className="col-md-6">
+									<label className="form-label about-subtitle fw-medium">
+										Profile Picture
+									</label>
+									<input
+										type="file"
+										className="form-control"
+										name="profile_picture"
+										accept="image/*"
+										onChange={handleInputChange}
+									/>
+									{profileImageUrl && (
+										<div className="mt-2">
+											<small className="text-muted">Preview:</small>
+											<div className="mt-1">
+												<img
+													src={profileImageUrl}
+													alt="Profile preview"
+													style={{
+														width: "60px",
+														height: "60px",
+														objectFit: "cover",
+													}}
+													className="rounded-circle"
+												/>
+											</div>
+										</div>
+									)}
+								</div>
+								<div className="col-md-6">
+									<label className="form-label about-subtitle fw-medium">
+										Logo
+									</label>
+									<input
+										type="file"
+										className="form-control"
+										name="logo"
+										accept="image/*"
+										onChange={handleInputChange}
+									/>
+									{logoImageUrl && (
+										<div className="mt-2">
+											<small className="text-muted">Preview:</small>
+											<div className="mt-1">
+												<img
+													src={logoImageUrl}
+													alt="Logo preview"
+													style={{
+														width: "60px",
+														height: "60px",
+														objectFit: "cover",
+													}}
+													className="rounded-circle"
+												/>
+											</div>
+										</div>
+									)}
+								</div>
+							</div>
+
+							{/* Date of Birth */}
+							<div className="mb-3">
+								<label className="form-label about-subtitle fw-medium">
+									Date of Birth
+								</label>
+								<input
+									type="date"
+									className="form-control"
+									name="date_of_birth"
+									value={formData.date_of_birth}
+									onChange={handleInputChange}
+								/>
+							</div>
+
+							{/* Address */}
+							<div className="mb-3">
+								<label className="form-label about-subtitle fw-medium">
+									Address
+								</label>
+								<input
+									type="text"
+									className="form-control"
+									name="address"
+									value={formData.address}
+									onChange={handleInputChange}
+								/>
+							</div>
+
+							{/* Country */}
+							<div className="mb-3">
+								<label className="form-label about-subtitle fw-medium">
+									Country
+								</label>
+								<input
+									type="text"
+									className="form-control"
+									name="country"
+									value={formData.country}
+									onChange={handleInputChange}
+								/>
+							</div>
+
+							{/* City */}
+							<div className="mb-3">
+								<label className="form-label about-subtitle fw-medium">
+									City
+								</label>
+								<input
+									type="text"
+									className="form-control"
+									name="city"
+									value={formData.city}
+									onChange={handleInputChange}
+								/>
+							</div>
+
+							{/* Specialization */}
+							<div className="mb-3">
+								<label className="form-label about-subtitle fw-medium">
+									Specialization
+								</label>
+								<input
+									type="text"
+									className="form-control"
+									name="specialization"
+									value={formData.specialization}
 									onChange={handleInputChange}
 									required
 								/>
@@ -119,91 +352,133 @@ function EducatorProfile() {
 								/>
 							</div>
 
-							{/* Bio */}
+							{/* Experience */}
 							<div className="mb-3">
 								<label className="form-label about-subtitle fw-medium">
-									Bio
+									Experience (Years)
 								</label>
-								<textarea
+								<input
+									type="number"
 									className="form-control"
-									name="bio"
-									rows="4"
-									value={formData.bio}
+									name="experiance"
+									value={formData.experiance}
 									onChange={handleInputChange}
 								/>
 							</div>
 
-							{/* Email */}
+							{/* Gender */}
 							<div className="mb-3">
 								<label className="form-label about-subtitle fw-medium">
-									Email
+									Gender
 								</label>
-								<input
-									type="email"
+								<select
 									className="form-control"
-									name="email"
-									value={formData.email}
+									name="gender"
+									value={formData.gender}
 									onChange={handleInputChange}
-									required
-								/>
+								>
+									<option value="">Select Gender</option>
+									<option value="Male">Male</option>
+									<option value="Female">Female</option>
+									<option value="Other">Other</option>
+								</select>
 							</div>
 
-							{/* Phone */}
-							<div className="mb-3">
-								<label className="form-label about-subtitle fw-medium">
-									Phone
-								</label>
-								<input
-									type="tel"
-									className="form-control"
-									name="phone"
-									value={formData.phone}
-									onChange={handleInputChange}
-								/>
-							</div>
+							{/* Color Settings */}
+							<h6 className="fw-bold mb-2">Theme Colors</h6>
+							<div className="d-flex flex-wrap justify-content-between gap-3 mb-3">
+								<div className="flex-grow-1">
+									<label className="form-label about-subtitle fw-medium">
+										Primary Color
+									</label>
+									<input
+										type="color"
+										className="form-control form-control-color"
+										name="primary_color"
+										value={formData.primary_color}
+										onChange={handleInputChange}
+									/>
+								</div>
 
-							{/* Profile Image Upload */}
-							<div className="mb-3">
-								<label className="form-label about-subtitle fw-medium">
-									Profile Image
-								</label>
-								<input
-									type="file"
-									className="form-control"
-									name="profileImage"
-									accept="image/*"
-									onChange={handleInputChange}
-								/>
-								{profileImageUrl && (
-									<div className="mt-2">
-										<small className="text-muted">Preview:</small>
-										<div className="mt-1">
-											<img
-												src={profileImageUrl}
-												alt="Profile preview"
-												style={{
-													width: "60px",
-													height: "60px",
-													objectFit: "cover",
-												}}
-												className="rounded-circle"
-											/>
-										</div>
-									</div>
-								)}
+								<div className="flex-grow-1">
+									<label className="form-label about-subtitle fw-medium">
+										Primary Color Light
+									</label>
+									<input
+										type="color"
+										className="form-control form-control-color"
+										name="primary_color_light"
+										value={formData.primary_color_light}
+										onChange={handleInputChange}
+									/>
+								</div>
+
+								<div className="flex-grow-1">
+									<label className="form-label about-subtitle fw-medium">
+										Primary Color Dark
+									</label>
+									<input
+										type="color"
+										className="form-control form-control-color"
+										name="primary_color_dark"
+										value={formData.primary_color_dark}
+										onChange={handleInputChange}
+									/>
+								</div>
+
+								<div className="flex-grow-1">
+									<label className="form-label about-subtitle fw-medium">
+										Secondary Color
+									</label>
+									<input
+										type="color"
+										className="form-control form-control-color"
+										name="secondary_color"
+										value={formData.secondary_color}
+										onChange={handleInputChange}
+									/>
+								</div>
+
+								<div className="flex-grow-1">
+									<label className="form-label about-subtitle fw-medium">
+										Accent Color
+									</label>
+									<input
+										type="color"
+										className="form-control form-control-color"
+										name="accent_color"
+										value={formData.accent_color}
+										onChange={handleInputChange}
+									/>
+								</div>
+
+								<div className="flex-grow-1">
+									<label className="form-label about-subtitle fw-medium">
+										Background Color
+									</label>
+									<input
+										type="color"
+										className="form-control form-control-color"
+										name="background_color"
+										value={formData.background_color}
+										onChange={handleInputChange}
+									/>
+								</div>
 							</div>
 
 							{/* Submit Button */}
-							<button type="submit" className="px-4 btn-edit-profile">
-								Update Profile
-							</button>
-							<button
-								type="button"
-								onClick={() => setShowEditForm(false)}
-								className="ms-2 px-4 btn-edit-profile"
-							>
-								Cancel
-							</button>
+							<div className="d-flex justify-content-end mt-5">
+								<button type="submit" className="px-4 btn-edit-profile">
+									Update Profile
+								</button>
+								<button
+									type="button"
+									onClick={() => setShowEditForm(false)}
+									className="ms-2 px-4 btn-edit-profile"
+								>
+									Cancel
+								</button>
+							</div>
 						</form>
 					</div>
 				</div>
@@ -251,7 +526,7 @@ function EducatorProfile() {
 												{educatorData?.user?.last_name || "__"}
 											</h4>
 											<div className=" small">
-												{educatorData?.user?.username || "__"}
+												{educatorData?.full_name || "__"}
 											</div>
 											<div className=" small">
 												{educatorData?.created_at
@@ -300,8 +575,7 @@ function EducatorProfile() {
 													<div className="d-flex flex-sm-row flex-column px-3">
 														<strong className="me-2 ">Experience:</strong>
 														<span className="small">
-															{(educatorData?.experience || "__")}{" "}
-															Years
+															{educatorData?.experiance || "__"} Years
 														</span>
 													</div>
 												</div>
@@ -323,12 +597,19 @@ function EducatorProfile() {
 												<small className="fw-bold fw-medium">Educator QR</small>
 											</div>
 											<div className="qr-container">
-												<img
+												{/* <img
 													src={`https://api.qrserver.com/v1/create-qr-code/?size=120x120&data=EducatorProfile:${encodeURIComponent(
-														formData.name
+														educatorData.user.username
 													)}`}
 													alt="QR Code"
 													className="qr-code-img"
+												/> */}
+												{/* full url for educator page */}
+												<QRCodeSVG
+													value={
+														window.location.origin +
+														pagePaths.student.educator("educatorusername")
+													}
 												/>
 											</div>
 										</div>
@@ -413,7 +694,10 @@ function EducatorProfile() {
 												<i className="bi bi-chevron-right text-primary"></i>
 											</div>
 										</Link>
-										<Link to={pagePaths.educator.students} style={{ textDecoration: "none" }}>
+										<Link
+											to={pagePaths.educator.students}
+											style={{ textDecoration: "none" }}
+										>
 											<div className="about-bubble px-3 py-2 d-flex align-items-center">
 												<i
 													className="bi bi-people me-3 text-primary"

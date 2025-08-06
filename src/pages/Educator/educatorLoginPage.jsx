@@ -12,7 +12,10 @@ export default function EducatorLoginPage() {
   const [loading, setLoading] = useState(false);
   const [errors, setErrors] = useState({});
   const navigate = useNavigate();
+
   const {mutate}=useRefreshToken()
+
+  
   const handleSubmit = async(e) => {
     e.preventDefault();
     if (!email || !password) {

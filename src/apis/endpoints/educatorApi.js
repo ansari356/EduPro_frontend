@@ -1,11 +1,6 @@
 
 export const educatorEndpoints = {
-		// "/teacher/login/",
-		// "/teacher/teacher-register/",
-		// "/teacher/teacher-profile/",
-		// "/teacher/update-profile/",
-		// "/teacher/students/remove/<student_id>/",
-		// "/teacher/get_students/",
+
 		login: `/teacher/login/`,
 		signup: `/teacher/teacher-register/`,
 		profile: `/teacher/teacher-profile/`,
@@ -13,23 +8,13 @@ export const educatorEndpoints = {
 		removeStudent: (studentId) => `/teacher/students/remove/${studentId}/`,
 		getStudents: `/teacher/get_students/`,
 	courseCategory: {
-		// "/course/category/create/",
-		// "/course/category/list/",
-		// "/course/category/update/<category_id>",
+
 		create: `/course/category/create/`,
 		list: `/course/category/list/`,
 		update: (categoryId) => `/course/category/update/${categoryId}`,
 	},
 	course: {
-		// "/course/create/",
-		// "/course/list/",
-		// "/course/course-detail/<course_id>",
-		// "/course/update/<course_id>",
-		// "/course/course-delete/<course_id>",
-		// "/course/course-enrollment/",
-		// "/course/course-enrollment-list/<teacher_username>",
-		// "/course/course-enrollment-delete/<course_id>/<enrollment_id>",
-		// "/course/course-search-filter/",
+
 		create: `/course/create/`,
 		list: `/course/list/`,
 		detail: (courseId) => `/course/course-detail/${courseId}`,
@@ -43,11 +28,7 @@ export const educatorEndpoints = {
 		searchFilter: `/course/course-search-filter/`,
 	},
 	coupon: {
-		// "/coupon/create/",
-		// "/coupon/list/",
-		// "/coupon/detail/<coupon_id>",
-		// "/coupon/update/<coupon_id>",
-		// "/coupon/delete/<coupon_id>",
+
 		create: `/coupon/create/`,
 		list: `/coupon/list/`,
 		detail: (couponId) => `/coupon/detail/${couponId}`,
