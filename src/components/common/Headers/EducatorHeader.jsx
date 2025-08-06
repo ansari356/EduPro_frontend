@@ -1,5 +1,6 @@
 import { Navbar, Nav, Dropdown, Container } from "react-bootstrap";
 import { NavLink } from "react-router-dom";
+import { pagePaths } from "../../../pagePaths";
 
 export default function EducatorHeader() {
   return (
@@ -18,28 +19,25 @@ export default function EducatorHeader() {
           <Nav className="mx-auto nav-links-container">
             <Nav.Link
               as={NavLink}
-              to="/educator-profile"
+              to={pagePaths.educator.profile}
               className="nav-link-custom"
             >
               <i className="bi bi-person-badge me-2"></i>
               My Profile
             </Nav.Link>
-            <Nav.Link as={NavLink} to="/courses" className="nav-link-custom">
+            <Nav.Link as={NavLink} to={pagePaths.educator.courses} className="nav-link-custom">
               <i className="bi bi-book me-2"></i>
               My Courses
             </Nav.Link>
-            <Nav.Link as={NavLink} to="/courses-list/create" className="nav-link-custom">
+            <Nav.Link as={NavLink} to={pagePaths.educator.createCourse} className="nav-link-custom">
               <i className="bi bi-plus-circle me-2"></i>
               Create Course
             </Nav.Link>
-            <Nav.Link as={NavLink} to="/student-management" className="nav-link-custom">
+            <Nav.Link as={NavLink} to={pagePaths.educator.students} className="nav-link-custom">
               <i className="bi bi-people me-2"></i>
               Students
             </Nav.Link>
-            <Nav.Link as={NavLink} to="/analytics" className="nav-link-custom">
-              <i className="bi bi-bar-chart me-2"></i>
-              Analytics
-            </Nav.Link>
+
           </Nav>
 
           <div className="user-section">

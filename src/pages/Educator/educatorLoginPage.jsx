@@ -1,27 +1,39 @@
 import React, { useState } from 'react';
 import { Eye, EyeOff, User, Lock } from 'lucide-react';
 import { useNavigate } from "react-router-dom";
+import loginEducator from '../../apis/actions/educator/loginEducator';
+import { pagePaths } from '../../pagePaths';
+import useRefreshToken from '../../apis/hooks/useRefreshToken';
 
 export default function EducatorLoginPage() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
-
+  const [errors, setErrors] = useState({});
   const navigate = useNavigate();
-
-  const handleSubmit = (e) => {
+  const {mutate}=useRefreshToken()
+  const handleSubmit = async(e) => {
     e.preventDefault();
     if (!email || !password) {
       alert('Please enter both email and password');
       return;
     }
     setLoading(true);
-    setTimeout(() => {
-      setLoading(false);
-      alert(`Welcome, ${email}!`);
-      navigate('/educator-profile');
-    }, 1000);
+    await loginEducator({ email, password })
+      .then((res) => {
+        console.log(res);
+        // navigate(pagePaths.educator.profile);
+        mutate()
+        setLoading(false);
+      })
+      .catch((err) => {
+        console.log(err);
+        if (err?.response?.status === 400) {
+          setErrors(err.response.data);
+        }
+        setLoading(false);
+      });
   };
 
   return (

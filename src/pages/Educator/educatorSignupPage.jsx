@@ -1,15 +1,17 @@
 import React, { useState } from 'react';
 import { Eye, EyeOff, User, Lock, Mail, UserPlus } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
+import registerEducator from '../../apis/actions/educator/registerEducator';
+import { pagePaths } from '../../pagePaths';
 
 export default function EducatorSignupPage() {
   const [formData, setFormData] = useState({
-    fullName: '',
+    firstName: '',
+    lastName: '',
     username: '',
     email: '',
     password: '',
     confirmPassword: '',
-    subject: '',
     phone: ''
   });
   const [showPassword, setShowPassword] = useState(false);
@@ -19,17 +21,7 @@ export default function EducatorSignupPage() {
 
   const navigate = useNavigate();
 
-  const subjects = [
-    'Mathematics',
-    'Physics',
-    'Chemistry',
-    'Biology',
-    'English Literature',
-    'Arabic',
-    'Computer Science',
-    'History',
-    'Geography'
-  ];
+
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -48,7 +40,8 @@ export default function EducatorSignupPage() {
 
   const validateForm = () => {
     const newErrors = {};
-    if (!formData.fullName.trim()) newErrors.fullName = 'Full name is required';
+    if (!formData.firstName.trim()) newErrors.firstName = 'First name is required';
+    if (!formData.lastName.trim()) newErrors.lastName = 'Last name is required';
     if (!formData.username.trim()) newErrors.username = 'Username is required';
     if (!formData.email.trim()) {
       newErrors.email = 'Email is required';
@@ -60,7 +53,6 @@ export default function EducatorSignupPage() {
     } else if (!/^01[0125][0-9]{8}$/.test(formData.phone)) {
       newErrors.phone = 'Please enter a valid phone number';
     }
-    if (!formData.subject) newErrors.subject = 'Please select your subject';
     if (!formData.password) {
       newErrors.password = 'Password is required';
     } else if (formData.password.length < 6) {
@@ -74,29 +66,35 @@ export default function EducatorSignupPage() {
     return newErrors;
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async(e) => {
+    console.log(formData);
     e.preventDefault();
     const validationErrors = validateForm();
     if (Object.keys(validationErrors).length > 0) {
       setErrors(validationErrors);
+      console.log(validationErrors);
       return;
     }
     setLoading(true);
-    setTimeout(() => {
+    await registerEducator({
+      first_name: formData.firstName,
+      last_name: formData.lastName,
+      username: formData.username,
+      email: formData.email,
+      password1: formData.password,
+      password2: formData.confirmPassword,
+      phone: formData.phone
+    })
+    .then((res) => {
+      console.log(res);
+      navigate(pagePaths.educator.login);
       setLoading(false);
-      alert(`Registration successful! Welcome, ${formData.fullName}!`);
-      setFormData({
-        fullName: '',
-        username: '',
-        email: '',
-        password: '',
-        confirmPassword: '',
-        subject: '',
-        phone: ''
-      });
-      setErrors({});
-      // navigate('/educator-dashboard'); // Uncomment when dashboard exists
-    }, 1200);
+    })
+    .catch((err) => {
+      console.log(err);
+      setLoading(false);
+    });
+    
   };
 
   return (
@@ -142,23 +140,43 @@ export default function EducatorSignupPage() {
                 </div>
 
                 <form onSubmit={handleSubmit}>
-                  {/* Full Name */}
-                  <div className="mb-3">
-                    <label className="form-label">
-                      Full Name *
-                    </label>
-                    <div className="position-relative">
-                      <input
-                        type="text"
-                        name="fullName"
-                        className={`form-control ${errors.fullName ? 'is-invalid' : ''}`}
-                        value={formData.fullName}
-                        onChange={handleInputChange}
-                        placeholder="Enter your full name"
-                        disabled={loading}
-                      />
-                      <User className="position-absolute top-50 translate-middle-y input-icon" size={20} />
-                      {errors.fullName && <div className="invalid-feedback">{errors.fullName}</div>}
+                  {/* First Name and Last Name */}
+                  <div className="row mb-3">
+                    <div className="col-md-6">
+                      <label className="form-label">
+                        First Name *
+                      </label>
+                      <div className="position-relative">
+                        <input
+                          type="text"
+                          name="firstName"
+                          className={`form-control ${errors.firstName ? 'is-invalid' : ''}`}
+                          value={formData.firstName}
+                          onChange={handleInputChange}
+                          placeholder="Enter your first name"
+                          disabled={loading}
+                        />
+                        <User className="position-absolute top-50 translate-middle-y input-icon" size={20} />
+                        {errors.firstName && <div className="invalid-feedback">{errors.firstName}</div>}
+                      </div>
+                    </div>
+                    <div className="col-md-6">
+                      <label className="form-label">
+                        Last Name *
+                      </label>
+                      <div className="position-relative">
+                        <input
+                          type="text"
+                          name="lastName"
+                          className={`form-control ${errors.lastName ? 'is-invalid' : ''}`}
+                          value={formData.lastName}
+                          onChange={handleInputChange}
+                          placeholder="Enter your last name"
+                          disabled={loading}
+                        />
+                        <User className="position-absolute top-50 translate-middle-y input-icon" size={20} />
+                        {errors.lastName && <div className="invalid-feedback">{errors.lastName}</div>}
+                      </div>
                     </div>
                   </div>
 
@@ -223,7 +241,7 @@ export default function EducatorSignupPage() {
                   </div>
 
                   {/* Subject */}
-                  <div className="mb-3">
+                  {/* <div className="mb-3">
                     <label className="form-label">
                       Subject *
                     </label>
@@ -240,7 +258,7 @@ export default function EducatorSignupPage() {
                       ))}
                     </select>
                     {errors.subject && <div className="invalid-feedback">{errors.subject}</div>}
-                  </div>
+                  </div> */}
 
                   {/* Password */}
                   <div className="mb-3">

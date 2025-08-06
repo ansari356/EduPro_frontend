@@ -12,41 +12,52 @@ import StudentnavbarLayout from "./components/layout/StudentnavbarLayout";
 import EducatorCourseDetailsPage from "./pages/Educator/EducatorCourseDetails";
 import StudentCourseDetailsPage from "./pages/Student/StudentCourseDetails";
 import EditCoursePage from "./pages/Educator/EducatorEditCoursePage";
+import Home from "./pages/home";
+import EducatorProtectedRoutes from "./components/auth/educatorProtectedRoutes";
+import EducatorRedirectIfLogedin from "./components/auth/educatorRedirectIfLogedin";
 function App() {
   return (
-    <Routes>
-      {/* Main pages */}
-      <Route path="educator-signup" element={<EducatorSignupPage />} />
-      <Route path="educator-login" element={<EducatorLoginPage />} />
-      <Route
-        path="/:teacher-name/student-login"
-        element={<StudentLoginPage />}
-      />
-      <Route
-        path="/:teacher-name/student-signup"
-        element={<StudentSignupPage />}
-      />
-      <Route>
-        {/* Educator User Section */}
-        <Route element={<EducatorNavbarLayout />}>
-          <Route path="educator-profile" element={<EducatorProfile />} />
-          <Route path="courses">
-            <Route index element={<CoursesList />} />
-            <Route path=":id" element={<EducatorCourseDetailsPage />} />
-            <Route path="create" element={<CreateCoursePage />} />
-            <Route path="edit/:courseId" element={<EditCoursePage />} />
-          </Route>
-        </Route>
-        {/* Student User Section */}
-        <Route element={<StudentnavbarLayout />}>
-          <Route path="student-profile" element={<StudentProfile />} />
-          <Route path="student-courses">
-            <Route path=":id" element={<StudentCourseDetailsPage />} />
-          </Route>
-        </Route>
-      </Route>
-    </Routes>
-  );
+		<Routes>
+			{/* Educator Pages */}
+			<Route path="/">
+				<Route index element={<Home />} />
+
+				{/* Unprotected Routes and redirects logged in educators */}
+				<Route element={<EducatorRedirectIfLogedin />}>
+					<Route path="signup" element={<EducatorSignupPage />} />
+					<Route path="login" element={<EducatorLoginPage />} />
+				</Route>
+
+				{/* Protected Routes -> Only accessible when educator is logged in */}
+				<Route element={<EducatorProtectedRoutes />}>
+					<Route element={<EducatorNavbarLayout />}>
+						<Route path="educator" element={<EducatorProfile />} />
+						<Route path="students" element={<h1> students Home Page Place Holder</h1>} />
+						<Route path="courses">
+							<Route index element={<CoursesList />} />
+							<Route path=":id" element={<EducatorCourseDetailsPage />} />
+							<Route path="create" element={<CreateCoursePage />} />
+							<Route path="edit/:courseId" element={<EditCoursePage />} />
+						</Route>
+					</Route>
+				</Route>
+			</Route>
+
+			{/* Educator Based Pages  [all student pages depend on educator username] */}
+
+			<Route path=":educator_username">
+				<Route index element={<h1> Educator Home Page Place Holder</h1>} />
+				<Route path="login" element={<StudentLoginPage />} />
+				<Route path="signup" element={<StudentSignupPage />} />
+				<Route path="student" element={<StudentnavbarLayout />}>
+					<Route path="profile" element={<StudentProfile />} />
+					<Route path="courses">
+						<Route path=":id" element={<StudentCourseDetailsPage />} />
+					</Route>
+				</Route>
+			</Route>
+		</Routes>
+	);
 }
 
 export default App;
