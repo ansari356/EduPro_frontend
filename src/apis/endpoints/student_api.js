@@ -9,4 +9,6 @@ export const studentEndpoints = {
 	profile: (teacherUsername) => `/student/student-profile/${teacherUsername}`,
 	updateProfile: `/student/update-profile/`,
 	join: (teacherUsername) => `/join-teacher/${teacherUsername}/`,
+	educatorPublicData: (educatorUsername) =>
+		`/teacher/teacher-profile/${educatorUsername}`,
 };

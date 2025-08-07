@@ -28,8 +28,8 @@ function App() {
 
 				{/* Unprotected Routes and redirects logged in educators */}
 				<Route element={<EducatorRedirectIfLogedin />}>
-					<Route path="signup" element={<EducatorSignupPage />} />
-					<Route path="login" element={<EducatorLoginPage />} />
+					<Route path="/signup" element={<EducatorSignupPage />} />
+					<Route path="/login" element={<EducatorLoginPage />} />
 				</Route>
 
 				{/* Protected Routes -> Only accessible when educator is logged in */}
@@ -50,12 +50,12 @@ function App() {
 				</Route>
 			</Route>
 			{/* Educator Based Pages  [all student pages depend on educator username] */}
-			<Route path=":educator_username" element={<EducatorPageDataٌٌٌRoutes />}>
-				<Route index element={<h1> Educator Home Page Place Holder</h1>} />
+			<Route path=":educatorUsername" element={<EducatorPageDataٌٌٌRoutes />}>
 				<Route element={<StudentRedirectIfLogedin />}>
 					<Route path="login" element={<StudentLoginPage />} />
 					<Route path="signup" element={<StudentSignupPage />} />
 				</Route>
+				<Route index element={<h1> Educator Home Page Place Holder</h1>} />
 
 				<Route element={<StudentProtectedRoutes />}>
 					<Route path="student" element={<StudentNavbarLayout />}>

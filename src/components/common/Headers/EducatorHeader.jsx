@@ -1,6 +1,7 @@
 import { Navbar, Nav, Dropdown, Container } from "react-bootstrap";
 import { NavLink } from "react-router-dom";
 import { pagePaths } from "../../../pagePaths";
+import logoutUser from "../../../apis/actions/logoutUser";
 
 export default function EducatorHeader() {
   return (
@@ -91,7 +92,7 @@ export default function EducatorHeader() {
                 </Dropdown.Item>
                 <Dropdown.Divider />
                 <Dropdown.Item
-                  href="#signout"
+                  onClick={() => logoutUser()}
                   className="dropdown-item-custom text-danger"
                 >
                   <i className="bi bi-box-arrow-right me-2"></i>

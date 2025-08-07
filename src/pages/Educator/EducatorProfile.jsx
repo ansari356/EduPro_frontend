@@ -138,7 +138,7 @@ function EducatorProfile() {
     }
 
     
-	  await updateEducatorProfile({ ...dataToSubmit, experiance: +educatorData?.experiance || "" })
+	  await updateEducatorProfile(dataToSubmit)
 			.then((res) => {
 				console.log(res.data);
 				mutate();

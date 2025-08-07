@@ -1,56 +1,123 @@
-import React from "react";
-import "bootstrap/dist/css/bootstrap.min.css";
-import "bootstrap-icons/font/bootstrap-icons.css";
-import { useState } from "react";
+import React, { useState, useEffect } from "react";
+import useStudentProfileData from "../../apis/hooks/student/useStudentProfileData";
+import updateStudentProfile from "../../apis/actions/student/updateStudentProfile";
+
 
 function StudentProfile() {
+  const { data: studentData, isLoading, error } = useStudentProfileData();
   const [showEditForm, setShowEditForm] = useState(false);
   const [formData, setFormData] = useState({
-    name: "Mohamed Ali Hassan El-Sayed",
-    phone1: "01051456789",
-    phone2: "01225456789",
-    profileImage: "",
-    cancelRequest: false,
+    full_name: "",
+    bio: "",
+    profile_picture: null,
+    date_of_birth: "",
+    address: "",
+    country: "",
+    city: "",
+    gender: "",
   });
 
+  // Add state for the profile image URL
+  const [profilePicturePreview, setProfilePicturePreview] = useState(
+    null
+  );
+
+  useEffect(() => {
+    if (studentData) {
+      setFormData({
+        full_name: studentData.student.full_name || "",
+        bio: studentData.student.bio || "",
+        profile_picture: null, // We don't pre-fill file inputs
+        date_of_birth: studentData.student.date_of_birth || "",
+        address: studentData.student.address || "",
+        country: studentData.student.country || "",
+        city: studentData.student.city || "",
+        gender: studentData.student.gender || "",
+      });
+      setProfilePicturePreview(studentData.student.profile_picture || null);
+    }
+  }, [studentData]);
+
   const handleInputChange = (e) => {
-    const { name, value, type, checked, files } = e.target;
+    const { name, value, type, files } = e.target;
     setFormData((prev) => ({
       ...prev,
-      [name]:
-        type === "checkbox" ? checked : type === "file" ? files[0] : value,
+      [name]: type === "file" ? files[0] : value,
     }));
+
+    // Handle profile image preview
+    if (name === "profile_picture" && files[0]) {
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setProfilePicturePreview(reader.result);
+      };
+      reader.readAsDataURL(files[0]);
+    } else if (name === "profile_picture" && !files[0]) {
+      setProfilePicturePreview(null);
+    }
   };
 
-  const handleSubmitRequest = (e) => {
+  const handleSubmitRequest = async (e) => {
     e.preventDefault();
-    // Sending a request
-    alert("Your request has been submitted to the educator.");
-    setShowEditForm(false);
+
+    const dataToSubmit = new FormData();
+    for (const key in formData) {
+      if (formData[key] !== null && formData[key] !== undefined && formData[key] !== "") {
+        dataToSubmit.append(key, formData[key]);
+      }
+    }
+
+    await updateStudentProfile(dataToSubmit)
+      .then((res) => {
+        console.log(res.data);
+        // Assuming useStudentProfileData provides a mutate function to re-fetch data
+        // If not, you might need to manually re-fetch or update state
+        // For now, assuming mutate is available from the hook
+        if (typeof studentData?.mutate === 'function') {
+          studentData.mutate();
+        }
+        alert("Your profile has been updated successfully!");
+        setShowEditForm(false);
+      })
+      .catch((err) => {
+        console.error("Error updating profile:", err);
+        alert("Failed to update profile. Please try again.");
+      });
   };
 
-  const progress = 75;
+  // Dummy data for progress, missing items, and schedule (replace with real data if available from hook)
+  const progress = studentData?.completed_lessons > 0 && studentData?.number_of_enrollment_courses > 0 
+    ? Math.round((studentData.completed_lessons / studentData.number_of_enrollment_courses) * 100) 
+    : 0;
 
-  const missingItems = [
-    { type: "assignment", message: "Algebra Homework #2 is overdue" },
-    { type: "class", message: "Missed Calculus lecture on Wednesday" },
-  ];
+  const missingItems = []; // Placeholder, replace with actual missing items from studentData if available
 
-  const schedule = [
-    { day: "Monday", time: "10:00 AM", subject: "Algebra", date: "2023-09-12" },
-    {
-      day: "Wednesday",
-      time: "12:00 PM",
-      subject: "Calculus",
-      date: "2023-09-14",
-    },
-    {
-      day: "Friday",
-      time: "09:00 AM",
-      subject: "Mechanics",
-      date: "2023-09-16",
-    },
-  ];
+  const schedule = []; // Placeholder, replace with actual schedule from studentData if available
+
+  if (isLoading) {
+    return (
+      <div className="profile-root min-vh-100 d-flex align-items-center justify-content-center">
+        <div className="text-center">
+          <div className="loading-spinner mb-3" role="status">
+            <span className="visually-hidden">Loading...</span>
+          </div>
+          <p className="profile-joined">Loading student profile...</p>
+        </div>
+      </div>
+    );
+  }
+
+
+
+  if (!studentData) {
+    return (
+      <div className="profile-root min-vh-100 d-flex align-items-center justify-content-center">
+        <div className="text-center">
+          <p className="profile-joined">No student data available.</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div
@@ -61,67 +128,138 @@ function StudentProfile() {
           <div className="mt-4 card card-body ">
             <h5 className="fw-bold mb-3 section-title">Edit Profile</h5>
           <form onSubmit={handleSubmitRequest}>
-            {/* Name */}
+            {/* Full Name */}
             <div className="mb-3">
-              <label className="form-label about-subtitle fw-medium">Full Name</label>
+              <label className="form-label about-subtitle fw-medium">
+                Full Name
+              </label>
               <input
                 type="text"
                 className="form-control"
-                name="name"
-                value={formData.name}
+                name="full_name"
+                value={formData.full_name}
                 onChange={handleInputChange}
+                required
               />
             </div>
 
-            {/* Phone 1 */}
+            {/* Bio */}
             <div className="mb-3">
-              <label className="form-label about-subtitle fw-medium">Phone 1</label>
-              <input
-                type="tel"
+              <label className="form-label about-subtitle fw-medium">
+                Bio
+              </label>
+              <textarea
                 className="form-control"
-                name="phone1"
-                value={formData.phone1}
+                name="bio"
+                rows="4"
+                value={formData.bio}
                 onChange={handleInputChange}
               />
             </div>
 
-            {/* Phone 2 */}
+            {/* Profile Picture Upload */}
             <div className="mb-3">
-              <label className="form-label about-subtitle fw-medium">Phone 2</label>
-              <input
-                type="tel"
-                className="form-control"
-                name="phone2"
-                value={formData.phone2}
-                onChange={handleInputChange}
-              />
-            </div>
-
-            {/* Profile Image Upload */}
-            <div className="mb-3">
-              <label className="form-label about-subtitle fw-medium">New Profile Image</label>
+              <label className="form-label about-subtitle fw-medium">
+                Profile Picture
+              </label>
               <input
                 type="file"
                 className="form-control"
-                name="profileImage"
+                name="profile_picture"
                 accept="image/*"
+                onChange={handleInputChange}
+              />
+              {profilePicturePreview && (
+                <div className="mt-2">
+                  <small className="text-muted">Preview:</small>
+                  <div className="mt-1">
+                    <img
+                      src={profilePicturePreview}
+                      alt="Profile preview"
+                      style={{
+                        width: "60px",
+                        height: "60px",
+                        objectFit: "cover",
+                      }}
+                      className="rounded-circle"
+                    />
+                  </div>
+                </div>
+              )}
+            </div>
+
+            {/* Date of Birth */}
+            <div className="mb-3">
+              <label className="form-label about-subtitle fw-medium">
+                Date of Birth
+              </label>
+              <input
+                type="date"
+                className="form-control"
+                name="date_of_birth"
+                value={formData.date_of_birth}
                 onChange={handleInputChange}
               />
             </div>
 
-            {/* Cancel Subscription */}
-            <div className="form-check mb-4">
+            {/* Address */}
+            <div className="mb-3">
+              <label className="form-label about-subtitle fw-medium">
+                Address
+              </label>
               <input
-                className="form-check-input"
-                type="checkbox"
-                id="cancelRequest"
-                name="cancelRequest"
-                checked={formData.cancelRequest}
+                type="text"
+                className="form-control"
+                name="address"
+                value={formData.address}
                 onChange={handleInputChange}
               />
-              <label className="form-check-label about-subtitle fw-medium" htmlFor="cancelRequest">
-                Request to cancel subscription
+            </div>
+
+            {/* Country */}
+            <div className="mb-3">
+              <label className="form-label about-subtitle fw-medium">
+                Country
               </label>
+              <input
+                type="text"
+                className="form-control"
+                name="country"
+                value={formData.country}
+                onChange={handleInputChange}
+              />
+            </div>
+
+            {/* City */}
+            <div className="mb-3">
+              <label className="form-label about-subtitle fw-medium">
+                City
+              </label>
+              <input
+                type="text"
+                className="form-control"
+                name="city"
+                value={formData.city}
+                onChange={handleInputChange}
+              />
+            </div>
+
+            {/* Gender */}
+            <div className="mb-3">
+              <label className="form-label about-subtitle fw-medium">
+                Gender
+              </label>
+              <select
+                className="form-control"
+                name="gender"
+                value={formData.gender}
+                onChange={handleInputChange}
+              >
+                <option value="">Select Gender</option>
+                <option value="Male">Male</option>
+                <option value="Female">Female</option>
+                <option value="Other">Other</option>
+              </select>
             </div>
 
             {/* Submit Button */}
@@ -170,18 +308,18 @@ function StudentProfile() {
                 <div className="card-body p-4">
                   <div className="d-flex align-items-start mb-4">
                     <img
-                      src="https://placehold.co/120x120?text=Student"
+                      src={studentData.student.profile_picture || "https://placehold.co/120x120?text=Student"}
                       alt="avatar"
                       className="rounded-circle me-3"
-                      style={{ width: "100px", height: "100px" }}
+                      style={{ width: "100px", height: "100px", objectFit: "cover" }}
                       aria-label="User avatar"
                     />
                     <div>
                       <h4 className="fw-bold mb-1 profile-main-title">
-                        Mohamed Ali Hassan El-Sayed
+                        {studentData.student.full_name}
                       </h4>
                       <div className="small">Student</div>
-                      <div className="small">Joined 2022</div>
+                      <div className="small">Joined {new Date(studentData.student.user.created_at).getFullYear()}</div>
                     </div>
                   </div>
 
@@ -194,33 +332,33 @@ function StudentProfile() {
                           <i className="bi bi-person-badge me-2 text-primary"></i>
                           <div>
                             <strong className="me-2">Professor:</strong>
-                            <span className="small">Mr. Mohamed El-Mahdy</span>
+                            <span className="small">N/A</span> {/* Professor data not in hook */}
                           </div>
                         </div>
                         <div className=" d-flex align-items-center px-3">
                           <i className="bi bi-people me-2 text-primary"></i>
                           <strong className="me-2">Group:</strong>
-                          <span className="small">Mostafa Kamel - 2</span>
+                          <span className="small">N/A</span> {/* Group data not in hook */}
                         </div>
                         <div className=" d-flex align-items-center px-3 ">
                           <i className="bi bi-mortarboard me-2 text-primary"></i>
                           <strong className="me-2">Grade:</strong>
-                          <span className="small">Senior 3</span>
+                          <span className="small">N/A</span> {/* Grade data not in hook */}
                         </div>
                         <div className=" d-flex align-items-center px-3 ">
                           <i className="bi bi-hash me-2 text-primary"></i>
                           <strong className="me-2">Code:</strong>
-                          <span className="small">#2k23</span>
+                          <span className="small">{studentData.student.user.slug}</span>
                         </div>
                         <div className=" d-flex align-items-center px-3">
                           <i className="bi bi-telephone me-2 text-primary"></i>
                           <strong className="me-2">Phone 1:</strong>
-                          <span className="small">01051456789</span>
+                          <span className="small">{studentData.student.user.phone}</span>
                         </div>
                         <div className=" d-flex align-items-center px-3 ">
                           <i className="bi bi-telephone-plus me-2 text-primary"></i>
                           <strong className="me-2">Phone 2:</strong>
-                          <span className="small">01225456789</span>
+                          <span className="small">{studentData.student.user.parent_phone}</span>
                         </div>
                       </div>
                     </div>
@@ -234,7 +372,7 @@ function StudentProfile() {
                       </div>
                       <div className="qr-container">
                         <img
-                          src="https://api.qrserver.com/v1/create-qr-code/?size=120x120&data=StudentProfile:EmilyCarter"
+                          src={`https://api.qrserver.com/v1/create-qr-code/?size=120x120&data=StudentProfile:${studentData.student.user.slug}`}
                           alt="QR Code"
                           className="qr-code-img"
                         />
@@ -352,21 +490,13 @@ function StudentProfile() {
                           </tr>
                         </thead>
                         <tbody>
-                          <tr className="border-bottom">
-                            <td className="fw-medium">Tuesday</td>
-                            <td className="fw-medium">4:00 PM – 6:00 PM</td>
-                            <td className="fw-medium">Algebra</td>
-                          </tr>
-                          <tr>
-                            <td className="fw-medium">Thursday</td>
-                            <td className="fw-medium">6:00 PM – 08:00 PM</td>
-                            <td className="fw-medium">Mechanics</td>
-                          </tr>
-                          <tr>
-                            <td className="fw-medium">Sunday</td>
-                            <td className="fw-medium">2:00 PM – 4:00 PM</td>
-                            <td className="fw-medium">Calculs</td>
-                          </tr>
+                          {schedule.map((item, idx) => (
+                            <tr key={idx} className="border-bottom">
+                              <td className="fw-medium">{item.day}</td>
+                              <td className="fw-medium">{item.time}</td>
+                              <td className="fw-medium">{item.subject}</td>
+                            </tr>
+                          ))}
                         </tbody>
                       </table>
                     </div>
