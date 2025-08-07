@@ -139,9 +139,10 @@ export default function EducatorCoursesList({ id }) {
   const averageRating = courses.filter(course => course.rating > 0).reduce((sum, course) => sum + course.rating, 0) / courses.filter(course => course.rating > 0).length;
 
   return (
-    <div className="profile-root">
+    <div className="min-vh-100 profile-root p-4">
+      <div className="container">
       {/* Header */}
-      <div className="card border-0 shadow-sm">
+      <div className="card border-0 shadow-sm mb-4">
         <div className="container py-3">
           <div className="d-flex align-items-center justify-content-between">
             <div className="d-flex align-items-center">
@@ -165,7 +166,6 @@ export default function EducatorCoursesList({ id }) {
       </div>
 
       {/* Stats Overview */}
-      <div className="container py-4">
         <div className="row g-3 mb-4">
           <div className="col-md-3">
             <div className="card">

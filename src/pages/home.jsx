@@ -1,8 +1,6 @@
 import React from "react";
 import "bootstrap/dist/css/bootstrap.min.css";
 import "bootstrap-icons/font/bootstrap-icons.css";
-import MainHeader from "../components/common/Headers/MainHeader.jsx";
-import MainFooter from "../components/common/Footers/MainFooter.jsx";
 // eslint-disable-next-line
 import { motion } from "framer-motion";
 import { useInView } from "react-intersection-observer";
@@ -137,8 +135,6 @@ export default function HomePage() {
       className="min-vh-100 profile-root"
       style={{ background: "var(--color-background)" }}
     >
-      <MainHeader />
-
       <div className="container py-5">
         {/* Who We Are Section */}
         <motion.div
@@ -426,8 +422,6 @@ export default function HomePage() {
           ))}
         </motion.div>
       </div>
-
-      <MainFooter />
     </div>
   );
 }
