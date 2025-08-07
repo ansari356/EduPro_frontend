@@ -1,5 +1,6 @@
 import { Navbar, Nav, Dropdown, Container } from "react-bootstrap";
 import { NavLink } from "react-router-dom";
+import { pagePaths } from "../../../pagePaths";
 
 export default function StudentHeader() {
   return (
@@ -18,7 +19,7 @@ export default function StudentHeader() {
           <Nav className="mx-auto nav-links-container">
             <Nav.Link
               as={NavLink}
-              to="/student-profile"
+              to={pagePaths.student.profile}
               className="nav-link-custom"
             >
               <i className="bi bi-person-badge me-2"></i>
