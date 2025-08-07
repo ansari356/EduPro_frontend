@@ -9,7 +9,7 @@ import StudentProfile from "./pages/Student/StudentProfile";
 import CoursesList from "./pages/Educator/CoursesList";
 import EducatorNavbarLayout from "./components/layout/EducatorNavbarLayout";
 import EducatorCourseDetailsPage from "./pages/Educator/EducatorCourseDetails";
-import StudentCourseDetailsPage from "./pages/Student/StudentCourseDetails";
+import StudentCourseDetailsPage from "./pages/Student/studentCourseDetails";
 import EditCoursePage from "./pages/Educator/EducatorEditCoursePage";
 import Home from "./pages/home";
 import EducatorProtectedRoutes from "./components/auth/educatorProtectedRoutes";
