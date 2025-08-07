@@ -1,8 +1,11 @@
 import { Navbar, Nav, Dropdown, Container } from "react-bootstrap";
 import { NavLink } from "react-router-dom";
 import { pagePaths } from "../../../pagePaths";
+import logoutUser from "../../../apis/actions/logoutUser";
+import useRefreshToken from "../../../apis/hooks/useRefreshToken";
 
 export default function StudentHeader() {
+  const {mutate} = useRefreshToken()
   return (
     <Navbar bg="white" expand="lg" className="custom-navbar shadow-sm">
       <Container fluid className="px-4">
@@ -79,7 +82,7 @@ export default function StudentHeader() {
                 </Dropdown.Item>
                 <Dropdown.Divider />
                 <Dropdown.Item
-                  href="#signout"
+                  onClick={() => logoutUser().then(() => mutate())}
                   className="dropdown-item-custom text-danger"
                 >
                   <i className="bi bi-box-arrow-right me-2"></i>

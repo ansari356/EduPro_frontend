@@ -1,110 +1,29 @@
 import React, { useState, useEffect } from 'react';
 import { Eye, EyeOff, User, Lock, Phone, Mail, BookOpen, ArrowRight, UserPlus } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
-
-// Teachers Database (unchanged)
-const teachersDatabase = {
-  'ahmed-alansari': {
-    id: 1,
-    name: 'Ahmed Al-Ansari',
-    fullName: 'Prof. Ahmed Al-Ansari',
-    subject: 'Mathematics',
-    students: 127,
-    avatar: '🧮',
-    color: 'blue',
-    description: 'High School Mathematics Teacher',
-    experience: '15 years experience',
-    grades: ['Grade 9', 'Grade 10', 'Grade 11', 'Grade 12']
-  },
-  'fatma-hassan': {
-    id: 2,
-    name: 'Fatma Hassan',
-    fullName: 'Dr. Fatma Hassan',
-    subject: 'Physics',
-    students: 89,
-    avatar: '⚛️',
-    color: 'purple',
-    description: 'PhD in Theoretical Physics',
-    experience: '12 years experience',
-    grades: ['Grade 10', 'Grade 11', 'Grade 12']
-  },
-  'mahmoud-ibrahim': {
-    id: 3,
-    name: 'Mahmoud Ibrahim',
-    fullName: 'Prof. Mahmoud Ibrahim',
-    subject: 'Chemistry',
-    students: 156,
-    avatar: '🧪',
-    color: 'green',
-    description: 'Organic Chemistry Specialist',
-    experience: '10 years experience',
-    grades: ['Grade 10', 'Grade 11', 'Grade 12']
-  },
-  'sara-ali': {
-    id: 4,
-    name: 'Sara Ali',
-    fullName: 'Prof. Sara Ali',
-    subject: 'English Literature',
-    students: 203,
-    avatar: '📚',
-    color: 'amber',
-    description: 'Master\'s in English Literature',
-    experience: '8 years experience',
-    grades: ['Grade 9', 'Grade 10', 'Grade 11', 'Grade 12']
-  },
-  'omar-mohamed': {
-    id: 5,
-    name: 'Omar Mohamed',
-    fullName: 'Dr. Omar Mohamed',
-    subject: 'Biology',
-    students: 145,
-    avatar: '🧬',
-    color: 'success',
-    description: 'Marine Biology Specialist',
-    experience: '13 years experience',
-    grades: ['Grade 10', 'Grade 11', 'Grade 12']
-  }
-};
+import useEducatorPublicData from '../../apis/hooks/student/useEducatorPublicData';
+import { pagePaths } from '../../pagePaths';
+import registerStudent from '../../apis/actions/student/registerStudent';
 
 const StudentSignupPage = () => {
   const [formData, setFormData] = useState({
-    fullName: '',
-    studentId: '',
+    firstName: '',
+    lastName: '',
+    username: '', // Mapping studentId to username
     phone: '',
     email: '',
     password: '',
     confirmPassword: '',
-    grade: '',
-    parentPhone: ''
+    parentPhone: '',
+    avatar: null,
+    avatarPreview: null
   });
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
-  const [teacherInfo, setTeacherInfo] = useState(null);
-  const [loading, setLoading] = useState(true);
   const [errors, setErrors] = useState({});
+  const [registerLoading, setRegisterLoading] = useState(false);
   const navigate = useNavigate();
-
-  // Extract teacher name from URL
-  useEffect(() => {
-    const getTeacherFromUrl = () => {
-      const currentPath = window.location.pathname;
-      const teacherSlug = currentPath.split('/')[1] || 'ahmed-alansari';
-      return teacherSlug;
-    };
-
-    const teacherSlug = getTeacherFromUrl();
-    const teacher = teachersDatabase[teacherSlug];
-    
-    if (teacher) {
-      setTeacherInfo(teacher);
-    } else {
-      setTeacherInfo(null);
-    }
-    
-    setTimeout(() => {
-      setLoading(false);
-    }, 1000);
-  }, []);
+  const { data: educatorData, error, isLoading } = useEducatorPublicData();
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -122,15 +41,36 @@ const StudentSignupPage = () => {
     }
   };
 
+  const handleAvatarChange = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      setFormData(prev => ({
+        ...prev,
+        avatar: file,
+        avatarPreview: URL.createObjectURL(file)
+      }));
+    } else {
+      setFormData(prev => ({
+        ...prev,
+        avatar: null,
+        avatarPreview: null
+      }));
+    }
+  };
+
   const validateForm = () => {
     const newErrors = {};
     
-    if (!formData.fullName.trim()) {
-      newErrors.fullName = 'Full name is required';
+    if (!formData.firstName.trim()) {
+      newErrors.firstName = 'First name is required';
     }
     
-    if (!formData.studentId.trim()) {
-      newErrors.studentId = 'Student ID is required';
+    if (!formData.lastName.trim()) {
+      newErrors.lastName = 'Last name is required';
+    }
+
+    if (!formData.username.trim()) {
+      newErrors.username = 'Username (Student ID) is required';
     }
         
     if (!formData.phone.trim()) {
@@ -157,10 +97,6 @@ const StudentSignupPage = () => {
       newErrors.confirmPassword = 'Passwords do not match';
     }
     
-    if (!formData.grade) {
-      newErrors.grade = 'Please select your grade';
-    }
-    
     if (!formData.parentPhone.trim()) {
       newErrors.parentPhone = 'Parent phone number is required';
     } else if (!/^01[0125][0-9]{8}$/.test(formData.parentPhone)) {
@@ -170,9 +106,9 @@ const StudentSignupPage = () => {
     return newErrors;
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    if (!teacherInfo) return;
+    if (!educatorData) return;
     
     const validationErrors = validateForm();
     if (Object.keys(validationErrors).length > 0) {
@@ -180,38 +116,49 @@ const StudentSignupPage = () => {
       return;
     }
     
-    console.log('Student registration:', {
-      ...formData,
-      teacherSlug: teacherInfo.name,
-      teacherId: teacherInfo.id,
-      subject: teacherInfo.subject
-    });
-    
-    alert(`Registration successful! Welcome to ${teacherInfo.fullName}'s ${teacherInfo.subject} class!`);
-    
-    // Reset form
-    setFormData({
-      fullName: '',
-      studentId: '',
-      phone: '',
-      email: '',
-      password: '',
-      confirmPassword: '',
-      grade: '',
-      parentPhone: ''
-    });
-    setErrors({});
-  };
+    const registrationData = {
+      first_name: formData.firstName,
+      last_name: formData.lastName,
+      email: formData.email,
+      username: formData.username,
+      phone: formData.phone,
+      parent_phone: formData.parentPhone,
+      password1: formData.password,
+      password2: formData.confirmPassword,
+      avatar: formData.avatar // Use the selected avatar file
+    };
 
-  const switchTeacher = (teacherSlug) => {
-    const teacher = teachersDatabase[teacherSlug];
-    if (teacher) {
-      setTeacherInfo(teacher);
-      window.history.pushState({}, '', `/${teacherSlug}/student-signup`);
+    setRegisterLoading(true);
+    try {
+      const response = await registerStudent(registrationData,educatorData?.user.username);
+      console.log('Student registration successful:', response.data);
+      alert(`Registration successful! Welcome to ${educatorData.full_name}'s ${educatorData.specialization} class!`);
+      
+      // Reset form
+      setFormData({
+        firstName: '',
+        lastName: '',
+        username: '',
+        phone: '',
+        email: '',
+        password: '',
+        confirmPassword: '',
+        parentPhone: '',
+        avatar: null,
+        avatarPreview: null
+      });
+      setErrors({});
+      navigate(pagePaths.student.login(educatorData?.user.username)); // Redirect to login page
+    } catch (err) {
+      console.error('Student registration failed:', err);
+      alert(`Registration failed: ${err.response?.data?.detail || err.message}`);
+      setErrors(err.response?.data || {}); // Set errors from API response
+    } finally {
+      setRegisterLoading(false);
     }
   };
 
-  if (loading) {
+  if (isLoading) {
     return (
       <div className="profile-root min-vh-100 d-flex align-items-center justify-content-center">
         <div className="text-center">
@@ -224,7 +171,17 @@ const StudentSignupPage = () => {
     );
   }
 
-  if (!teacherInfo) {
+  if (error) {
+    return (
+      <div className="profile-root min-vh-100 d-flex align-items-center justify-content-center">
+        <div className="text-center">
+          <p className="profile-joined text-danger">Error loading teacher data: {error.message}</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (!educatorData) {
     return (
       <div className="profile-root min-vh-100 d-flex align-items-center justify-content-center">
         <div className="text-center">
@@ -236,7 +193,7 @@ const StudentSignupPage = () => {
           </p>
           <button 
             className="btn-edit-profile"
-            onClick={() => switchTeacher('ahmed-alansari')}
+            onClick={() => navigate('/')} // Navigate to a default homepage or error page
           >
             Back to Homepage
           </button>
@@ -253,14 +210,14 @@ const StudentSignupPage = () => {
           <div className="d-flex align-items-center justify-content-between">
             <div className="d-flex align-items-center">
               <div className="header-avatar">
-                <span>{teacherInfo.avatar}</span>
+                <img src={educatorData.profile_picture} alt="Educator Profile" className="rounded-circle" style={{ width: '50px', height: '50px', objectFit: 'cover' }} />
               </div>
               <div>
                 <span className="section-title mb-0">
-                  {teacherInfo.fullName}'s Class
+                  {educatorData.full_name}'s Class
                 </span>
                 <p className="profile-role mb-0">
-                  {teacherInfo.subject}
+                  {educatorData.specialization}
                 </p>
               </div>
             </div>
@@ -268,7 +225,7 @@ const StudentSignupPage = () => {
             <div className="d-flex align-items-center gap-2">
               <button 
                 className="btn-edit-profile d-flex align-items-center"
-                onClick={() => navigate(`/${Object.keys(teachersDatabase).find(slug => teachersDatabase[slug].id === teacherInfo.id)}/student-login`)}
+                onClick={() => navigate(pagePaths.student.login(educatorData.username))}
               >
                 <ArrowRight size={16} className="me-2" />
                 Student Login
@@ -288,58 +245,103 @@ const StudentSignupPage = () => {
               <div className="card-body">
                 <div className="text-center mb-4">
                   <div className="avatar-circle">
-                    <span>{teacherInfo.avatar}</span>
+                    <img src={educatorData.profile_picture} alt="Educator Profile" className="rounded-circle" style={{ width: '80px', height: '80px', objectFit: 'cover' }} />
                   </div>
                   <h1 className="section-title mb-2">
                     Join
                   </h1>
                   <h2 className="profile-name text-accent mb-2">
-                    {teacherInfo.fullName}'s Class
+                    {educatorData.full_name}'s Class
                   </h2>
                   <p className="profile-role mb-2">
-                    {teacherInfo.description}
+                    {educatorData.bio}
                   </p>
                   <p className="profile-joined">
-                    {teacherInfo.experience} • {teacherInfo.students} registered students
+                    {educatorData.experiance} years experience • {educatorData.number_of_students} registered students
                   </p>
                 </div>
 
                 <form onSubmit={handleSubmit}>
-                  {/* Full Name */}
-                  <div className="mb-3">
-                    <label className="form-label">
-                      Full Name *
+                  {/* Avatar */}
+                  <div className="mb-4 text-center">
+                    <label htmlFor="avatar-upload" className="d-block mb-2 form-label">
+                      Profile Picture
                     </label>
-                    <div className="position-relative">
-                      <input
-                        type="text"
-                        name="fullName"
-                        className={`form-control ${errors.fullName ? 'is-invalid' : ''}`}
-                        value={formData.fullName}
-                        onChange={handleInputChange}
-                        placeholder="Enter your full name"
+                    <div className="avatar-upload-container mx-auto position-relative">
+                      <img 
+                        src={formData.avatarPreview || "https://placehold.co/120x120?text=Studnet"} 
+                        alt="Avatar Preview" 
+                        className="rounded-circle avatar-preview" 
+                        style={{ width: '100px', height: '100px', objectFit: 'cover', border: '2px solid var(--color-border)' }}
                       />
-                      <User className="position-absolute top-50 translate-middle-y input-icon" size={20} />
-                      {errors.fullName && <div className="invalid-feedback">{errors.fullName}</div>}
+                      <input
+                        type="file"
+                        id="avatar-upload"
+                        name="avatar"
+                        accept="image/*"
+                        onChange={handleAvatarChange}
+                        className="d-none"
+                      />
+                      <label htmlFor="avatar-upload" className="avatar-upload-button">
+                        <UserPlus size={20} />
+                      </label>
                     </div>
                   </div>
 
-                  {/* Student ID */}
+                  {/* First Name */}
                   <div className="mb-3">
                     <label className="form-label">
-                      Student ID *
+                      First Name *
                     </label>
                     <div className="position-relative">
                       <input
                         type="text"
-                        name="studentId"
-                        className={`form-control ${errors.studentId ? 'is-invalid' : ''}`}
-                        value={formData.studentId}
+                        name="firstName"
+                        className={`form-control ${errors.firstName ? 'is-invalid' : ''}`}
+                        value={formData.firstName}
                         onChange={handleInputChange}
-                        placeholder="Enter your student ID"
+                        placeholder="Enter your first name"
+                      />
+                      <User className="position-absolute top-50 translate-middle-y input-icon" size={20} />
+                      {errors.firstName && <div className="invalid-feedback">{errors.firstName}</div>}
+                    </div>
+                  </div>
+
+                  {/* Last Name */}
+                  <div className="mb-3">
+                    <label className="form-label">
+                      Last Name *
+                    </label>
+                    <div className="position-relative">
+                      <input
+                        type="text"
+                        name="lastName"
+                        className={`form-control ${errors.lastName ? 'is-invalid' : ''}`}
+                        value={formData.lastName}
+                        onChange={handleInputChange}
+                        placeholder="Enter your last name"
+                      />
+                      <User className="position-absolute top-50 translate-middle-y input-icon" size={20} />
+                      {errors.lastName && <div className="invalid-feedback">{errors.lastName}</div>}
+                    </div>
+                  </div>
+
+                  {/* Username (Student ID) */}
+                  <div className="mb-3">
+                    <label className="form-label">
+                      Username (Student ID) *
+                    </label>
+                    <div className="position-relative">
+                      <input
+                        type="text"
+                        name="username"
+                        className={`form-control ${errors.username ? 'is-invalid' : ''}`}
+                        value={formData.username}
+                        onChange={handleInputChange}
+                        placeholder="Enter your student ID or desired username"
                       />
                       <BookOpen className="position-absolute top-50 translate-middle-y input-icon" size={20} />
-                      {errors.studentId && <div className="invalid-feedback">{errors.studentId}</div>}
+                      {errors.username && <div className="invalid-feedback">{errors.username}</div>}
                     </div>
                   </div>
 
@@ -379,25 +381,6 @@ const StudentSignupPage = () => {
                       <Mail className="position-absolute top-50 translate-middle-y input-icon" size={20} />
                       {errors.email && <div className="invalid-feedback">{errors.email}</div>}
                     </div>
-                  </div>
-
-                  {/* Grade */}
-                  <div className="mb-3">
-                    <label className="form-label">
-                      Grade *
-                    </label>
-                    <select
-                      name="grade"
-                      className={`form-control ${errors.grade ? 'is-invalid' : ''}`}
-                      value={formData.grade}
-                      onChange={handleInputChange}
-                    >
-                      <option value="">Select your grade</option>
-                      {teacherInfo.grades.map(grade => (
-                        <option key={grade} value={grade}>{grade}</option>
-                      ))}
-                    </select>
-                    {errors.grade && <div className="invalid-feedback">{errors.grade}</div>}
                   </div>
 
                   {/* Parent Phone */}
@@ -481,9 +464,14 @@ const StudentSignupPage = () => {
                   <button
                     type="submit"
                     className="btn-edit-profile w-100 mb-3 d-flex align-items-center justify-content-center"
+                    disabled={registerLoading}
                   >
-                    <UserPlus size={20} className="me-2" />
-                    Register for {teacherInfo.subject} Class
+                    {registerLoading ? (
+                      <span className="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
+                    ) : (
+                      <UserPlus size={20} className="me-2" />
+                    )}
+                    {registerLoading ? 'Registering...' : `Register for ${educatorData.specialization} Class`}
                   </button>
                 </form>
 
@@ -492,7 +480,7 @@ const StudentSignupPage = () => {
                     Already have an account? 
                     <button 
                       className="btn-link-custom text-accent ms-1"
-                      onClick={() => navigate(`/${Object.keys(teachersDatabase).find(slug => teachersDatabase[slug].id === teacherInfo.id)}/student-login`)}
+                      onClick={() => navigate(pagePaths.student.login(educatorData.username))}
                     >
                       Login here
                     </button>
@@ -507,20 +495,20 @@ const StudentSignupPage = () => {
             <div className="illustration-card">
               <div className="text-center mb-4">
                 <h2 className="section-title text-white mb-2">
-                  Register for {teacherInfo.subject}
+                  Register for {educatorData.specialization}
                 </h2>
                 <p className="profile-name text-white mb-2">
-                  with {teacherInfo.fullName}
+                  with {educatorData.full_name}
                 </p>
                 <p className="text-white opacity-75">
-                  {teacherInfo.description}
+                  {educatorData.bio}
                 </p>
               </div>
               
               <div className="position-relative mx-auto mb-4 illustration-container">
                 <div className="card h-100 d-flex align-items-center justify-content-center">
                   <div className="text-center">
-                    <div className="display-1 mb-3">{teacherInfo.avatar}</div>
+                    <img src={educatorData.logo} alt="Educator Logo" className="img-fluid" style={{ maxHeight: '150px' }} />
                     <div className="progress-bar-primary"></div>
                     <div className="progress-bar-light"></div>
                     <div className="progress-bar-accent"></div>
@@ -537,22 +525,22 @@ const StudentSignupPage = () => {
                 <div className="row text-center">
                   <div className="col-6">
                     <div className="section-title text-accent">
-                      {teacherInfo.students}
+                      {educatorData.number_of_students}
                     </div>
                     <div className="profile-joined">Current Students</div>
                   </div>
                   <div className="col-6">
                     <div className="section-title text-accent">
-                      {teacherInfo.grades.length}
+                      {educatorData.number_of_courses}
                     </div>
-                    <div className="profile-joined">Available Grades</div>
+                    <div className="profile-joined">Available Courses</div>
                   </div>
                 </div>
               </div>
               
               <div className="text-center">
                 <p className="profile-role text-white fw-bold">
-                  {teacherInfo.fullName} - {teacherInfo.subject}
+                  {educatorData.full_name} - {educatorData.specialization}
                 </p>
               </div>
             </div>

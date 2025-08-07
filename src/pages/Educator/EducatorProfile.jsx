@@ -147,21 +147,20 @@ function EducatorProfile() {
       }
     }
 
-    await updateEducatorProfile({
-      ...dataToSubmit,
-      experiance: +educatorData?.experiance || "",
-    })
-      .then((res) => {
-        console.log(res.data);
-        mutate();
-        setShowEditForm(false);
-      })
-      .catch((err) => {
-        console.error("Error updating profile:", err);
-        alert("Failed to update profile. Please try again.");
-      });
-    // Optionally, re-fetch profile data to ensure UI is updated
-    // useEducatorProfileData hook might have a re-fetch mechanism or you can trigger it
+    
+	  await updateEducatorProfile(dataToSubmit)
+			.then((res) => {
+				console.log(res.data);
+				mutate();
+				setShowEditForm(false);
+			})
+			.catch((err) => {
+				console.error("Error updating profile:", err);
+				alert("Failed to update profile. Please try again.");
+			});
+      // Optionally, re-fetch profile data to ensure UI is updated
+      // useEducatorProfileData hook might have a re-fetch mechanism or you can trigger it
+    
   };
 
   const courses = [
