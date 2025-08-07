@@ -8,13 +8,17 @@ import EducatorProfile from "./pages/Educator/EducatorProfile";
 import StudentProfile from "./pages/Student/StudentProfile";
 import CoursesList from "./pages/Educator/CoursesList";
 import EducatorNavbarLayout from "./components/layout/EducatorNavbarLayout";
-import StudentnavbarLayout from "./components/layout/StudentnavbarLayout";
 import EducatorCourseDetailsPage from "./pages/Educator/EducatorCourseDetails";
 import StudentCourseDetailsPage from "./pages/Student/studentCourseDetails";
 import EditCoursePage from "./pages/Educator/EducatorEditCoursePage";
 import Home from "./pages/home";
 import EducatorProtectedRoutes from "./components/auth/educatorProtectedRoutes";
 import EducatorRedirectIfLogedin from "./components/auth/educatorRedirectIfLogedin";
+import StudentProtectedRoutes from "./components/auth/studentProtectedRoutes";
+import StudentRedirectIfLogedin from "./components/auth/studentRedirectIfLogedin";
+import StudentNavbarLayout from "./components/layout/StudentNavbarLayout";
+import EducatorPageDataٌٌٌRoutes from "./components/layout/EducatorPageDataRoutes";
+import NotFoundPage from "./pages/NotFoundPage"; // Import the NotFoundPage
 function App() {
   return (
 		<Routes>
@@ -32,7 +36,10 @@ function App() {
 				<Route element={<EducatorProtectedRoutes />}>
 					<Route element={<EducatorNavbarLayout />}>
 						<Route path="educator" element={<EducatorProfile />} />
-						<Route path="students" element={<h1> students Home Page Place Holder</h1>} />
+						<Route
+							path="students"
+							element={<h1> students Home Page Place Holder</h1>}
+						/>
 						<Route path="courses">
 							<Route index element={<CoursesList />} />
 							<Route path=":id" element={<EducatorCourseDetailsPage />} />
@@ -42,20 +49,25 @@ function App() {
 					</Route>
 				</Route>
 			</Route>
-
 			{/* Educator Based Pages  [all student pages depend on educator username] */}
-
-			<Route path=":educator_username">
+			<Route path=":educator_username" element={<EducatorPageDataٌٌٌRoutes />}>
 				<Route index element={<h1> Educator Home Page Place Holder</h1>} />
-				<Route path="login" element={<StudentLoginPage />} />
-				<Route path="signup" element={<StudentSignupPage />} />
-				<Route path="student" element={<StudentnavbarLayout />}>
-					<Route path="profile" element={<StudentProfile />} />
-					<Route path="courses">
-						<Route path=":id" element={<StudentCourseDetailsPage />} />
+				<Route element={<StudentRedirectIfLogedin />}>
+					<Route path="login" element={<StudentLoginPage />} />
+					<Route path="signup" element={<StudentSignupPage />} />
+				</Route>
+
+				<Route element={<StudentProtectedRoutes />}>
+					<Route path="student" element={<StudentNavbarLayout />}>
+						<Route path="profile" element={<StudentProfile />} />
+						<Route path="courses">
+							<Route path=":id" element={<StudentCourseDetailsPage />} />
+						</Route>
 					</Route>
 				</Route>
 			</Route>
+			{/* Catch-all route for 404 Not Found */}
+			<Route path="*" element={<NotFoundPage />} />
 		</Routes>
 	);
 }

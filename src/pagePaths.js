@@ -1,6 +1,7 @@
 export const pagePaths = {
 	home: "/",
 	student: {
+		educator: (educator_username) => `/${educator_username}`,
 		login: (educator_username) => `/${educator_username}/login`,
 		signup: (educator_username) => `/${educator_username}/signup`,
 		profile: (educator_username) => `/${educator_username}/student/profile`,
