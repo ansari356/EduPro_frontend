@@ -57,7 +57,7 @@ function App() {
       </Route>
 
       {/* Educator Based Pages  [all student pages depend on educator username] */}
-      <Route path=":educator_username" element={<EducatorPageDataٌٌٌRoutes />}>
+      <Route path=":educatorUsername" element={<EducatorPageDataٌٌٌRoutes />}>
         <Route index element={<h1> Educator Home Page Place Holder</h1>} />
         <Route element={<StudentRedirectIfLogedin />}>
           <Route path="login" element={<StudentLoginPage />} />
