@@ -1,13 +1,19 @@
 import { Navbar, Nav, Dropdown, Container } from "react-bootstrap";
-import { NavLink } from "react-router-dom";
+import { NavLink, useParams } from "react-router-dom";
 import { pagePaths } from "../../../pagePaths";
 import logoutUser from "../../../apis/actions/logoutUser";
 import useRefreshToken from "../../../apis/hooks/useRefreshToken";
 
 export default function StudentHeader() {
-  const {mutate} = useRefreshToken()
+  const { mutate } = useRefreshToken();
+  const { educatorUsername } = useParams(); // get from URL params or provide otherwise
+
+  if (!educatorUsername) {
+    return null; // or a fallback UI if username is not ready yet
+  }
+
   return (
-    <Navbar bg="white" expand="lg" className="custom-navbar shadow-sm">
+    <Navbar expand="lg" className="custom-navbar shadow-sm">
       <Container fluid className="px-4">
         <Navbar.Brand className="brand-logo">
           <div className="logo-container">
@@ -22,19 +28,27 @@ export default function StudentHeader() {
           <Nav className="mx-auto nav-links-container">
             <Nav.Link
               as={NavLink}
-              to={pagePaths.student.profile}
+              to={pagePaths.student.about(educatorUsername)}
+              className="nav-link-custom"
+            >
+              <i className="bi bi-house-door-fill me-2"></i>
+              Home
+            </Nav.Link>
+            <Nav.Link
+              as={NavLink}
+              to={pagePaths.student.profile(educatorUsername)}
               className="nav-link-custom"
             >
               <i className="bi bi-person-badge me-2"></i>
-              My Profile
+              Dashboard
             </Nav.Link>
-            <Nav.Link as={NavLink} to="/my-courses" className="nav-link-custom">
+            <Nav.Link
+              as={NavLink}
+              to={pagePaths.student.courses(educatorUsername)}
+              className="nav-link-custom"
+            >
               <i className="bi bi-book me-2"></i>
               My Courses
-            </Nav.Link>
-            <Nav.Link as={NavLink} to="/about" className="nav-link-custom">
-              <i className="bi bi-info-circle me-2"></i>
-              About
             </Nav.Link>
           </Nav>
 
@@ -43,11 +57,11 @@ export default function StudentHeader() {
               <Dropdown.Toggle
                 variant="outline-primary"
                 id="dropdown-user"
-                className="dropdown-toggle"
+                className="custom-toggler"
                 aria-label="User menu"
               >
                 <div className="user-avatar">
-                  <i className="bi bi-person-circle"></i>
+                  <i className="bi bi-person-circle custom-toggler"></i>
                 </div>
               </Dropdown.Toggle>
 
@@ -60,30 +74,10 @@ export default function StudentHeader() {
                 </Dropdown.Header>
                 <Dropdown.Divider />
                 <Dropdown.Item
-                  href="/student-profile"
-                  className="dropdown-item-custom"
-                >
-                  <i className="bi bi-person me-2"></i>
-                  Profile
-                </Dropdown.Item>
-                <Dropdown.Item
-                  href="#settings"
-                  className="dropdown-item-custom"
-                >
-                  <i className="bi bi-gear me-2"></i>
-                  Settings
-                </Dropdown.Item>
-                <Dropdown.Item
-                  href="#notifications"
-                  className="dropdown-item-custom"
-                >
-                  <i className="bi bi-bell me-2"></i>
-                  Notifications
-                </Dropdown.Item>
-                <Dropdown.Divider />
-                <Dropdown.Item
-                  onClick={() => logoutUser().then(() => mutate())}
-                  className="dropdown-item-custom text-danger"
+                  onClick={() => {
+                    logoutUser();
+                    mutate();
+                  }}
                 >
                   <i className="bi bi-box-arrow-right me-2"></i>
                   Sign out

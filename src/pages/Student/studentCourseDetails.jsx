@@ -1,14 +1,35 @@
-import React, { useState } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
-import { LibraryBig, User, Clock, BookOpen, Play, CheckCircle } from 'lucide-react';
+import React, { useState, useEffect } from "react";
+import { useParams, useNavigate } from "react-router-dom";
+import {
+  LibraryBig,
+  User,
+  Clock,
+  BookOpen,
+  Play,
+  CheckCircle,
+  Star,
+  Calendar,
+  Award,
+  BarChart3,
+  ArrowLeft,
+  MessageCircle,
+  Download,
+  X,
+  Pause,
+  SkipForward,
+  SkipBack,
+  Volume2,
+  Maximize,
+  Settings
+} from "lucide-react";
 
 const courses = [
   {
     id: 1,
     title: "Data Analysis Fundamentals",
-    description: "Master the fundamentals of data analysis with this comprehensive course. Learn to collect, clean, analyze, and visualize data using industry-standard tools and techniques. This course covers statistical concepts, data manipulation, and practical applications in real-world scenarios. Perfect for beginners who want to start their journey in data science and analytics.",
+    description: "Master the fundamentals of data analysis with this comprehensive course. Learn to collect, clean, analyze, and visualize data using industry-standard tools and techniques.",
     fullDescription: "This comprehensive Data Analysis course is designed to take you from a complete beginner to a confident data analyst. You'll learn essential statistical concepts, data cleaning techniques, exploratory data analysis, and how to draw meaningful insights from complex datasets. The course includes hands-on projects using real-world data from various industries including finance, healthcare, and marketing. By the end of this course, you'll be able to confidently analyze data, create compelling visualizations, and present your findings to stakeholders.",
-    progress: "80%",
+    progress: 75,
     status: "Active",
     image: "https://placehold.co/600x300?text=Data+Analysis+Fundamentals",
     educator: {
@@ -16,231 +37,378 @@ const courses = [
       title: "Senior Data Scientist",
       experience: "8 years",
       rating: 4.8,
-      avatar: "👩‍💻"
+      avatar: "https://placehold.co/150x150?text=Dr.+Sarah"
     },
     duration: "12 weeks",
     level: "Beginner to Intermediate",
     enrolledStudents: 1247,
+    nextLesson: {
+      id: 6,
+      title: "Statistical Analysis Methods",
+      date: "2025-01-20",
+      time: "10:00 AM"
+    },
+    totalLessons: 24,
+    completedLessons: 18,
     tableOfContents: [
       {
         chapter: "Chapter 1: Introduction to Data Analysis",
-        topics: ["What is Data Analysis?", "Types of Data", "Data Analysis Process", "Tools Overview"]
+        topics: ["What is Data Analysis?", "Types of Data", "Data Analysis Process", "Tools Overview"],
+        lessons: 4,
+        completed: 4
       },
       {
         chapter: "Chapter 2: Statistical Foundations",
-        topics: ["Descriptive Statistics", "Probability Basics", "Distributions", "Hypothesis Testing"]
+        topics: ["Descriptive Statistics", "Probability Basics", "Distributions", "Hypothesis Testing"],
+        lessons: 4,
+        completed: 4
       },
       {
         chapter: "Chapter 3: Data Collection & Cleaning",
-        topics: ["Data Sources", "Data Quality Assessment", "Cleaning Techniques", "Missing Data Handling"]
+        topics: ["Data Sources", "Data Quality Assessment", "Cleaning Techniques", "Missing Data Handling"],
+        lessons: 4,
+        completed: 4
       },
       {
         chapter: "Chapter 4: Exploratory Data Analysis",
-        topics: ["EDA Process", "Pattern Recognition", "Correlation Analysis", "Outlier Detection"]
+        topics: ["EDA Process", "Pattern Recognition", "Correlation Analysis", "Outlier Detection"],
+        lessons: 4,
+        completed: 3
       },
       {
         chapter: "Chapter 5: Data Visualization",
-        topics: ["Visualization Principles", "Chart Types", "Interactive Dashboards", "Storytelling with Data"]
+        topics: ["Visualization Principles", "Chart Types", "Interactive Dashboards", "Storytelling with Data"],
+        lessons: 4,
+        completed: 2
       },
       {
         chapter: "Chapter 6: Advanced Analytics",
-        topics: ["Predictive Modeling", "Time Series Analysis", "Classification", "Clustering"]
+        topics: ["Predictive Modeling", "Time Series Analysis", "Classification", "Clustering"],
+        lessons: 4,
+        completed: 1
       }
     ],
     lessons: [
-      { id: 1, title: "Welcome to Data Analysis", duration: "15 min", type: "video", completed: true },
-      { id: 2, title: "Understanding Data Types", duration: "20 min", type: "video", completed: true },
-      { id: 3, title: "Data Analysis Tools Overview", duration: "25 min", type: "video", completed: true },
-      { id: 4, title: "Basic Statistics Quiz", duration: "10 min", type: "quiz", completed: true },
-      { id: 5, title: "Descriptive Statistics Deep Dive", duration: "30 min", type: "video", completed: true },
-      { id: 6, title: "Probability Fundamentals", duration: "35 min", type: "video", completed: false },
-      { id: 7, title: "Working with Distributions", duration: "28 min", type: "video", completed: false },
-      { id: 8, title: "Data Collection Methods", duration: "22 min", type: "video", completed: false },
-      { id: 9, title: "Data Cleaning Exercise", duration: "45 min", type: "exercise", completed: false },
-      { id: 10, title: "EDA Project Assignment", duration: "60 min", type: "project", completed: false }
-    ]
-  },
-  {
-    id: 2,
-    title: "Advanced Excel Techniques for Business",
-    description: "Unlock the full potential of Microsoft Excel with advanced formulas, data analysis tools, and automation techniques. Learn to create dynamic dashboards, perform complex calculations, and streamline your workflow with VBA programming.",
-    fullDescription: "Transform your Excel skills from basic to expert level with this comprehensive course. You'll master advanced formulas, pivot tables, data validation, conditional formatting, and VBA programming. The course focuses on practical business applications including financial modeling, data analysis, reporting automation, and dashboard creation. Each module includes real-world scenarios and hands-on exercises that you can immediately apply in your workplace.",
-    progress: "65%",
-    status: "Active",
-    image: "https://placehold.co/600x300?text=Advanced+Excel+Techniques",
-    educator: {
-      name: "Prof. Michael Chen",
-      title: "Business Analytics Expert",
-      experience: "12 years",
-      rating: 4.9,
-      avatar: "👨‍🏫"
-    },
-    duration: "8 weeks",
-    level: "Intermediate to Advanced",
-    enrolledStudents: 892,
-    tableOfContents: [
-      {
-        chapter: "Chapter 1: Advanced Formulas & Functions",
-        topics: ["INDEX-MATCH", "Array Formulas", "Nested Functions", "Error Handling"]
+      { 
+        id: 1, 
+        title: "Welcome to Data Analysis", 
+        duration: "15 min", 
+        type: "video", 
+        completed: true,
+        videoUrl: "https://sample-videos.com/zip/10/mp4/SampleVideo_1280x720_1mb.mp4",
+        description: "An introduction to the world of data analysis and what you'll learn in this course."
       },
-      {
-        chapter: "Chapter 2: Data Analysis Tools",
-        topics: ["Pivot Tables Mastery", "Power Query", "Data Modeling", "What-If Analysis"]
+      { 
+        id: 2, 
+        title: "Understanding Data Types", 
+        duration: "20 min", 
+        type: "video", 
+        completed: true,
+        videoUrl: "https://sample-videos.com/zip/10/mp4/SampleVideo_1280x720_2mb.mp4",
+        description: "Learn about different types of data and how they affect your analysis approach."
       },
-      {
-        chapter: "Chapter 3: Visualization & Dashboards",
-        topics: ["Advanced Charts", "Interactive Dashboards", "Conditional Formatting", "Sparklines"]
+      { 
+        id: 3, 
+        title: "Data Analysis Tools Overview", 
+        duration: "25 min", 
+        type: "video", 
+        completed: true,
+        videoUrl: "https://sample-videos.com/zip/10/mp4/SampleVideo_1280x720_1mb.mp4",
+        description: "Overview of the essential tools used in modern data analysis."
       },
-      {
-        chapter: "Chapter 4: Automation with VBA",
-        topics: ["VBA Basics", "Macro Creation", "User Forms", "Event Programming"]
+      { 
+        id: 4, 
+        title: "Basic Statistics Quiz", 
+        duration: "10 min", 
+        type: "quiz", 
+        completed: true,
+        description: "Test your understanding of basic statistical concepts."
       },
-      {
-        chapter: "Chapter 5: Business Applications",
-        topics: ["Financial Modeling", "Budgeting Templates", "Reporting Automation", "Data Integration"]
+      { 
+        id: 5, 
+        title: "Descriptive Statistics Deep Dive", 
+        duration: "30 min", 
+        type: "video", 
+        completed: true,
+        videoUrl: "https://sample-videos.com/zip/10/mp4/SampleVideo_1280x720_2mb.mp4",
+        description: "Comprehensive look at descriptive statistics and their applications."
+      },
+      { 
+        id: 6, 
+        title: "Probability Fundamentals", 
+        duration: "35 min", 
+        type: "video", 
+        completed: false,
+        videoUrl: "https://sample-videos.com/zip/10/mp4/SampleVideo_1280x720_1mb.mp4",
+        description: "Understanding probability theory and its role in data analysis."
+      },
+      { 
+        id: 7, 
+        title: "Working with Distributions", 
+        duration: "28 min", 
+        type: "video", 
+        completed: false,
+        videoUrl: "https://sample-videos.com/zip/10/mp4/SampleVideo_1280x720_2mb.mp4",
+        description: "Explore different statistical distributions and their characteristics."
       }
     ],
-    lessons: [
-      { id: 1, title: "Advanced Formula Techniques", duration: "25 min", type: "video", completed: true },
-      { id: 2, title: "Mastering INDEX-MATCH", duration: "30 min", type: "video", completed: true },
-      { id: 3, title: "Array Formulas Workshop", duration: "40 min", type: "exercise", completed: true },
-      { id: 4, title: "Pivot Tables Deep Dive", duration: "35 min", type: "video", completed: true },
-      { id: 5, title: "Power Query Introduction", duration: "28 min", type: "video", completed: false },
-      { id: 6, title: "Dashboard Creation Project", duration: "90 min", type: "project", completed: false },
-      { id: 7, title: "VBA Programming Basics", duration: "45 min", type: "video", completed: false },
-      { id: 8, title: "Macro Automation Exercise", duration: "50 min", type: "exercise", completed: false }
-    ]
-  },
-  {
-    id: 3,
-    title: "Data Visualization Mastery with Tableau",
-    description: "Create stunning, interactive data visualizations and dashboards using Tableau. Learn best practices for visual design, storytelling with data, and building compelling reports that drive business decisions.",
-    fullDescription: "Become a data visualization expert with this comprehensive Tableau course. You'll learn to transform raw data into compelling visual stories that inform and influence decision-making. The course covers everything from basic chart creation to advanced dashboard design, calculated fields, parameters, and custom visualizations. You'll work with real datasets from various industries and learn to apply design principles that make your visualizations both beautiful and functional. By the end, you'll be able to create publication-ready dashboards and present data insights effectively to any audience.",
-    progress: "92%",
-    status: "Active",
-    image: "https://placehold.co/600x300?text=Tableau+Mastery",
-    educator: {
-      name: "Alex Rodriguez",
-      title: "Data Visualization Specialist",
-      experience: "6 years",
-      rating: 4.7,
-      avatar: "🎨"
-    },
-    duration: "10 weeks",
-    level: "Beginner to Advanced",
-    enrolledStudents: 654,
-    tableOfContents: [
-      {
-        chapter: "Chapter 1: Tableau Fundamentals",
-        topics: ["Interface Overview", "Data Connections", "Basic Charts", "Filters & Sorting"]
-      },
-      {
-        chapter: "Chapter 2: Advanced Visualizations",
-        topics: ["Custom Charts", "Dual Axis", "Calculated Fields", "Parameters"]
-      },
-      {
-        chapter: "Chapter 3: Dashboard Design",
-        topics: ["Layout Principles", "Interactivity", "Actions", "Mobile Design"]
-      },
-      {
-        chapter: "Chapter 4: Data Storytelling",
-        topics: ["Narrative Structure", "Story Points", "Annotations", "Presentation Tips"]
-      },
-      {
-        chapter: "Chapter 5: Advanced Features",
-        topics: ["LOD Expressions", "Table Calculations", "Mapping", "Statistical Functions"]
-      },
-      {
-        chapter: "Chapter 6: Publishing & Sharing",
-        topics: ["Tableau Server", "Tableau Online", "Embedding", "Security"]
-      }
-    ],
-    lessons: [
-      { id: 1, title: "Getting Started with Tableau", duration: "20 min", type: "video", completed: true },
-      { id: 2, title: "Creating Your First Visualization", duration: "25 min", type: "video", completed: true },
-      { id: 3, title: "Working with Filters", duration: "18 min", type: "video", completed: true },
-      { id: 4, title: "Basic Charts Practice", duration: "30 min", type: "exercise", completed: true },
-      { id: 5, title: "Advanced Chart Types", duration: "35 min", type: "video", completed: true },
-      { id: 6, title: "Calculated Fields Workshop", duration: "40 min", type: "exercise", completed: true },
-      { id: 7, title: "Dashboard Design Principles", duration: "28 min", type: "video", completed: true },
-      { id: 8, title: "Interactive Dashboard Project", duration: "75 min", type: "project", completed: true },
-      { id: 9, title: "Data Storytelling Techniques", duration: "32 min", type: "video", completed: false },
-      { id: 10, title: "Final Capstone Project", duration: "120 min", type: "project", completed: false }
-    ]
+    studentReview: null
   }
 ];
 
-export default function EducatorCourseDetailsPage() {
-  const { id } = useParams();
+export default function StudentCourseDetailsPage() {
+  const { educatorUsername, id } = useParams();
   const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState('overview');
+  
+  // Video player states
+  const [showVideoModal, setShowVideoModal] = useState(false);
+  const [currentLesson, setCurrentLesson] = useState(null);
+  const [isPlaying, setIsPlaying] = useState(false);
+  
+  // Review system states
+  const [showReviewForm, setShowReviewForm] = useState(false);
+  const [reviewRating, setReviewRating] = useState(0);
+  const [reviewComment, setReviewComment] = useState('');
+  const [hoverRating, setHoverRating] = useState(0);
+  const [reviewSubmitted, setReviewSubmitted] = useState(false);
 
   const course = courses.find((c) => c.id === Number(id));
 
+  // Check if student has already submitted a review
+  useEffect(() => {
+    if (course?.studentReview) {
+      setReviewSubmitted(true);
+    }
+  }, [course]);
+
+  // Video player functions
+  const openVideoPlayer = (lesson) => {
+    if (lesson.type === 'video' && lesson.videoUrl) {
+      setCurrentLesson(lesson);
+      setShowVideoModal(true);
+      setIsPlaying(true);
+    } else if (lesson.type === 'quiz') {
+      // Handle quiz opening - you can implement quiz modal here
+      alert(`Opening quiz: ${lesson.title}`);
+    }
+  };
+
+  const closeVideoPlayer = () => {
+    setShowVideoModal(false);
+    setCurrentLesson(null);
+    setIsPlaying(false);
+  };
+
+  const handleContinueLearning = () => {
+    // Find the next incomplete lesson or the next lesson based on course.nextLesson
+    let nextLesson = null;
+    
+    if (course.nextLesson && course.nextLesson.id) {
+      nextLesson = course.lessons.find(lesson => lesson.id === course.nextLesson.id);
+    } else {
+      // Find first incomplete lesson
+      nextLesson = course.lessons.find(lesson => !lesson.completed);
+    }
+    
+    if (nextLesson) {
+      openVideoPlayer(nextLesson);
+    } else {
+      alert("Congratulations! You've completed all available lessons.");
+    }
+  };
+
+  const markLessonComplete = (lessonId) => {
+    // In a real app, this would call an API
+    const lessonIndex = course.lessons.findIndex(lesson => lesson.id === lessonId);
+    if (lessonIndex !== -1) {
+      course.lessons[lessonIndex].completed = true;
+      // Update progress calculation
+      const newCompletedCount = course.lessons.filter(lesson => lesson.completed).length;
+      course.progress = Math.round((newCompletedCount / course.lessons.length) * 100);
+    }
+  };
+
+  // Handle keyboard shortcuts for video player
+  useEffect(() => {
+    const handleKeyPress = (e) => {
+      if (showVideoModal) {
+        switch (e.key) {
+          case 'Escape':
+            closeVideoPlayer();
+            break;
+          case ' ':
+            e.preventDefault();
+            setIsPlaying(!isPlaying);
+            break;
+        }
+      }
+    };
+
+    document.addEventListener('keydown', handleKeyPress);
+    return () => document.removeEventListener('keydown', handleKeyPress);
+  }, [showVideoModal, isPlaying]);
+
   if (!course) {
     return (
-      <div className="profile-root">
-        {/* Header */}
-        <div className="card border-0 shadow-sm">
-          <div className="container py-3">
-            <div className="d-flex align-items-center">
-              <div className="header-avatar me-2">
-                <i className="bi bi-exclamation-triangle"></i>
-              </div>
-              <div>
-                <span className="section-title mb-0">Course Not Found</span>
-                <p className="profile-role mb-0">The requested course could not be found</p>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        {/* Not Found Content */}
-        <div className="container py-5">
-          <div className="row justify-content-center">
-            <div className="col-lg-6">
-              <div className="card">
-                <div className="card-body text-center">
-                  <div className="avatar-circle mb-4">
-                    <i className="bi bi-exclamation-triangle"></i>
-                  </div>
-                  <h2 className="main-title mb-3">Course Not Found</h2>
-                  <p className="profile-joined mb-4">
-                    Sorry, we couldn't find the course you're looking for. 
-                    It may have been removed or the link might be incorrect.
-                  </p>
-                  <button 
-                    className="btn-edit-profile" 
-                    onClick={() => navigate('/courses')}
-                  >
-                    <i className="bi bi-arrow-left me-2"></i>
-                    Back to Courses
-                  </button>
-                </div>
-              </div>
-            </div>
-          </div>
+      <div className="profile-root min-vh-100 d-flex align-items-center justify-content-center">
+        <div className="text-center">
+          <h2 className="main-title mb-3">Course Not Found</h2>
+          <p className="profile-joined mb-4">
+            Sorry, we couldn't find the course you're looking for.
+          </p>
+          <button 
+            className="btn-edit-profile" 
+            onClick={() => navigate(-1)}
+          >
+            <ArrowLeft size={16} className="me-2" />
+            Go Back
+          </button>
         </div>
       </div>
     );
   }
+
+  const handleReviewSubmit = (e) => {
+    e.preventDefault();
+    if (reviewRating === 0) {
+      alert("Please select a rating");
+      return;
+    }
+
+    console.log("Review submitted:", {
+      rating: reviewRating,
+      comment: reviewComment
+    });
+
+    setReviewSubmitted(true);
+    setShowReviewForm(false);
+    
+    course.studentReview = {
+      rating: reviewRating,
+      comment: reviewComment,
+      date: new Date().toISOString()
+    };
+
+    alert("Thank you for your review! Your feedback helps us improve.");
+  };
 
   const completedLessons = course.lessons.filter(lesson => lesson.completed).length;
   const totalLessons = course.lessons.length;
 
   return (
     <div className="profile-root">
+      {/* Video Player Modal */}
+      {showVideoModal && currentLesson && (
+        <div 
+          className="position-fixed top-0 start-0 w-100 h-100 d-flex align-items-center justify-content-center"
+          style={{ 
+            backgroundColor: 'rgba(0,0,0,0.9)', 
+            zIndex: 1050,
+            backdropFilter: 'blur(5px)'
+          }}
+          onClick={closeVideoPlayer}
+        >
+          <div 
+            className="position-relative bg-secondary rounded"
+            style={{ maxWidth: '90vw', maxHeight: '90vh' }}
+            onClick={(e) => e.stopPropagation()}
+          >
+            {/* Video Player Header */}
+            <div className="d-flex justify-content-between align-items-center p-3 text-white border-bottom border-secondary">
+              <div>
+                <h5 className="mb-0">{currentLesson.title}</h5>
+                <small className="text-muted">{currentLesson.duration} • {course.title}</small>
+              </div>
+              <button
+                className="btn btn-sm text-white p-0"
+                onClick={closeVideoPlayer}
+                style={{ background: 'none', border: 'none' }}
+              >
+                <X size={24} />
+              </button>
+            </div>
+
+            {/* Video Element */}
+            <div className="position-relative">
+              <video
+                width="800"
+                height="450"
+                controls
+                autoPlay={isPlaying}
+                className="d-block"
+                style={{ maxWidth: '90vw', maxHeight: '60vh' }}
+                onEnded={() => {
+                  markLessonComplete(currentLesson.id);
+                  setIsPlaying(false);
+                }}
+              >
+                <source src={currentLesson.videoUrl} type="video/mp4" />
+                Your browser does not support the video tag.
+              </video>
+            </div>
+
+            {/* Video Player Footer */}
+            <div className="p-3 text-white border-top border-secondary">
+              <div className="d-flex justify-content-between align-items-center">
+                <div>
+                  <p className="mb-1 small">{currentLesson.description}</p>
+                </div>
+                <div className="d-flex gap-2">
+                  {!currentLesson.completed && (
+                    <button
+                      className="btn btn-secondary-action btn-sm"
+                      onClick={() => {
+                        markLessonComplete(currentLesson.id);
+                        alert("Lesson marked as complete!");
+                      }}
+                    >
+                      <CheckCircle size={16} className="me-1" />
+                      Mark Complete
+                    </button>
+                  )}
+                  <button
+                    className="btn btn-edit-profile btn-sm"
+                    onClick={() => {
+                      closeVideoPlayer();
+                      // Find next lesson
+                      const currentIndex = course.lessons.findIndex(l => l.id === currentLesson.id);
+                      const nextLesson = course.lessons[currentIndex + 1];
+                      if (nextLesson) {
+                        setTimeout(() => openVideoPlayer(nextLesson), 100);
+                      }
+                    }}
+                  >
+                    Next Lesson
+                    <SkipForward size={16} className="ms-1" />
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* Header */}
       <div className="card border-0 shadow-sm">
         <div className="container py-3">
-          <div className="d-flex align-items-center">
-            <div className="header-avatar me-2">
-              <LibraryBig size={20} />
+          <div className="d-flex align-items-center justify-content-between">
+            <div className="d-flex align-items-center">
+              <div className="header-avatar me-2">
+                <LibraryBig size={20} />
+              </div>
+              <div>
+                <span className="section-title mb-0">{course.title}</span>
+                <p className="profile-role mb-0">by {course.educator.name}</p>
+              </div>
             </div>
-            <div>
-              <span className="section-title mb-0">{course.title}</span>
-              <p className="profile-role mb-0">by {course.educator.name}</p>
-            </div>
+            <button
+              className="btn-edit-profile d-flex align-items-center"
+              onClick={() => navigate(-1)}
+            >
+              <ArrowLeft size={16} className="me-2" />
+              Back to Courses
+            </button>
           </div>
         </div>
       </div>
@@ -256,7 +424,8 @@ export default function EducatorCourseDetailsPage() {
                 <img
                   src={course.image}
                   alt={course.title}
-                  className="course-detail-image"
+                  className="course-detail-image w-100 rounded"
+                  style={{ height: "300px", objectFit: "cover" }}
                 />
               </div>
             )}
@@ -283,6 +452,12 @@ export default function EducatorCourseDetailsPage() {
                   >
                     Lessons
                   </button>
+                  <button
+                    className={`btn-link-custom flex-fill text-center py-3 ${activeTab === 'review' ? 'text-accent border-bottom border-primary border-3' : 'profile-joined'}`}
+                    onClick={() => setActiveTab('review')}
+                  >
+                    Review
+                  </button>
                 </div>
               </div>
             </div>
@@ -300,26 +475,26 @@ export default function EducatorCourseDetailsPage() {
 
                   <div className="row mb-4">
                     <div className="col-md-6 mb-3">
-                      <div className="about-bubble">
-                        <Clock size={16} className="me-2" />
+                      <div className="about-bubble p-3">
+                        <Clock size={16} className="me-2 text-primary" />
                         <strong>Duration:</strong> {course.duration}
                       </div>
                     </div>
                     <div className="col-md-6 mb-3">
-                      <div className="about-bubble">
-                        <BookOpen size={16} className="me-2" />
+                      <div className="about-bubble p-3">
+                        <BookOpen size={16} className="me-2 text-primary" />
                         <strong>Level:</strong> {course.level}
                       </div>
                     </div>
                     <div className="col-md-6 mb-3">
-                      <div className="about-bubble">
-                        <User size={16} className="me-2" />
+                      <div className="about-bubble p-3">
+                        <User size={16} className="me-2 text-primary" />
                         <strong>Students:</strong> {course.enrolledStudents}
                       </div>
                     </div>
                     <div className="col-md-6 mb-3">
-                      <div className="about-bubble">
-                        <i className="bi bi-star-fill me-2"></i>
+                      <div className="about-bubble p-3">
+                        <Star size={16} className="me-2 text-primary" />
                         <strong>Rating:</strong> {course.educator.rating}/5.0
                       </div>
                     </div>
@@ -335,12 +510,31 @@ export default function EducatorCourseDetailsPage() {
                   
                   {course.tableOfContents.map((chapter, index) => (
                     <div key={index} className="mb-4">
-                      <h4 className="about-subtitle mb-3">{chapter.chapter}</h4>
+                      <div className="d-flex justify-content-between align-items-center mb-3">
+                        <h4 className="about-subtitle mb-0">{chapter.chapter}</h4>
+                        <div className="d-flex align-items-center">
+                          <span className="badge bg-secondary me-2">
+                            {chapter.completed}/{chapter.lessons} completed
+                          </span>
+                          <div className="progress" style={{ width: "100px", height: "6px" }}>
+                            <div
+                              className="progress-bar progress-bar-filled"
+                              style={{ width: `${(chapter.completed / chapter.lessons) * 100}%` }}
+                            />
+                          </div>
+                        </div>
+                      </div>
                       <div className="ms-3">
                         {chapter.topics.map((topic, topicIndex) => (
-                          <div key={topicIndex} className="about-bubble mb-2">
-                            <i className="bi bi-play-circle me-2"></i>
-                            {topic}
+                          <div key={topicIndex} className="about-bubble mb-2 d-flex align-items-center">
+                            <div className="me-2">
+                              {topicIndex < chapter.completed ? (
+                                <CheckCircle size={16} className="text-success" />
+                              ) : (
+                                <Play size={16} className="text-muted" />
+                              )}
+                            </div>
+                            <span>{topic}</span>
                           </div>
                         ))}
                       </div>
@@ -356,12 +550,35 @@ export default function EducatorCourseDetailsPage() {
                   <h3 className="section-title mb-4">Course Lessons</h3>
                   
                   {course.lessons.map((lesson) => (
-                    <div key={lesson.id} className="d-flex align-items-center p-3 mb-2 about-bubble">
+                    <div 
+                      key={lesson.id} 
+                      className="d-flex align-items-center p-3 mb-2 about-bubble position-relative"
+                      style={{ 
+                        cursor: lesson.type === 'video' ? 'pointer' : 'default',
+                        transition: 'all 0.2s ease'
+                      }}
+                      onClick={() => openVideoPlayer(lesson)}
+                      onMouseEnter={(e) => {
+                        if (lesson.type === 'video') {
+                          e.currentTarget.style.transform = 'translateX(5px)';
+                          e.currentTarget.style.boxShadow = '0 4px 12px rgba(0,0,0,0.15)';
+                        }
+                      }}
+                      onMouseLeave={(e) => {
+                        if (lesson.type === 'video') {
+                          e.currentTarget.style.transform = 'translateX(0)';
+                          e.currentTarget.style.boxShadow = 'none';
+                        }
+                      }}
+                    >
                       <div className="me-3">
                         {lesson.completed ? (
                           <CheckCircle size={20} className="text-success" />
                         ) : (
-                          <Play size={20} className="text-muted" />
+                          <Play 
+                            size={20} 
+                            className={lesson.type === 'video' ? "text-primary" : "text-muted"} 
+                          />
                         )}
                       </div>
                       
@@ -372,19 +589,159 @@ export default function EducatorCourseDetailsPage() {
                             <Clock size={14} className="me-1" />
                             {lesson.duration}
                           </small>
-                          <small className="border border-primary rounded px-4" style={{ color: "var(--color-primary)" }}>
+                          <small 
+                            className="border rounded px-2 py-1" 
+                            style={{ 
+                              color: lesson.type === 'video' ? "var(--color-primary)" : "var(--color-secondary)",
+                              borderColor: lesson.type === 'video' ? "var(--color-primary)" : "var(--color-secondary)"
+                            }}
+                          >
                             {lesson.type.charAt(0).toUpperCase() + lesson.type.slice(1)}
                           </small>
                         </div>
+                        {lesson.description && (
+                          <small className="text-muted d-block mt-1">
+                            {lesson.description}
+                          </small>
+                        )}
                       </div>
                       
-                      {lesson.completed && (
-                        <div className="text-success">
-                          <i className="bi bi-check-circle-fill"></i>
-                        </div>
-                      )}
+                      <div className="d-flex align-items-center">
+                        {lesson.completed && (
+                          <div className="text-success me-2">
+                            <CheckCircle size={20} />
+                          </div>
+                        )}
+                        {lesson.type === 'video' && !lesson.completed && (
+                          <div className="text-primary opacity-75">
+                            <Play size={16} />
+                          </div>
+                        )}
+                      </div>
                     </div>
                   ))}
+                </div>
+              </div>
+            )}
+
+            {activeTab === 'review' && (
+              <div className="card">
+                <div className="card-body">
+                  <h3 className="section-title mb-4">Course Review</h3>
+                  
+                  {reviewSubmitted || course.studentReview ? (
+                    <div className="alert alert-success">
+                      <h5 className="alert-heading d-flex align-items-center">
+                        <CheckCircle size={20} className="me-2" />
+                        Review Submitted
+                      </h5>
+                      <p className="mb-0">
+                        Thank you for your feedback! You've already reviewed this course.
+                        {course.studentReview && (
+                          <>
+                            <br />
+                            <strong>Your Rating:</strong> 
+                            <span className="ms-2">
+                              {[...Array(5)].map((_, i) => (
+                                <Star
+                                  key={i}
+                                  size={16}
+                                  className={i < course.studentReview.rating ? "text-warning" : "text-muted"}
+                                  fill={i < course.studentReview.rating ? "currentColor" : "none"}
+                                />
+                              ))}
+                            </span>
+                            {course.studentReview.comment && (
+                              <>
+                                <br />
+                                <strong>Your Comment:</strong> {course.studentReview.comment}
+                              </>
+                            )}
+                          </>
+                        )}
+                      </p>
+                    </div>
+                  ) : (
+                    <div>
+                      <p className="profile-joined mb-4">
+                        Share your experience with this course to help other students make informed decisions.
+                      </p>
+                      
+                      {!showReviewForm ? (
+                        <button
+                          className="btn-edit-profile"
+                          onClick={() => setShowReviewForm(true)}
+                        >
+                          <Star size={16} className="me-2" />
+                          Write a Review
+                        </button>
+                      ) : (
+                        <form onSubmit={handleReviewSubmit}>
+                          <div className="mb-4">
+                            <h5 className="about-subtitle mb-3">Rate this course</h5>
+                            <div className="d-flex gap-1">
+                              {[1, 2, 3, 4, 5].map((rating) => (
+                                <Star
+                                  key={rating}
+                                  size={32}
+                                  className={`cursor-pointer ${
+                                    rating <= (hoverRating || reviewRating)
+                                      ? "text-warning"
+                                      : "text-muted"
+                                  }`}
+                                  fill={rating <= (hoverRating || reviewRating) ? "currentColor" : "none"}
+                                  onMouseEnter={() => setHoverRating(rating)}
+                                  onMouseLeave={() => setHoverRating(0)}
+                                  onClick={() => setReviewRating(rating)}
+                                  style={{ cursor: "pointer" }}
+                                />
+                              ))}
+                            </div>
+                            {reviewRating > 0 && (
+                              <small className="text-muted d-block mt-2">
+                                You rated this course {reviewRating} out of 5 stars
+                              </small>
+                            )}
+                          </div>
+
+                          <div className="mb-4">
+                            <label className="form-label about-subtitle">
+                              Share your thoughts (optional)
+                            </label>
+                            <textarea
+                              className="form-control"
+                              rows="4"
+                              placeholder="Tell other students about your experience with this course..."
+                              value={reviewComment}
+                              onChange={(e) => setReviewComment(e.target.value)}
+                            />
+                          </div>
+
+                          <div className="d-flex gap-2">
+                            <button
+                              type="submit"
+                              className="btn-edit-profile"
+                              disabled={reviewRating === 0}
+                            >
+                              Submit Review
+                            </button>
+                            <button
+                              type="button"
+                              className="btn-edit-profile"
+                              onClick={() => {
+                                setShowReviewForm(false);
+                                setReviewRating(0);
+                                setReviewComment('');
+                                setHoverRating(0);
+                              }}
+                            >
+                              Cancel
+                            </button>
+                          </div>
+                        </form>
+                      )}
+                    </div>
+                  )}
                 </div>
               </div>
             )}
@@ -392,65 +749,76 @@ export default function EducatorCourseDetailsPage() {
 
           {/* Sidebar */}
           <div className="col-lg-4">
-            {/* Educator Info */}
+            {/* Course Progress */}
+            <div className="card mb-4">
+              <div className="card-body">
+                <h4 className="section-title mb-3">Your Progress</h4>
+                
+                <div className="mb-3">
+                  <div className="d-flex justify-content-between mb-1">
+                    <span className="about-subtitle">Overall Progress</span>
+                    <span className="text-accent fw-bold">{course.progress}%</span>
+                  </div>
+                  <div className="progress mb-2">
+                    <div 
+                      className="progress-bar progress-bar-filled" 
+                      style={{width: `${course.progress}%`}}
+                    />
+                  </div>
+                  <small className="text-muted">
+                    {completedLessons}/{totalLessons} lessons completed
+                  </small>
+                </div>
+
+                <div className="mb-3">
+                  <span className={`badge ${course.status === "Active" ? "bg-secondary" : ""} px-3 py-2`}>
+                    {course.status}
+                  </span>
+                </div>
+
+                {course.nextLesson && (
+                  <div className="about-bubble p-3">
+                    <h6 className="about-subtitle mb-2">Next Lesson</h6>
+                    <div className="mb-1">{course.nextLesson.title}</div>
+                    <small className="text-muted">
+                      <Calendar size={14} className="me-1" />
+                      {course.nextLesson.date} at {course.nextLesson.time}
+                    </small>
+                  </div>
+                )}
+              </div>
+            </div>
+
+            {/* Instructor Info */}
             <div className="card mb-4">
               <div className="card-body">
                 <h4 className="section-title mb-3">Your Instructor</h4>
                 
                 <div className="d-flex align-items-center mb-3">
-                  <div className="header-avatar me-3">
-                    <span>{course.educator.avatar}</span>
-                  </div>
+                  <img
+                    src={course.educator.avatar}
+                    alt={course.educator.name}
+                    className="rounded-circle me-3"
+                    style={{ width: "60px", height: "60px", objectFit: "cover" }}
+                  />
                   <div>
-                    <h5 className="profile-name mb-1">{course.educator.name}</h5>
-                    <p className="profile-role mb-0">{course.educator.title}</p>
+                    <h5 className="about-subtitle mb-1">{course.educator.name}</h5>
+                    <p className="profile-joined mb-0">{course.educator.title}</p>
                   </div>
                 </div>
                 
-                <div className="mb-2">
-                  <div className="about-bubble mb-2">
-                    <i className="bi bi-award me-2"></i>
-                    <strong>Experience:</strong> {course.educator.experience}
+                <div className="row">
+                  <div className="col-6">
+                    <div className="about-bubble p-2 text-center">
+                      <Award size={16} className="text-primary mb-1" />
+                      <div className="small">{course.educator.experience}</div>
+                    </div>
                   </div>
-                  <div className="about-bubble">
-                    <i className="bi bi-star-fill me-2"></i>
-                    <strong>Rating:</strong> {course.educator.rating}/5.0
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            {/* Course Stats */}
-            <div className="card mb-4">
-              <div className="card-body">
-                <h4 className="section-title mb-3">Course Stats</h4>
-                
-                <div className="mb-3">
-                  <div className="d-flex justify-content-between mb-1">
-                    <span className="about-subtitle">Status</span>
-                    <span className={course.status === "Active" ? "text-accent fw-bold" : "profile-joined"}>
-                      {course.status}
-                    </span>
-                  </div>
-                </div>
-                
-                <div className="mb-3">
-                  <div className="d-flex justify-content-between mb-1">
-                    <span className="about-subtitle">Progress</span>
-                    <span className="text-accent fw-bold">{course.progress}</span>
-                  </div>
-                  <div className="progress">
-                    <div 
-                      className="progress-bar-filled" 
-                      style={{width: course.progress}}
-                    ></div>
-                  </div>
-                </div>
-                
-                <div className="mb-3">
-                  <div className="d-flex justify-content-between">
-                    <span className="about-subtitle">Lessons Completed</span>
-                    <span className="profile-joined">{completedLessons}/{totalLessons}</span>
+                  <div className="col-6">
+                    <div className="about-bubble p-2 text-center">
+                      <Star size={16} className="text-primary mb-1" />
+                      <div className="small">★ {course.educator.rating}</div>
+                    </div>
                   </div>
                 </div>
               </div>
@@ -461,18 +829,17 @@ export default function EducatorCourseDetailsPage() {
               <div className="card-body">
                 <div className="d-grid gap-2">
                   {course.status === "Active" && (
-                    <button className="btn-edit-profile mb-2">
-                      <i className="bi bi-play-circle me-2"></i>
+                    <button 
+                      className="btn-edit-profile"
+                      onClick={handleContinueLearning}
+                    >
+                      <Play size={16} className="me-2" />
                       Continue Learning
                     </button>
                   )}
-                  
-                  <button
-                    className="btn-edit-profile"
-                    onClick={() => navigate('/courses')}
-                  >
-                    <i className="bi bi-arrow-left me-2"></i>
-                    Back to Courses
+                  <button className="btn-edit-profile">
+                    <Download size={16} className="me-2" />
+                    Download Materials
                   </button>
                 </div>
               </div>

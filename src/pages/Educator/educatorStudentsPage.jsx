@@ -45,28 +45,27 @@ export default function EducatorStudentsList() {
 
   return (
     <div className="min-vh-100 profile-root p-4">
-            <div className="container">
-
-      {/* Header */}
-      <div className="card border-0 shadow-sm mb-4">
-        <div className="container py-3">
-          <div className="d-flex align-items-center justify-content-between">
-            <div className="d-flex align-items-center">
-              <div className="header-avatar me-2 mx-auto w-fit">
-                <Users size={20} />
-              </div>
-              <div>
-                <span className="section-title mb-0">My Students</span>
-                <p className="profile-role mb-0">
-                  Manage your enrolled students
-                </p>
+      <div className="container">
+        {/* Header */}
+        <div className="card border-0 shadow-sm mb-4">
+          <div className="container py-3">
+            <div className="d-flex align-items-center justify-content-between">
+              <div className="d-flex align-items-center">
+                <div className="header-avatar me-2 mx-auto w-fit">
+                  <Users size={20} />
+                </div>
+                <div>
+                  <span className="section-title mb-0">My Students</span>
+                  <p className="profile-role mb-0">
+                    Manage your enrolled students
+                  </p>
+                </div>
               </div>
             </div>
           </div>
         </div>
-      </div>
 
-      {/* Stats Overview */}
+        {/* Stats Overview */}
         <div className="row g-3 mb-4">
           <div className="col-md-4">
             <div className="card">

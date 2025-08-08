@@ -1,8 +1,9 @@
 import React from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import '../index.css'; // Import global styles for CSS variables and classes
 
 const NotFoundPage = () => {
+  const navigate = useNavigate();
   return (
     <div style={{
       display: 'flex',
@@ -38,7 +39,7 @@ const NotFoundPage = () => {
       }}>
         The page you are looking for might have been removed, had its name changed, or is temporarily unavailable.
       </p>
-      <Link to="/" style={{
+      <button onClick={navigate('-1')} style={{
         backgroundColor: 'var(--color-primary-light)',
         color: 'var(--color-card-background)',
         fontWeight: '600',
@@ -51,7 +52,7 @@ const NotFoundPage = () => {
         textDecoration: 'none',
       }}>
         Go to Homepage
-      </Link>
+      </button>
     </div>
   );
 };

@@ -25,24 +25,24 @@ export default function EducatorFooter() {
           {/* Contact info left side with phone under email and centered */}
           <div className="col-12 col-md-6 mb-3 mb-md-0 d-flex flex-column align-items-center justify-content-center justify-content-md-start">
             <div className="d-flex align-items-center mb-2">
-              <Mail style={{ width: 18, height: 18, color: "var(--color-primary)" }} className="me-1" />
+              <Mail style={{ width: 18, height: 18, color: "var(--color-primary-dark)" }} className="me-1" />
               <span className="fw-medium">contact@eduplatform.com</span>
             </div>
             <div className="d-flex align-items-center">
-              <Phone style={{ width: 18, height: 18, color: "var(--color-primary)" }} className="me-1" />
+              <Phone style={{ width: 18, height: 18, color: "var(--color-primary-dark)" }} className="me-1" />
               <span className="fw-medium">+123 456 7890</span>
             </div>
           </div>
 
           {/* Social media links right side centered */}
           <div className="col-12 col-md-6 mb-3 mb-md-0 d-flex flex-column align-items-center justify-content-center text-center text-md-end">
-            <div className="fw-bold mb-2" style={{ color: "var(--color-primary)" }}>
+            <div className="fw-bold mb-2" style={{ color: "var(--color-primary-dark)" }}>
               Connect with us:
             </div>
             <div className="d-flex gap-3 justify-content-center justify-content-md-end">
               <a
                 href="https://linkedin.com"
-                className="text-accent"
+                className="section-title"
                 target="_blank"
                 rel="noopener noreferrer"
                 aria-label="LinkedIn"
@@ -51,7 +51,7 @@ export default function EducatorFooter() {
               </a>
               <a
                 href="https://twitter.com"
-                className="text-accent"
+                className="section-title"
                 target="_blank"
                 rel="noopener noreferrer"
                 aria-label="Twitter"
@@ -60,7 +60,7 @@ export default function EducatorFooter() {
               </a>
               <a
                 href="https://facebook.com"
-                className="text-accent"
+                className="section-title"
                 target="_blank"
                 rel="noopener noreferrer"
                 aria-label="Facebook"
@@ -69,7 +69,7 @@ export default function EducatorFooter() {
               </a>
               <a
                 href="https://instagram.com"
-                className="text-accent"
+                className="section-title"
                 target="_blank"
                 rel="noopener noreferrer"
                 aria-label="Instagram"

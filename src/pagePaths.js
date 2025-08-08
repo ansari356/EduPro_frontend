@@ -1,9 +1,12 @@
 export const pagePaths = {
   home: "/",
   student: {
-    educator: (educator_username) => `/${educator_username}`,
+    home: (educator_username) => `/${educator_username}`,
+    about: (educator_username) => `/${educator_username}/student/about`,
     login: (educator_username) => `/${educator_username}/login`,
     signup: (educator_username) => `/${educator_username}/signup`,
+    
+    // Protected student routes (all under /student)
     profile: (educator_username) => `/${educator_username}/student/profile`,
     courses: (educator_username) => `/${educator_username}/student/courses`,
     courseDetails: (educator_username, courseId) =>

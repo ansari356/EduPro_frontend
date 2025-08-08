@@ -98,7 +98,8 @@ export default function EducatorSignupPage() {
   };
 
   return (
-    <div className="profile-root">
+    <div className="min-vh-100 profile-root p-4">
+      <div className="container">
       {/* Header */}
       <div className="card border-0 shadow-sm">
         <div className="container py-3">
@@ -118,6 +119,7 @@ export default function EducatorSignupPage() {
             </div>
           </div>
         </div>
+      </div>
       </div>
 
       {/* Main Content */}
