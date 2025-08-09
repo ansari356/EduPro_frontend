@@ -345,7 +345,7 @@ export default function EducatorSignupPage() {
                     Already have an account?
                     <button
                       className="btn-link-custom text-accent ms-1"
-                      onClick={() => navigate('/educator-login')}
+                      onClick={() => navigate('/login')}
                       disabled={loading}
                     >
                       Login here

@@ -163,7 +163,7 @@ export default function EducatorLoginPage() {
                     Not registered yet?
                     <button
                       className="btn-link-custom text-accent ms-1"
-                      onClick={() => navigate("/educator-signup")}
+                      onClick={() => navigate("/signup")}
                       disabled={loading}
                     >
                       Create an Account

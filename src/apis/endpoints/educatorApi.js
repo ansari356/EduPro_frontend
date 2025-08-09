@@ -26,6 +26,8 @@ export const educatorEndpoints = {
 		enrollmentDelete: (courseId, enrollmentId) =>
 			`/course/course-enrollment-delete/${courseId}/${enrollmentId}`,
 		searchFilter: `/course/course-search-filter/`,
+		teacherList: (teacherUsername) =>
+		`/course/teacher-list/${teacherUsername}`,
 	},
 	coupon: {
 
@@ -36,11 +38,7 @@ export const educatorEndpoints = {
 		delete: (couponId) => `/coupon/delete/${couponId}`,
 	},
 	module: {
-		// "/modules/<uuid:module_id>/",
-		// "/modules/<uuid:module_id>/update/",
-		// "/modules/<uuid:module_id>/delete/",
-		// "/courses/<uuid:course_id>/modules/",
-		// "/courses/<uuid:course_id>/modules/create/",
+	
 		list: (courseId) => `/courses/${courseId}/modules/`,
 		create: (courseId) => `/courses/${courseId}/modules/create/`,
 		detail: (moduleId) => `/modules/${moduleId}/`,
@@ -48,11 +46,7 @@ export const educatorEndpoints = {
 		delete: (moduleId) => `/modules/${moduleId}/delete/`,
 	},
 	lesson: {
-		// "/lessons/<uuid:id>/",
-		// "/lessons/<uuid:id>/update/",
-		// "/lessons/<uuid:id>/delete/",
-		// "/modules/<uuid:module_id>/lessons/",
-		// "/modules/<uuid:module_id>/lessons/create/",
+
 		detail: (id) => `/lessons/${id}/`,
 		update: (id) => `/lessons/${id}/update/`,
 		delete: (id) => `/lessons/${id}/delete/`,
@@ -60,5 +54,3 @@ export const educatorEndpoints = {
 		create: (moduleId) => `/modules/${moduleId}/lessons/create/`,
 	},
 };
-{
-}

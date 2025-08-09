@@ -4,6 +4,7 @@ import "bootstrap-icons/font/bootstrap-icons.css";
 import { Link } from "react-router-dom";
 import useEducatorProfileData from "../../apis/hooks/educator/useEducatorProfileData";
 import updateEducatorProfile from "../../apis/actions/educator/updateEducatorProfile";
+import useEducatorCoursesData from "../../apis/hooks/educator/useEducatorCoursesData";
 import { pagePaths } from "../../pagePaths";
 import { QRCodeSVG } from "qrcode.react";
 import { CircleUserRound } from "lucide-react";
@@ -31,12 +32,23 @@ import { CircleUserRound } from "lucide-react";
 //   }
 function EducatorProfile() {
   const [showEditForm, setShowEditForm] = useState(false);
+
+
   const {
     isLoading,
     data: educatorData,
     error,
     mutate,
   } = useEducatorProfileData();
+
+  const {
+  data: coursesData,
+  error: coursesError,
+  isLoading: coursesLoading,
+} = useEducatorCoursesData(educatorData?.user?.username);
+
+
+
   const [formData, setFormData] = useState({
     full_name: educatorData?.full_name || "",
     bio: educatorData?.bio || "",
@@ -163,14 +175,13 @@ function EducatorProfile() {
     
   };
 
-  const courses = [
-    { name: "Introduction to Psychology", students: 50, status: "Active" },
-    { name: "Advanced Research Methods", students: 25, status: "Active" },
-    { name: "Educational Psychology", students: 40, status: "Inactive" },
-    { name: "Cognitive Psychology", students: 35, status: "Active" },
-    { name: "Statistics for Psychology", students: 28, status: "Active" },
-  ];
-
+  const courses = 
+   coursesData?.map((course) => ({
+    name: course.title, // اسم الكورس من الـ API
+    students: course.total_enrollments, // عدد الطلبة
+    status: course.is_published ? "Active" : "Inactive", // الحالة
+  })) || [];
+  
   const handleRowClick = (courseName) => {
     window.location.href = `/courses/${encodeURIComponent(courseName)}`;
   };
@@ -608,7 +619,7 @@ function EducatorProfile() {
                         <QRCodeSVG
                           value={
                             window.location.origin +
-                            pagePaths.student.educator("educatorusername")
+                            pagePaths.student.home(educatorData?.user?.username || "")
                           }
                         />
                       </div>
