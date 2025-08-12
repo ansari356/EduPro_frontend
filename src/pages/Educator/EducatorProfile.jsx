@@ -608,7 +608,7 @@ function EducatorProfile() {
                         <QRCodeSVG
                           value={
                             window.location.origin +
-                            pagePaths.student.educator("educatorusername")
+                            pagePaths.student.home(educatorData?.user?.username)
                           }
                         />
                       </div>

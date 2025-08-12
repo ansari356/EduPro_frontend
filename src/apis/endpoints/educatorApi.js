@@ -20,11 +20,6 @@ export const educatorEndpoints = {
 		detail: (courseId) => `/course/course-detail/${courseId}`,
 		update: (courseId) => `/course/update/${courseId}`,
 		delete: (courseId) => `/course/course-delete/${courseId}`,
-		enrollment: `/course/course-enrollment/`,
-		enrollmentList: (teacherUsername) =>
-			`/course/course-enrollment-list/${teacherUsername}`,
-		enrollmentDelete: (courseId, enrollmentId) =>
-			`/course/course-enrollment-delete/${courseId}/${enrollmentId}`,
 		searchFilter: `/course/course-search-filter/`,
 	},
 	coupon: {
