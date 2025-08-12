@@ -11,4 +11,11 @@ export const studentEndpoints = {
 	join: (teacherUsername) => `/join-teacher/${teacherUsername}/`,
 	educatorPublicData: (educatorUsername) =>
 		`/teacher/teacher-profile/${educatorUsername}`,
+	courses: {
+		enrollIn: `/course/course-enrollment/`,
+		enrolledIn: (teacherUsername) =>
+			`/course/course-enrollment-list/${teacherUsername}`,
+		enrollmentDelete: (courseId, enrollmentId) =>
+			`/course/course-enrollment-delete/${courseId}/${enrollmentId}`,
+	},
 };
