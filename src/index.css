@@ -68,7 +68,7 @@ body {
 /* Card components*/
 .card {
   background-color: var(--color-card-background);
-  border: 1px solid var(--color-primary-dark) !important;
+  border: 1px solid var(--color-border) !important;
   border-radius: var(--border-radius-lg);
   box-shadow: var(--shadow-light);
   transition: box-shadow var(--transition-medium);
@@ -160,7 +160,7 @@ body {
   font-weight: 600;
   border-radius: var(--border-radius-md);
   padding: var(--spacing-sm) var(--spacing-xl);
-  border: 1px solid var(--color-primary-dark) !important;
+  border: 1px solid var(--color-border) !important;
   cursor: pointer;
   transition: all var(--transition-fast);
   font-size: var(--font-size-base);
