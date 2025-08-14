@@ -1,24 +1,41 @@
 import useSWR from "swr";
 import { studentEndpoints } from "../../endpoints/student_api";
 import { swrFetcher } from "../../base";
+import { useParams } from "react-router-dom";
 
-export default function useListAllEducatorCourses(courseId) {
+export default function useListAllEducatorCourses() {
+	const { educatorUsername } = useParams();
+	const endpoint = educatorUsername && studentEndpoints.courses.listAll(educatorUsername);
+	
 	const { isLoading, error, data, mutate } = useSWR(
-		courseId && studentEndpoints.courses.courseModules(courseId),
+		endpoint,
 		swrFetcher()
 	);
-	[
-		{
-			"id": "f2d0ab98-481e-4bb0-905c-807cc51108e6",
-			"title": "Module 1 for Course 4 by teacher1",
-			"course": "Course 4 by teacher1",
-			"order": 1,
-			"price": "24.99",
-			"is_free": false,
-			"total_lessons": 0,
-			"total_duration": 0,
-			"image_url": null
-		},
-	]
-	return { isLoading, error,  data, mutate };
+	
+	// Sample response structure from backend
+	// [
+	// 	{
+	// 		"id": "cc2b83c5-2d2c-461c-9bcc-affdc3210216",
+	// 		"title": "Course Title",
+	// 		"description": "Course description",
+	// 		"trailer_video": null,
+	// 		"price": "0.00",
+	// 		"is_published": true,
+	// 		"is_free": true,
+	// 		"category": {
+	// 			"id": "83bdbca4-daee-40d6-8f9e-88a2e7526f45",
+	// 			"name": "Design",
+	// 			"icon": null,
+	// 		},
+	// 		"thumbnail": null,
+	// 		"created_at": "2025-08-08T22:23:20.576170Z",
+	// 		"total_enrollments": 4,
+	// 		"total_lessons": 0,
+	// 		"total_reviews": 0,
+	// 		"average_rating": "0.00",
+	// 		"total_durations": 0,
+	// 	}
+	// ];
+	
+	return { isLoading, error, data, mutate };
 }

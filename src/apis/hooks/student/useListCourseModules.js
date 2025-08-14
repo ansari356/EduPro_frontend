@@ -3,32 +3,53 @@ import { swrFetcher } from "../../base";
 import { studentEndpoints } from "../../endpoints/student_api";
 
 export default function useListCourseModules(courseId) {
+	const endpoint = courseId && studentEndpoints.courses.courseModules(courseId);
+	
+	// Debug the endpoint construction
+	console.log("🔍 useListCourseModules Debug:");
+	console.log("courseId:", courseId);
+	console.log("endpoint:", endpoint);
+	console.log("studentEndpoints.courses.courseModules:", studentEndpoints.courses.courseModules);
+	console.log("Full API URL:", endpoint ? `http://127.0.0.1:8000/api/v1${endpoint}` : "No endpoint");
+	
 	const { isLoading, error, data, mutate } = useSWR(
-		courseId && studentEndpoints.courses.courseModules(courseId),
+		endpoint,
 		swrFetcher()
 	);
-	[
-		{
-			"id": "bfa27880-1a46-45d8-a354-315ff28c040b",
-			"title": "Course 4 by teacher1",
-			"description": "This is a demo course number 4.",
-			"trailer_video": null,
-			"price": "74.96",
-			"is_published": true,
-			"is_free": false,
-			"category": {
-				"id": "35830086-441d-4c53-93ea-e8c292c69b9d",
-				"name": "Marketing",
-				"icon": null
-			},
-			"thumbnail": null,
-			"created_at": "2025-08-08T22:23:20.580484Z",
-			"total_enrollments": 3,
-			"total_lessons": 0,
-			"total_reviews": 0,
-			"average_rating": "0.00",
-			"total_durations": 0
-		},
-	]
+	
+	// Debug the API response
+	console.log("🔍 useListCourseModules API Response:");
+	console.log("isLoading:", isLoading);
+	console.log("error:", error);
+	console.log("data:", data);
+	console.log("data type:", typeof data);
+	console.log("data length:", Array.isArray(data) ? data.length : "Not an array");
+	
 	return { isLoading, error, courseModules: data, mutate };
+}
+
+// Hook to fetch lessons for a specific module
+export function useModuleLessons(moduleId) {
+	const endpoint = moduleId && studentEndpoints.courses.moduleLessons(moduleId);
+	
+	// Debug the endpoint construction
+	console.log("🔍 useModuleLessons Debug:");
+	console.log("moduleId:", moduleId);
+	console.log("endpoint:", endpoint);
+	console.log("Full API URL:", endpoint ? `http://127.0.0.1:8000/api/v1${endpoint}` : "No endpoint");
+	
+	const { isLoading, error, data, mutate } = useSWR(
+		endpoint,
+		swrFetcher()
+	);
+	
+	// Debug the API response
+	console.log("🔍 useModuleLessons API Response:");
+	console.log("isLoading:", isLoading);
+	console.log("error:", error);
+	console.log("data:", data);
+	console.log("data type:", typeof data);
+	console.log("data length:", Array.isArray(data) ? data.length : "Not an array");
+	
+	return { isLoading, error, lessons: data, mutate };
 }

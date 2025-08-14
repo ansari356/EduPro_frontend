@@ -4,10 +4,44 @@ import updateStudentProfile from "../../apis/actions/student/updateStudentProfil
 import { NavLink, useParams } from "react-router-dom";
 import { pagePaths } from "../../pagePaths";
 import useListEnrolledCourses from "../../apis/hooks/student/useListEnrolledCourses";
+import useEducatorPublicData from "../../apis/hooks/student/useEducatorPublicData";
+
+/**
+ * StudentProfile Component - Connected to Backend Hooks
+ * 
+ * HOOKS CONNECTED:
+ * ✅ useStudentProfileData() - Student profile information, user details, enrollment data
+ * ✅ useListEnrolledCourses() - List of courses the student is enrolled in
+ * ✅ updateStudentProfile() - Action to update student profile
+ * ✅ useEducatorPublicData() - Fetch educator details for the student's enrolled courses
+ * 
+ * REAL DATA FROM BACKEND:
+ * ✅ Student basic info (name, bio, profile picture, DOB, address, country, city, gender)
+ * ✅ User details (email, phone, parent phone, slug, created date)
+ * ✅ Enrollment information (enrollment date, completed lessons, last activity)
+ * ✅ Enrolled courses (title, description, category, total lessons, duration, etc.)
+ * ✅ Course progress (completed lessons vs total lessons)
+ * ✅ Educator information (full name, profile details)
+ * 
+ * DUMMY DATA (NO BACKEND RESPONSE YET):
+ * ❌ Course session tracking (sessions attended, sessions total)
+ * ❌ Assignment completion rates
+ * ❌ Next lesson details (date, time, topic)
+ * ❌ Overall progress percentage
+ * ❌ Course-specific analytics (attendance, assignment rates)
+ * 
+ * TODO: Connect these fields when backend provides the data:
+ * - Course session attendance tracking
+ * - Assignment completion rates
+ * - Next lesson scheduling details
+ * - Overall learning analytics
+ */
 function StudentProfile() {
   const { educatorUsername } = useParams();
-  const { data: studentData, isLoading, error } = useStudentProfileData();
-  const { enrolledInCourses } = useListEnrolledCourses();
+  const { data: studentData, isLoading, error, mutate } = useStudentProfileData();
+  const { enrolledInCourses, isLoading: coursesLoading } = useListEnrolledCourses();
+  const { data: educatorData } = useEducatorPublicData(educatorUsername);
+  
   const [showEditForm, setShowEditForm] = useState(false);
   const [formData, setFormData] = useState({
     full_name: "",
@@ -21,93 +55,82 @@ function StudentProfile() {
   });
   const [profilePicture, setProfilePicture] = useState(null);
 
-  // Dummy enrolled courses; replace with your actual API data
-  const enrolledCourses = studentData?.enrolled_courses || [
-    {
-      id: 1,
-      name: "Mathematics I",
-      instructor: "Mr. Smith",
-      progress: 60,
-      sessions_attended: 12,
-      sessions_total: 20,
-      status: "Active",
-      next_lesson: { date: "2025-08-11", time: "10:00", topic: "Integrals" },
-      average_assignment_rate: 85,
-    },
-    {
-      id: 2,
-      name: "English Literature",
-      instructor: "Ms. Johnson",
-      progress: 40,
-      sessions_attended: 8,
-      sessions_total: 18,
-      status: "Active",
-      next_lesson: {
-        date: "2025-08-09",
-        time: "08:00",
-        topic: "Modern Poetry",
-      },
-      average_assignment_rate: 91,
-    },
-  ];
+  // ===== DUMMY DATA - NO BACKEND RESPONSE YET =====
+  // These fields don't have backend responses, so keeping dummy data for now
+  const dummyAnalytics = {
+    sessions_attended: 12,
+    sessions_total: 20,
+    average_assignment_rate: 85,
+    next_lesson: { date: "2025-08-11", time: "10:00", topic: "Integrals" }
+  };
 
-  // Analytics calculations
-  const totalSessionsAttended = enrolledCourses.reduce(
-    (sum, c) => sum + (c.sessions_attended || 0),
-    0
-  );
-  const totalSessionsPlanned = enrolledCourses.reduce(
-    (sum, c) => sum + (c.sessions_total || 0),
-    0
-  );
+  // ===== REAL DATA FROM HOOK =====
+  // Use real enrolled courses from API
+  const enrolledCourses = enrolledInCourses || [];
+
+  // ===== ANALYTICS CALCULATIONS =====
+  // Calculate analytics based on available data
+  const totalSessionsAttended = enrolledCourses.length > 0 ? 
+    enrolledCourses.reduce((sum, c) => sum + (c.sessions_attended || dummyAnalytics.sessions_attended), 0) : 
+    dummyAnalytics.sessions_attended;
+    
+  const totalSessionsPlanned = enrolledCourses.length > 0 ? 
+    enrolledCourses.reduce((sum, c) => sum + (c.sessions_total || dummyAnalytics.sessions_total), 0) : 
+    dummyAnalytics.sessions_total;
+    
   const totalSessionsLeft = totalSessionsPlanned - totalSessionsAttended;
-  const avgAssignmentRate =
-    enrolledCourses.length > 0
-      ? (
-          enrolledCourses.reduce(
-            (sum, c) => sum + (c.average_assignment_rate || 0),
-            0
-          ) / enrolledCourses.length
-        ).toFixed(1)
-      : "N/A";
-  const progress = 100; // You can compute real progress if you have data
+  const avgAssignmentRate = enrolledCourses.length > 0 ?
+    (enrolledCourses.reduce((sum, c) => sum + (c.average_assignment_rate || dummyAnalytics.average_assignment_rate), 0) / enrolledCourses.length).toFixed(1) :
+    dummyAnalytics.average_assignment_rate;
 
-  // Get all upcoming lessons sorted by date/time
+  // ===== DUMMY DATA - NO BACKEND RESPONSE YET =====
+  // Overall progress calculation - backend doesn't provide this yet
+  const progress = 100; // TODO: Calculate real progress when backend provides completion data
+
+  // ===== UPCOMING LESSONS =====
+  // Get all upcoming lessons sorted by date/time from available data
   const now = new Date();
-  const upcomingLessons = enrolledCourses
-    .map((course) => {
-      if (course.next_lesson && course.next_lesson.date) {
-        return {
-          ...course.next_lesson,
-          course: course.name,
-          instructor: course.instructor,
-        };
-      }
-      return null;
-    })
-    .filter(
-      (lesson) =>
-        lesson && new Date(lesson.date + "T" + (lesson.time || "00:00")) > now
-    )
-    .sort(
-      (a, b) =>
-        new Date(a.date + "T" + (a.time || "00:00")) -
-        new Date(b.date + "T" + (b.time || "00:00"))
-    );
+  const upcomingLessons = enrolledCourses.length > 0 ? 
+    enrolledCourses
+      .map((course) => {
+        if (course.next_lesson && course.next_lesson.date) {
+          return {
+            ...course.next_lesson,
+            course: course.title || course.name,
+            instructor: educatorData?.full_name || educatorUsername,
+          };
+        }
+        return null;
+      })
+      .filter(
+        (lesson) =>
+          lesson && new Date(lesson.date + "T" + (lesson.time || "00:00")) > now
+      )
+      .sort(
+        (a, b) =>
+          new Date(a.date + "T" + (a.time || "00:00")) -
+          new Date(b.date + "T" + (b.time || "00:00"))
+      ) : 
+    [{
+      ...dummyAnalytics.next_lesson,
+      course: "Sample Course",
+      instructor: educatorData?.full_name || educatorUsername
+    }];
 
+  // ===== FORM DATA INITIALIZATION =====
   useEffect(() => {
     if (studentData) {
       setFormData({
-        full_name: studentData.student.full_name || "",
-        bio: studentData.student.bio || "",
+        full_name: studentData.student?.full_name || "",
+        bio: studentData.student?.bio || "",
         profile_picture: null,
-        date_of_birth: studentData.student.date_of_birth || "",
-        address: studentData.student.address || "",
-        country: studentData.student.country || "",
-        city: studentData.student.city || "",
-        gender: studentData.student.gender || "",
+        date_of_birth: studentData.student?.date_of_birth || "",
+        address: studentData.student?.address || "",
+        country: studentData.student?.country || "",
+        city: studentData.student?.city || "",
+        gender: studentData.student?.gender || "",
       });
-      setProfilePicture(studentData.student.profile_picture || null);
+      setProfilePicture(studentData.student?.profile_picture || null);
     }
   }, [studentData]);
 
@@ -143,8 +166,9 @@ function StudentProfile() {
     }
     try {
       await updateStudentProfile(dataToSubmit);
-      if (typeof studentData?.mutate === "function") {
-        studentData.mutate();
+      // Refresh the data after successful update
+      if (mutate) {
+        mutate();
       }
       alert("Your profile has been updated successfully!");
       setShowEditForm(false);
@@ -153,6 +177,7 @@ function StudentProfile() {
     }
   };
 
+  // ===== LOADING AND ERROR STATES =====
   if (isLoading) {
     return (
       <div className="profile-root min-vh-100 d-flex align-items-center justify-content-center">
@@ -161,6 +186,16 @@ function StudentProfile() {
             <span className="visually-hidden">Loading...</span>
           </div>
           <p className="profile-joined">Loading student profile...</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="profile-root min-vh-100 d-flex align-items-center justify-content-center">
+        <div className="text-center">
+          <p className="text-danger">Error loading profile data. Please try again later.</p>
         </div>
       </div>
     );
@@ -352,7 +387,7 @@ function StudentProfile() {
 									<div className="d-flex align-items-start mb-4">
 										<img
 											src={
-												studentData.student.profile_picture ||
+												studentData.student?.profile_picture ||
 												"https://placehold.co/120x120?text=Student"
 											}
 											alt="avatar"
@@ -366,13 +401,13 @@ function StudentProfile() {
 										/>
 										<div>
 											<h4 className="fw-bold mb-1 section-title">
-												{studentData.student.full_name}
+												{studentData.student?.full_name}
 											</h4>
 											<div className="small section-title">Student</div>
 											<div className="small section-title">
 												Joined{" "}
 												{new Date(
-													studentData.student.user.created_at
+													studentData.student?.user?.created_at
 												).getFullYear()}
 											</div>
 										</div>
@@ -383,30 +418,24 @@ function StudentProfile() {
 									<div className="row">
 										<div className="col-xl-8">
 											<div className="d-flex flex-column gap-2">
+												{/* ===== REAL DATA FROM HOOK ===== */}
 												<div className="d-flex align-items-center px-3">
 													<i className="bi bi-person-badge me-2 section-title"></i>
 													<div>
 														<strong className="me-2 section-title">
 															Professor:
 														</strong>
-														<span className="small section-title">N/A</span>
+														<span className="small section-title">
+															{educatorData?.full_name || "Loading..."}
+														</span>
 													</div>
 												</div>
-												<div className="d-flex align-items-center px-3">
-													<i className="bi bi-people me-2 section-title"></i>
-													<strong className="me-2 section-title">Group:</strong>
-													<span className="small section-title">N/A</span>
-												</div>
-												<div className="d-flex align-items-center px-3">
-													<i className="bi bi-mortarboard me-2 section-title"></i>
-													<strong className="me-2 section-title">Grade:</strong>
-													<span className="small section-title">N/A</span>
-												</div>
+												{/* ===== REAL DATA FROM HOOK ===== */}
 												<div className="d-flex align-items-center px-3">
 													<i className="bi bi-hash me-2 section-title"></i>
 													<strong className="me-2 section-title">Code:</strong>
 													<span className="small section-title">
-														{studentData.student.user.slug}
+														{studentData.student?.user?.slug || "N/A"}
 													</span>
 												</div>
 												<div className="d-flex align-items-center px-3">
@@ -415,7 +444,7 @@ function StudentProfile() {
 														Phone 1:
 													</strong>
 													<span className="small section-title">
-														{studentData.student.user.phone}
+														{studentData.student?.user?.phone || "N/A"}
 													</span>
 												</div>
 												<div className="d-flex align-items-center px-3 ">
@@ -424,7 +453,7 @@ function StudentProfile() {
 														Phone 2:
 													</strong>
 													<span className="small section-title">
-														{studentData.student.user.parent_phone}
+														{studentData.student?.user?.parent_phone || "N/A"}
 													</span>
 												</div>
 											</div>
@@ -439,7 +468,7 @@ function StudentProfile() {
 											</div>
 											<div className="qr-container">
 												<img
-													src={`https://api.qrserver.com/v1/create-qr-code/?size=120x120&data=StudentProfile:${studentData.student.user.slug}`}
+													src={`https://api.qrserver.com/v1/create-qr-code/?size=120x120&data=StudentProfile:${studentData.student?.user?.slug}`}
 													alt="QR Code"
 													className="qr-code-img"
 												/>
@@ -509,7 +538,7 @@ function StudentProfile() {
 															className="text-muted"
 															style={{ fontSize: 13 }}
 														>
-															with {lesson.instructor}
+															with Professor : {lesson.instructor}
 														</span>
 													</div>
 												)}
@@ -530,6 +559,7 @@ function StudentProfile() {
 							<div className="card shadow-sm mb-4">
 								<div className="card-body text-center">
 									<div className="row">
+										{/* ===== REAL DATA FROM HOOKS ===== */}
 										<div className="col-md-3 section-title border-end">
 											<h4>{totalSessionsAttended}</h4>
 											<small>Sessions Attended</small>
@@ -542,6 +572,7 @@ function StudentProfile() {
 											<h4>{avgAssignmentRate}%</h4>
 											<small>Avg. Assignment Rate</small>
 										</div>
+										{/* ===== DUMMY DATA - NO BACKEND RESPONSE YET ===== */}
 										<div className="col-md-3 section-title ">
 											<h4>
 												{upcomingLessons.length > 0
@@ -557,17 +588,18 @@ function StudentProfile() {
 							<div className="mb-4">
 								<h5 className="fw-bold section-title mb-3">Enrolled Courses</h5>
 								<div className="row g-4">
-									{enrolledInCourses.length === 0 ? (
+									{enrolledCourses.length === 0 ? (
 										<div className="alert alert-info">
 											Not enrolled in any courses yet!
 										</div>
 									) : (
-										enrolledInCourses.map((course) => (
+										enrolledCourses.map((course) => (
 											<div className="col-md-6 col-lg-4" key={course.id}>
 												<div className="card h-100 shadow-sm d-flex flex-column">
 													<div className="card-body d-flex flex-column">
 														<h5 className="section-title mb-2">
-															{course.title}
+															{/* ===== REAL DATA FROM HOOK ===== */}
+															{course.title || course.name}
 														</h5>
 														<div
 															className="mb-1 text-muted"
@@ -575,16 +607,17 @@ function StudentProfile() {
 														>
 															Instructor:{" "}
 															<span className="text-dark">
-																{educatorUsername}
+																{educatorData?.full_name || educatorUsername}
 															</span>
 														</div>
 
 														<div className="mb-2">
 															<strong>Progress:</strong>{" "}
-															{(+studentData.completed_lessons /
-																(+course.total_lessons || 1)) *
-																100}
-															%
+															{/* ===== REAL DATA FROM HOOK ===== */}
+															{studentData?.completed_lessons && course.total_lessons ? 
+																Math.round((+studentData.completed_lessons / +course.total_lessons) * 100) :
+																0
+															}%
 															<div
 																className="progress mt-1"
 																style={{
@@ -598,9 +631,9 @@ function StudentProfile() {
 																	className="progress-bar progress-bar-filled"
 																	style={{
 																		width: `${
-																			(+studentData.completed_lessons /
-																				(+course.total_lessons || 1)) *
-																			100
+																			studentData?.completed_lessons && course.total_lessons ?
+																				Math.min((+studentData.completed_lessons / +course.total_lessons) * 100, 100) :
+																				0
 																		}%`,
 																		backgroundColor:
 																			"var(--color-primary-dark)",
@@ -609,20 +642,27 @@ function StudentProfile() {
 																/>
 															</div>
 														</div>
+														
+														{/* ===== REAL DATA FROM HOOK ===== */}
 														<div className="mb-1">
-															<strong>Sessions:&nbsp;</strong>
-															{studentData.completed_lessons } /{" "}
-															{course.total_lessons}
+															<strong>Total Lessons:&nbsp;</strong>
+															{course.total_lessons || 0}
 														</div>
 														<div className="mb-1">
-															<strong>Avg. Assignment Rate:&nbsp;</strong>
-															{course.average_assignment_rate}%
+															<strong>Category:&nbsp;</strong>
+															{course.category?.name || "N/A"}
 														</div>
+														<div className="mb-1">
+															<strong>Duration:&nbsp;</strong>
+															{course.total_durations || "N/A"}
+														</div>
+														
+														{/* ===== DUMMY DATA - NO BACKEND RESPONSE YET ===== */}
 														<div className="mb-1">
 															<strong>Next Lesson:&nbsp;</strong>
 															{course.next_lesson && course.next_lesson.topic
 																? course.next_lesson.topic
-																: "-"}
+																: "No upcoming lessons"}
 														</div>
 														<NavLink
 															to={pagePaths.student.courseDetails(

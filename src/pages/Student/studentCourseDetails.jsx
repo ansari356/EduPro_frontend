@@ -22,145 +22,299 @@ import {
   Maximize,
   Settings
 } from "lucide-react";
+import useGetCourseDetails from "../../apis/hooks/student/useGetCourseDetails";
+import useListCourseModules, { useModuleLessons } from "../../apis/hooks/student/useListCourseModules";
+import useEducatorPublicData from "../../apis/hooks/student/useEducatorPublicData";
 
-const courses = [
-  {
-    id: 1,
-    title: "Data Analysis Fundamentals",
-    description: "Master the fundamentals of data analysis with this comprehensive course. Learn to collect, clean, analyze, and visualize data using industry-standard tools and techniques.",
-    fullDescription: "This comprehensive Data Analysis course is designed to take you from a complete beginner to a confident data analyst. You'll learn essential statistical concepts, data cleaning techniques, exploratory data analysis, and how to draw meaningful insights from complex datasets. The course includes hands-on projects using real-world data from various industries including finance, healthcare, and marketing. By the end of this course, you'll be able to confidently analyze data, create compelling visualizations, and present your findings to stakeholders.",
+/**
+ * StudentCourseDetails Component - Connected to Backend Hooks
+ * 
+ * HOOKS CONNECTED:
+ * ✅ useGetCourseDetails() - Course details and information
+ * ✅ useListCourseModules() - Course modules and lessons
+ * ✅ useEducatorPublicData() - Educator information
+ * 
+ * REAL DATA FROM BACKEND:
+ * ✅ Course basic info (title, description, category, price, etc.)
+ * ✅ Course modules and lessons
+ * ✅ Educator information (name, profile)
+ * ✅ Lessons for each module
+ * 
+ * DUMMY DATA (NO BACKEND RESPONSE YET):
+ * ❌ Course progress calculations
+ * ❌ Lesson completion status
+ * ❌ Next lesson details
+ * ❌ Course ratings and reviews
+ * ❌ Student progress tracking
+ */
+function StudentCourseDetails() {
+  const params = useParams();
+  const courseId = params.id; 
+  const educatorUsername = params.educatorUsername;
+  const navigate = useNavigate();
+  
+  // Debug all available params
+  console.log("🔍 All URL Params:", params);
+  console.log("🔍 Course ID from params.id:", courseId);
+  console.log("🔍 Educator Username from params.educatorUsername:", educatorUsername);
+  
+  // ===== REAL DATA FROM HOOKS =====
+  const { data: courseDetails, isLoading: courseLoading, error: courseError } = useGetCourseDetails(courseId);
+  const { courseModules, isLoading: modulesLoading } = useListCourseModules(courseId);
+  const { data: educatorData } = useEducatorPublicData(educatorUsername);
+
+  // Fetch lessons for the first module (Chapter 1) only
+  const firstModuleId = courseModules && courseModules.length > 0 ? courseModules[0].id : null;
+  const { lessons: firstModuleLessons, isLoading: firstModuleLessonsLoading, error: firstModuleLessonsError } = useModuleLessons(firstModuleId);
+
+  // Debug the hook calls
+  console.log("🔍 Hook Debug:");
+  console.log("useGetCourseDetails called with courseId:", courseId);
+  console.log("useListCourseModules called with courseId:", courseId);
+  console.log("useEducatorPublicData called with educatorUsername:", educatorUsername);
+  console.log("First Module ID:", firstModuleId);
+  console.log("First Module Lessons:", firstModuleLessons);
+  console.log("First Module Lessons Loading:", firstModuleLessonsLoading);
+  console.log("First Module Lessons Error:", firstModuleLessonsError);
+
+  // Debug logging
+  console.log("🔍 Course Details Debug:");
+  console.log("courseId from params:", courseId);
+  console.log("courseDetails:", courseDetails);
+  console.log("courseError:", courseError);
+  console.log("courseModules:", courseModules);
+  console.log("educatorData:", educatorData);
+
+  // ===== DUMMY DATA - NO BACKEND RESPONSE YET =====
+  // These fields don't have backend responses, so keeping dummy data for now
+  const dummyCourseData = {
     progress: 75,
     status: "Active",
-    image: "https://placehold.co/600x300?text=Data+Analysis+Fundamentals",
-    educator: {
-      name: "Dr. Sarah Johnson",
-      title: "Senior Data Scientist",
-      experience: "8 years",
-      rating: 4.8,
-      avatar: "https://placehold.co/150x150?text=Dr.+Sarah"
-    },
-    duration: "12 weeks",
-    level: "Beginner to Intermediate",
-    enrolledStudents: 1247,
     nextLesson: {
       id: 6,
-      title: "Statistical Analysis Methods",
+      title: "Next Lesson Topic",
       date: "2025-01-20",
       time: "10:00 AM"
     },
-    totalLessons: 24,
     completedLessons: 18,
+    enrolledStudents: 1247,
+    level: "Beginner to Intermediate",
     tableOfContents: [
       {
-        chapter: "Chapter 1: Introduction to Data Analysis",
-        topics: ["What is Data Analysis?", "Types of Data", "Data Analysis Process", "Tools Overview"],
-        lessons: 4,
-        completed: 4
-      },
-      {
-        chapter: "Chapter 2: Statistical Foundations",
-        topics: ["Descriptive Statistics", "Probability Basics", "Distributions", "Hypothesis Testing"],
-        lessons: 4,
-        completed: 4
-      },
-      {
-        chapter: "Chapter 3: Data Collection & Cleaning",
-        topics: ["Data Sources", "Data Quality Assessment", "Cleaning Techniques", "Missing Data Handling"],
-        lessons: 4,
-        completed: 4
-      },
-      {
-        chapter: "Chapter 4: Exploratory Data Analysis",
-        topics: ["EDA Process", "Pattern Recognition", "Correlation Analysis", "Outlier Detection"],
-        lessons: 4,
+        chapter: "Chapter 1: Introduction",
+        topics: ["What is this course?", "Course Overview", "Getting Started"],
+        lessons: 3,
         completed: 3
       },
       {
-        chapter: "Chapter 5: Data Visualization",
-        topics: ["Visualization Principles", "Chart Types", "Interactive Dashboards", "Storytelling with Data"],
+        chapter: "Chapter 2: Fundamentals",
+        topics: ["Basic Concepts", "Core Principles", "Foundation Skills"],
         lessons: 4,
         completed: 2
-      },
-      {
-        chapter: "Chapter 6: Advanced Analytics",
-        topics: ["Predictive Modeling", "Time Series Analysis", "Classification", "Clustering"],
-        lessons: 4,
-        completed: 1
       }
     ],
     lessons: [
       { 
         id: 1, 
-        title: "Welcome to Data Analysis", 
+        title: "Welcome to the Course", 
         duration: "15 min", 
         type: "video", 
         completed: true,
         videoUrl: "https://sample-videos.com/zip/10/mp4/SampleVideo_1280x720_1mb.mp4",
-        description: "An introduction to the world of data analysis and what you'll learn in this course."
+        description: "An introduction to the course and what you'll learn."
       },
       { 
         id: 2, 
-        title: "Understanding Data Types", 
+        title: "Getting Started", 
         duration: "20 min", 
         type: "video", 
         completed: true,
-        videoUrl: "https://sample-videos.com/zip/10/mp4/SampleVideo_1280x720_2mb.mp4",
-        description: "Learn about different types of data and how they affect your analysis approach."
+        videoUrl: "https://sample-videos.com/zip/10/mp4/SampleVideo_1280x720_1mb.mp4",
+        description: "Learn how to get started with the course materials."
       },
       { 
         id: 3, 
-        title: "Data Analysis Tools Overview", 
+        title: "First Lesson", 
         duration: "25 min", 
         type: "video", 
-        completed: true,
-        videoUrl: "https://sample-videos.com/zip/10/mp4/SampleVideo_1280x720_1mb.mp4",
-        description: "Overview of the essential tools used in modern data analysis."
-      },
-      { 
-        id: 4, 
-        title: "Basic Statistics Quiz", 
-        duration: "10 min", 
-        type: "quiz", 
-        completed: true,
-        description: "Test your understanding of basic statistical concepts."
-      },
-      { 
-        id: 5, 
-        title: "Descriptive Statistics Deep Dive", 
-        duration: "30 min", 
-        type: "video", 
-        completed: true,
-        videoUrl: "https://sample-videos.com/zip/10/mp4/SampleVideo_1280x720_2mb.mp4",
-        description: "Comprehensive look at descriptive statistics and their applications."
-      },
-      { 
-        id: 6, 
-        title: "Probability Fundamentals", 
-        duration: "35 min", 
-        type: "video", 
         completed: false,
         videoUrl: "https://sample-videos.com/zip/10/mp4/SampleVideo_1280x720_1mb.mp4",
-        description: "Understanding probability theory and its role in data analysis."
-      },
-      { 
-        id: 7, 
-        title: "Working with Distributions", 
-        duration: "28 min", 
-        type: "video", 
-        completed: false,
-        videoUrl: "https://sample-videos.com/zip/10/mp4/SampleVideo_1280x720_2mb.mp4",
-        description: "Explore different statistical distributions and their characteristics."
+        description: "Your first real lesson in the course."
       }
-    ],
-    studentReview: null
-  }
-];
+    ]
+  };
 
-export default function StudentCourseDetailsPage() {
-  const { educatorUsername, id } = useParams();
-  const navigate = useNavigate();
-  const [activeTab, setActiveTab] = useState('overview');
+  // ===== PROCESSED COURSE DATA =====
+  // Combine real course data with dummy data for missing fields
+  const course = courseDetails ? {
+    ...courseDetails,
+    // Real data from backend - handle different possible field names
+    id: courseDetails.id || courseDetails.course_id,
+    title: courseDetails.title || courseDetails.course || courseDetails.name || "Untitled Course",
+    description: courseDetails.description || courseDetails.course_description || "Course description not available",
+    image: courseDetails.image_url || courseDetails.thumbnail || courseDetails.image || "https://placehold.co/600x300?text=Course",
+    category: courseDetails.category?.name || courseDetails.category_name || courseDetails.category || "General",
+    totalLessons: courseModules && courseModules.length > 0 ? courseModules.length : (courseDetails.total_lessons || courseDetails.lessons_count || 0),
+    duration: courseDetails.total_durations || courseDetails.duration ? `${courseDetails.total_durations || courseDetails.duration} weeks` : "N/A",
+    price: courseDetails.price || courseDetails.course_price || "0.00",
+    isFree: courseDetails.is_free || courseDetails.free || false,
+    
+    // Real course modules data from backend
+    modules: courseModules || [],
+    
+    // Dummy data for missing backend fields
+    progress: dummyCourseData.progress,
+    status: dummyCourseData.status,
+    nextLesson: dummyCourseData.nextLesson,
+    completedLessons: dummyCourseData.completedLessons,
+    enrolledStudents: dummyCourseData.enrolledStudents,
+    level: dummyCourseData.level,
+    
+    // Use real modules for table of contents if available, otherwise fall back to dummy
+    tableOfContents: courseModules && courseModules.length > 0 ? 
+      courseModules.map((module, index) => {
+        const chapterTitle = `Chapter ${index + 1}: ${module.title || `Module ${index + 1}`}`;
+        
+        // Get real lessons for this module (only Chapter 1 has lessons for now)
+        const moduleLessons = index === 0 ? (firstModuleLessons || []) : [];
+        const lessonsCount = moduleLessons.length;
+        const hasPermissionError = index === 0 && firstModuleLessonsError;
+        
+        return {
+          id: module.id || index + 1,
+          chapter: chapterTitle,
+          topics: [module.description || "Chapter Introduction"],
+          lessons: lessonsCount,
+          completed: 0, // TODO: Get completion status from backend when available
+          module: module, // Store the full module data for reference
+          hasLessons: lessonsCount > 0,
+          hasPermissionError: hasPermissionError,
+          // Use real lesson data from API
+          chapterLessons: moduleLessons.map((lesson, lessonIndex) => ({
+            id: lesson.id,
+            title: lesson.title,
+            duration: lesson.duration,
+            type: "video", // Default to video, can be enhanced based on lesson data
+            completed: false, // TODO: Get from backend when available
+            videoUrl: lesson.playback_info || "https://sample-videos.com/zip/10/mp4/SampleVideo_1280x720_1mb.mp4",
+            description: lesson.description || "Lesson description not available",
+            order: lesson.order || lessonIndex + 1,
+            is_published: lesson.is_published || true,
+            is_free: lesson.is_free || false,
+            module: lesson.module || module.id,
+            document_url: lesson.document_url,
+            thumbnail_url: lesson.thumbnail_url,
+            playback_info: lesson.playback_info,
+            created_at: lesson.created_at
+          }))
+        };
+      }) : dummyCourseData.tableOfContents,
+    
+    // Create a flat lessons array grouped by chapters for the lessons tab
+    lessons: courseModules && courseModules.length > 0 ? 
+      courseModules.flatMap((module, index) => {
+        const chapterTitle = `Chapter ${index + 1}: ${module.title || `Module ${index + 1}`}`;
+        
+        // Get real lessons for this module (only Chapter 1 has lessons for now)
+        const moduleLessons = index === 0 ? (firstModuleLessons || []) : [];
+        const hasLessons = moduleLessons.length > 0;
+        const hasPermissionError = index === 0 && firstModuleLessonsError;
+        
+        const result = [
+          // Chapter header
+          {
+            id: `chapter-${module.id || index + 1}`,
+            title: chapterTitle,
+            isChapter: true,
+            chapterId: module.id || index + 1,
+            description: module.description || "Chapter description not available",
+            hasLessons: hasLessons,
+            hasPermissionError: hasPermissionError
+          }
+        ];
+        
+        // Add lessons only if this chapter has them
+        if (hasLessons) {
+          // Add real lessons from API
+          const chapterLessons = moduleLessons.map((lesson, lessonIndex) => ({
+            id: lesson.id,
+            title: lesson.title,
+            duration: lesson.duration,
+            type: "video", // Default to video, can be enhanced based on lesson data
+            completed: false, // TODO: Get from backend when available
+            videoUrl: lesson.playback_info || "https://sample-videos.com/zip/10/mp4/SampleVideo_1280x720_1mb.mp4",
+            description: lesson.description || "Lesson description not available",
+            order: lesson.order || lessonIndex + 1,
+            is_published: lesson.is_published || true,
+            is_free: lesson.is_free || false,
+            module: lesson.module || module.id,
+            chapterId: module.id || index + 1,
+            chapterTitle: chapterTitle,
+            isChapter: false,
+            document_url: lesson.document_url,
+            thumbnail_url: lesson.thumbnail_url,
+            playback_info: lesson.playback_info,
+            created_at: lesson.created_at
+          }));
+          
+          result.push(...chapterLessons);
+        } else if (hasPermissionError) {
+          // Add permission error message
+          result.push({
+            id: `${module.id}-permission-error`,
+            title: "Enrollment Required",
+            isChapter: false,
+            chapterId: module.id || index + 1,
+            chapterTitle: chapterTitle,
+            isPermissionError: true,
+            errorMessage: "You need to be enrolled in this course to access lessons."
+          });
+        } else {
+          // Add a placeholder for chapters without lessons
+          result.push({
+            id: `${module.id}-no-lessons`,
+            title: "No lessons available yet",
+            isChapter: false,
+            chapterId: module.id || index + 1,
+            chapterTitle: chapterTitle,
+            isEmpty: true
+          });
+        }
+        
+        return result;
+      }) : dummyCourseData.lessons,
+    
+    // Educator information
+    educator: {
+      name: educatorData?.full_name || educatorData?.name || "Instructor",
+      title: "Course Instructor",
+      experience: "N/A",
+      rating: courseDetails.average_rating || courseDetails.rating || "0.00",
+      avatar: educatorData?.profile_picture || educatorData?.avatar || "https://placehold.co/150x150?text=Instructor"
+    }
+  } : null;
+
+  // Debug the processed course data
+  console.log("🔍 Processed Course Data:", course);
+  console.log("🔍 Course Details Raw:", courseDetails);
+  console.log("🔍 Course Modules Raw:", courseModules);
+  console.log("🔍 First Module Lessons Raw:", firstModuleLessons);
+  console.log("🔍 Educator Data Raw:", educatorData);
   
+  // Check if modules are available
+  const hasModules = courseModules && courseModules.length > 0;
+  console.log("🔍 Has Modules:", hasModules);
+  
+  // Debug module structure
+  if (hasModules) {
+    console.log("🔍 First Module Structure:", courseModules[0]);
+    console.log("🔍 All Modules:", courseModules);
+    console.log("🔍 First Module Lessons Count:", firstModuleLessons ? firstModuleLessons.length : 0);
+    if (firstModuleLessons && firstModuleLessons.length > 0) {
+      console.log("🔍 First Lesson Structure:", firstModuleLessons[0]);
+    }
+  }
+
   // Video player states
   const [showVideoModal, setShowVideoModal] = useState(false);
   const [currentLesson, setCurrentLesson] = useState(null);
@@ -173,7 +327,8 @@ export default function StudentCourseDetailsPage() {
   const [hoverRating, setHoverRating] = useState(0);
   const [reviewSubmitted, setReviewSubmitted] = useState(false);
 
-  const course = courses.find((c) => c.id === Number(id));
+  // Tab state
+  const [activeTab, setActiveTab] = useState('overview');
 
   // Check if student has already submitted a review
   useEffect(() => {
@@ -181,6 +336,76 @@ export default function StudentCourseDetailsPage() {
       setReviewSubmitted(true);
     }
   }, [course]);
+
+  // Handle keyboard shortcuts for video player
+  useEffect(() => {
+    const handleKeyPress = (e) => {
+      if (showVideoModal) {
+        switch (e.key) {
+          case 'Escape':
+            closeVideoPlayer();
+            break;
+          case ' ':
+            e.preventDefault();
+            setIsPlaying(!isPlaying);
+            break;
+        }
+      }
+    };
+
+    document.addEventListener('keydown', handleKeyPress);
+    return () => document.removeEventListener('keydown', handleKeyPress);
+  }, [showVideoModal, isPlaying]);
+
+  // ===== LOADING AND ERROR STATES =====
+  // Check if lessons are still loading
+  const lessonsLoading = firstModuleLessonsLoading;
+  
+  if (courseLoading || modulesLoading || lessonsLoading) {
+    return (
+      <div className="profile-root min-vh-100 d-flex align-items-center justify-content-center">
+        <div className="text-center">
+          <div className="loading-spinner mb-3" role="status">
+            <span className="visually-hidden">Loading...</span>
+          </div>
+          <p className="profile-joined">Loading course details...</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (courseError || !course) {
+    return (
+      <div className="profile-root min-vh-100 d-flex align-items-center justify-content-center">
+        <div className="text-center">
+          <h2 className="main-title mb-3">Course Not Found</h2>
+          <p className="profile-joined mb-4">
+            Sorry, we couldn't find the course you're looking for.
+          </p>
+          {courseError && (
+            <div className="alert alert-danger mb-3">
+              <strong>Error Details:</strong> {courseError.message || courseError}
+            </div>
+          )}
+          <div className="mb-3">
+            <small className="text-muted">
+              Course ID: {courseId}<br/>
+              Educator: {educatorUsername}<br/>
+              Course Details: {courseDetails ? 'Loaded' : 'Not loaded'}<br/>
+              Educator Data: {educatorData ? 'Loaded' : 'Not loaded'}
+            </small>
+          </div>
+          <button 
+            className="btn-edit-profile" 
+            onClick={() => navigate(-1)}
+          >
+            <ArrowLeft size={16} className="me-2" />
+            Go Back
+          </button>
+        </div>
+      </div>
+    );
+  }
 
   // Video player functions
   const openVideoPlayer = (lesson) => {
@@ -228,46 +453,6 @@ export default function StudentCourseDetailsPage() {
       course.progress = Math.round((newCompletedCount / course.lessons.length) * 100);
     }
   };
-
-  // Handle keyboard shortcuts for video player
-  useEffect(() => {
-    const handleKeyPress = (e) => {
-      if (showVideoModal) {
-        switch (e.key) {
-          case 'Escape':
-            closeVideoPlayer();
-            break;
-          case ' ':
-            e.preventDefault();
-            setIsPlaying(!isPlaying);
-            break;
-        }
-      }
-    };
-
-    document.addEventListener('keydown', handleKeyPress);
-    return () => document.removeEventListener('keydown', handleKeyPress);
-  }, [showVideoModal, isPlaying]);
-
-  if (!course) {
-    return (
-      <div className="profile-root min-vh-100 d-flex align-items-center justify-content-center">
-        <div className="text-center">
-          <h2 className="main-title mb-3">Course Not Found</h2>
-          <p className="profile-joined mb-4">
-            Sorry, we couldn't find the course you're looking for.
-          </p>
-          <button 
-            className="btn-edit-profile" 
-            onClick={() => navigate(-1)}
-          >
-            <ArrowLeft size={16} className="me-2" />
-            Go Back
-          </button>
-        </div>
-      </div>
-    );
-  }
 
   const handleReviewSubmit = (e) => {
     e.preventDefault();
@@ -508,38 +693,127 @@ export default function StudentCourseDetailsPage() {
                 <div className="card-body">
                   <h3 className="section-title mb-4">Course Curriculum</h3>
                   
-                  {course.tableOfContents.map((chapter, index) => (
-                    <div key={index} className="mb-4">
-                      <div className="d-flex justify-content-between align-items-center mb-3">
-                        <h4 className="about-subtitle mb-0">{chapter.chapter}</h4>
-                        <div className="d-flex align-items-center">
-                          <span className="badge bg-secondary me-2">
-                            {chapter.completed}/{chapter.lessons} completed
-                          </span>
-                          <div className="progress" style={{ width: "100px", height: "6px" }}>
-                            <div
-                              className="progress-bar progress-bar-filled"
-                              style={{ width: `${(chapter.completed / chapter.lessons) * 100}%` }}
-                            />
+                  {hasModules ? (
+                    course.tableOfContents.map((chapter, index) => (
+                      <div key={chapter.id} className="mb-4">
+                        <div className="d-flex justify-content-between align-items-center mb-3">
+                          <h4 className="about-subtitle mb-0">{chapter.chapter}</h4>
+                          <div className="d-flex align-items-center">
+                            <span className="badge bg-secondary me-2">
+                              {chapter.completed}/{chapter.lessons} completed
+                            </span>
+                            <div className="progress" style={{ width: "100px", height: "6px" }}>
+                              <div
+                                className="progress-bar progress-bar-filled"
+                                style={{ width: `${(chapter.completed / chapter.lessons) * 100}%` }}
+                              />
+                            </div>
                           </div>
                         </div>
-                      </div>
-                      <div className="ms-3">
-                        {chapter.topics.map((topic, topicIndex) => (
-                          <div key={topicIndex} className="about-bubble mb-2 d-flex align-items-center">
-                            <div className="me-2">
-                              {topicIndex < chapter.completed ? (
-                                <CheckCircle size={16} className="text-success" />
-                              ) : (
-                                <Play size={16} className="text-muted" />
-                              )}
-                            </div>
-                            <span>{topic}</span>
+                        
+                        {/* Chapter Description */}
+                        {chapter.module && chapter.module.description && (
+                          <div className="ms-3 mb-3">
+                            <p className="text-muted mb-2">{chapter.module.description}</p>
                           </div>
-                        ))}
+                        )}
+                        
+                        {/* Chapter Topics */}
+                        <div className="ms-3 mb-3">
+                          {chapter.topics.map((topic, topicIndex) => (
+                            <div key={topicIndex} className="about-bubble mb-2 d-flex align-items-center">
+                              <div className="me-2">
+                                {topicIndex < chapter.completed ? (
+                                  <CheckCircle size={16} className="text-success" />
+                                ) : (
+                                  <Play size={16} className="text-muted" />
+                                )}
+                              </div>
+                              <span>{topic}</span>
+                            </div>
+                          ))}
+                        </div>
+                        
+                        {/* Chapter Lessons */}
+                        {chapter.chapterLessons && chapter.chapterLessons.length > 0 ? (
+                          <div className="ms-4">
+                            <h6 className="text-muted mb-2">Lessons in this chapter:</h6>
+                            {chapter.chapterLessons.map((lesson, lessonIndex) => (
+                              <div key={lesson.id} className="about-bubble mb-2 d-flex align-items-center">
+                                <div className="me-2">
+                                  {lesson.completed ? (
+                                    <CheckCircle size={14} className="text-success" />
+                                  ) : (
+                                    <Play size={14} className="text-muted" />
+                                  )}
+                                </div>
+                                <span className="me-2">{lesson.title}</span>
+                                <small className="text-muted">
+                                  <Clock size={12} className="me-1" />
+                                  {typeof lesson.duration === 'number' ? `${lesson.duration} min` : lesson.duration}
+                                </small>
+                                {lesson.order && (
+                                  <small className="text-muted ms-2">
+                                    Order: {lesson.order}
+                                  </small>
+                                )}
+                                {lesson.is_free && (
+                                  <small className="badge bg-success ms-2">
+                                    Free
+                                  </small>
+                                )}
+                              </div>
+                            ))}
+                          </div>
+                        ) : chapter.hasPermissionError ? (
+                          <div className="ms-4">
+                            <div className="alert alert-warning mb-2">
+                              <div className="d-flex align-items-center">
+                                <div className="me-2">
+                                  <Clock size={16} className="text-warning" />
+                                </div>
+                                <div>
+                                  <strong>Enrollment Required</strong>
+                                  <br />
+                                  <small>You need to be enrolled in this course to access lessons.</small>
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+                        ) : (
+                          <div className="ms-4">
+                            <div className="about-bubble mb-2 d-flex align-items-center">
+                              <div className="me-2">
+                                <Clock size={14} className="text-muted" />
+                              </div>
+                              <span className="text-muted">No lessons available yet</span>
+                            </div>
+                          </div>
+                        )}
+                        
+                        {/* Chapter Metadata */}
+                        {chapter.module && (
+                          <div className="ms-3 mt-2">
+                            <small className="text-muted">
+                              <Clock size={12} className="me-1" />
+                              Duration: {chapter.module.duration || "N/A"}
+                            </small>
+                            {chapter.module.total_lessons && (
+                              <small className="text-muted ms-3">
+                                <BookOpen size={12} className="me-1" />
+                                Lessons: {chapter.module.total_lessons}
+                              </small>
+                            )}
+                          </div>
+                        )}
                       </div>
+                    ))
+                  ) : (
+                    <div className="text-center py-5">
+                      <p className="profile-joined">No curriculum available for this course yet.</p>
+                      <p className="profile-joined">Please check back later or contact the instructor.</p>
                     </div>
-                  ))}
+                  )}
                 </div>
               </div>
             )}
@@ -549,77 +823,150 @@ export default function StudentCourseDetailsPage() {
                 <div className="card-body">
                   <h3 className="section-title mb-4">Course Lessons</h3>
                   
-                  {course.lessons.map((lesson) => (
-                    <div 
-                      key={lesson.id} 
-                      className="d-flex align-items-center p-3 mb-2 about-bubble position-relative"
-                      style={{ 
-                        cursor: lesson.type === 'video' ? 'pointer' : 'default',
-                        transition: 'all 0.2s ease'
-                      }}
-                      onClick={() => openVideoPlayer(lesson)}
-                      onMouseEnter={(e) => {
-                        if (lesson.type === 'video') {
-                          e.currentTarget.style.transform = 'translateX(5px)';
-                          e.currentTarget.style.boxShadow = '0 4px 12px rgba(0,0,0,0.15)';
+                  {hasModules ? (
+                    course.lessons.map((lesson) => {
+                      if (lesson.isChapter) {
+                        // Render chapter header
+                        return (
+                          <div key={lesson.id} className="mb-4">
+                            <div className="d-flex align-items-center p-3 mb-2 about-bubble bg-light">
+                              <div className="me-3">
+                                <BookOpen size={24} className="text-primary" />
+                              </div>
+                              <div className="flex-grow-1">
+                                <h5 className="about-subtitle mb-1">{lesson.title}</h5>
+                                {lesson.description && (
+                                  <small className="text-muted">{lesson.description}</small>
+                                )}
+                              </div>
+                            </div>
+                          </div>
+                        );
+                      } else {
+                        // Render lesson under its chapter
+                        if (lesson.isEmpty) {
+                          // Render empty chapter placeholder
+                          return (
+                            <div key={lesson.id} className="ms-4 mb-2">
+                              <div className="about-bubble d-flex align-items-center p-3">
+                                <div className="me-3">
+                                  <Clock size={16} className="text-muted" />
+                                </div>
+                                <div className="flex-grow-1">
+                                  <small className="text-muted">No lessons available yet</small>
+                                </div>
+                              </div>
+                            </div>
+                          );
                         }
-                      }}
-                      onMouseLeave={(e) => {
-                        if (lesson.type === 'video') {
-                          e.currentTarget.style.transform = 'translateX(0)';
-                          e.currentTarget.style.boxShadow = 'none';
+                        
+                        if (lesson.isPermissionError) {
+                          // Render permission error message
+                          return (
+                            <div key={lesson.id} className="ms-4 mb-2">
+                              <div className="alert alert-warning d-flex align-items-center p-3">
+                                <div className="me-3">
+                                  <Clock size={16} className="text-warning" />
+                                </div>
+                                <div className="flex-grow-1">
+                                  <strong>Enrollment Required</strong>
+                                  <br />
+                                  <small>{lesson.errorMessage}</small>
+                                </div>
+                              </div>
+                            </div>
+                          );
                         }
-                      }}
-                    >
-                      <div className="me-3">
-                        {lesson.completed ? (
-                          <CheckCircle size={20} className="text-success" />
-                        ) : (
-                          <Play 
-                            size={20} 
-                            className={lesson.type === 'video' ? "text-primary" : "text-muted"} 
-                          />
-                        )}
-                      </div>
-                      
-                      <div className="flex-grow-1">
-                        <h5 className="about-subtitle mb-1">{lesson.title}</h5>
-                        <div className="d-flex align-items-center gap-3">
-                          <small className="profile-joined">
-                            <Clock size={14} className="me-1" />
-                            {lesson.duration}
-                          </small>
-                          <small 
-                            className="border rounded px-2 py-1" 
+                        
+                        return (
+                          <div 
+                            key={lesson.id} 
+                            className="d-flex align-items-center p-3 mb-2 about-bubble position-relative ms-4"
                             style={{ 
-                              color: lesson.type === 'video' ? "var(--color-primary)" : "var(--color-secondary)",
-                              borderColor: lesson.type === 'video' ? "var(--color-primary)" : "var(--color-secondary)"
+                              cursor: lesson.type === 'video' ? 'pointer' : 'default',
+                              transition: 'all 0.2s ease'
+                            }}
+                            onClick={() => openVideoPlayer(lesson)}
+                            onMouseEnter={(e) => {
+                              if (lesson.type === 'video') {
+                                e.currentTarget.style.transform = 'translateX(5px)';
+                                e.currentTarget.style.boxShadow = '0 4px 12px rgba(0,0,0,0.15)';
+                              }
+                            }}
+                            onMouseLeave={(e) => {
+                              if (lesson.type === 'video') {
+                                e.currentTarget.style.transform = 'translateX(0)';
+                                e.currentTarget.style.boxShadow = 'none';
+                              }
                             }}
                           >
-                            {lesson.type.charAt(0).toUpperCase() + lesson.type.slice(1)}
-                          </small>
-                        </div>
-                        {lesson.description && (
-                          <small className="text-muted d-block mt-1">
-                            {lesson.description}
-                          </small>
-                        )}
-                      </div>
-                      
-                      <div className="d-flex align-items-center">
-                        {lesson.completed && (
-                          <div className="text-success me-2">
-                            <CheckCircle size={20} />
+                            <div className="me-3">
+                              {lesson.completed ? (
+                                <CheckCircle size={20} className="text-success" />
+                              ) : (
+                                <Play 
+                                  size={20} 
+                                  className={lesson.type === 'video' ? "text-primary" : "text-muted"} 
+                                />
+                              )}
+                            </div>
+                            
+                            <div className="flex-grow-1">
+                              <h6 className="about-subtitle mb-1">{lesson.title}</h6>
+                              <div className="d-flex align-items-center gap-3">
+                                <small className="profile-joined">
+                                  <Clock size={14} className="me-1" />
+                                  {typeof lesson.duration === 'number' ? `${lesson.duration} min` : lesson.duration}
+                                </small>
+                                <small 
+                                  className="border rounded px-2 py-1" 
+                                  style={{ 
+                                    color: lesson.type === 'video' ? "var(--color-primary)" : "var(--color-secondary)",
+                                    borderColor: lesson.type === 'video' ? "var(--color-primary)" : "var(--color-secondary)"
+                                  }}
+                                >
+                                  {lesson.type.charAt(0).toUpperCase() + lesson.type.slice(1)}
+                                </small>
+                                {lesson.order && (
+                                  <small className="text-muted">
+                                    Order: {lesson.order}
+                                  </small>
+                                )}
+                                {lesson.is_free && (
+                                  <small className="badge bg-success">
+                                    Free
+                                  </small>
+                                )}
+                              </div>
+                              {lesson.description && (
+                                <small className="text-muted d-block mt-1">
+                                  {lesson.description}
+                                </small>
+                              )}
+                            </div>
+                            
+                            <div className="d-flex align-items-center">
+                              {lesson.completed && (
+                                <div className="text-success me-2">
+                                  <CheckCircle size={20} />
+                                </div>
+                              )}
+                              {lesson.type === 'video' && !lesson.completed && (
+                                <div className="text-primary opacity-75">
+                                  <Play size={16} />
+                                </div>
+                              )}
+                            </div>
                           </div>
-                        )}
-                        {lesson.type === 'video' && !lesson.completed && (
-                          <div className="text-primary opacity-75">
-                            <Play size={16} />
-                          </div>
-                        )}
-                      </div>
+                        );
+                      }
+                    })
+                  ) : (
+                    <div className="text-center py-5">
+                      <p className="profile-joined">No lessons available for this course yet.</p>
+                      <p className="profile-joined">Please check back later or contact the instructor.</p>
                     </div>
-                  ))}
+                  )}
                 </div>
               </div>
             )}
@@ -798,8 +1145,8 @@ export default function StudentCourseDetailsPage() {
                   <img
                     src={course.educator.avatar}
                     alt={course.educator.name}
-                    className="rounded-circle me-3"
-                    style={{ width: "60px", height: "60px", objectFit: "cover" }}
+                    className="avatar-circle me-3"
+                    style={{ width: "60px", height: "80px", objectFit: "cover" }}
                   />
                   <div>
                     <h5 className="about-subtitle mb-1">{course.educator.name}</h5>
@@ -850,3 +1197,5 @@ export default function StudentCourseDetailsPage() {
     </div>
   );
 }
+
+export default StudentCourseDetails;

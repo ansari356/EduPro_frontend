@@ -16,11 +16,15 @@ export const studentEndpoints = {
 		enrollIn: `/course/course-enrollment/`,
 		enrolledIn: (teacherUsername) =>
 			`/course/course-enrollment-list/${teacherUsername}`,
-		// unused
-		courseModules: (courseId) => `courses${courseId}/modules/`,
+		// Course modules/lessons - adjust this endpoint based on your backend structure
+		courseModules: (courseId) => `/courses/${courseId}/modules/`,
+		// Alternative endpoint - uncomment if this matches your backend
+		// courseModules: (courseId) => `/course/${courseId}/lessons/`,
 		courseDetails: (courseId) => `/course/course-detail/${courseId}`,
 		listAll: (educatorUsername) => `course/teacher-list/${educatorUsername}`,
 		enrollmentDelete: (courseId, enrollmentId) =>
 			`/course/course-enrollment-delete/${courseId}/${enrollmentId}`,
+		// New endpoint for fetching lessons within a module
+		moduleLessons: (moduleId) => `/modules/${moduleId}/lessons/`,
 	},
 };

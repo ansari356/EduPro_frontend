@@ -14,37 +14,45 @@ import {
   Target,
   Shield
 } from "lucide-react";
+import useEducatorPublicData from "../../apis/hooks/student/useEducatorPublicData";
+import MainLoader from "../../components/common/MainLoader";
 
 function StudentHome() {
   const { educatorUsername } = useParams();
+  const { isLoading, error, data: educatorData } = useEducatorPublicData();
 
-  // Dummy educator data - replace with real API call
-  const educatorData = {
-    name: "Dr. Sarah Johnson",
-    title: "Senior Data Scientist & Educator",
-    avatar: "https://placehold.co/150x150?text=Dr.+Sarah",
-    bio: "Passionate educator with over 8 years of experience in data science and analytics. I believe in making complex concepts simple and accessible to all students. My goal is to empower the next generation of data professionals through hands-on learning and real-world applications.",
-    specialization: "Data Science, Machine Learning, Statistics",
-    experience: "8+ years",
-    rating: 4.8,
-    totalStudents: 1247,
-    totalCourses: 12,
-    institution: "Stanford University",
-    achievements: [
-      "PhD in Computer Science",
-      "Published 25+ Research Papers",
-      "Google Developer Expert",
-      "AWS Certified Solutions Architect"
-    ],
-    contact: {
-      email: "sarah.johnson@eduplatform.com",
-      phone: "+1 (555) 123-4567",
-      office: "+1 (555) 765-4321",
-      location: "San Francisco, CA",
-      address: "123 Education Street, San Francisco, CA 94102",
-      officeHours: "Mon-Fri: 2:00 PM - 4:00 PM"
-    }
-  };
+  // Show loading state
+  if (isLoading) {
+    return (
+      <div className="min-vh-100 d-flex justify-content-center align-items-center">
+        <MainLoader />
+      </div>
+    );
+  }
+
+  // Show error state
+  if (error) {
+    return (
+      <div className="min-vh-100 d-flex justify-content-center align-items-center">
+        <div className="text-center">
+          <h3 className="text-danger">Error Loading Educator Data</h3>
+          <p className="text-muted">Unable to load educator information. Please try again later.</p>
+        </div>
+      </div>
+    );
+  }
+
+  // Show message if no educator data
+  if (!educatorData) {
+    return (
+      <div className="min-vh-100 d-flex justify-content-center align-items-center">
+        <div className="text-center">
+          <h3 className="text-muted">No Educator Found</h3>
+          <p className="text-muted">The requested educator profile could not be found.</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-vh-100 profile-root p-4">
@@ -55,7 +63,7 @@ function StudentHome() {
             <div className="text-center">
               <h1 className="main-title mb-2">Welcome to EduPlatform</h1>
               <p className="section-title">
-                Your journey to knowledge starts here with {educatorData.name}
+                Your journey to knowledge starts here with {educatorData.full_name}
               </p>
             </div>
           </div>
@@ -74,26 +82,28 @@ function StudentHome() {
                 <div className="row">
                   {/* Educator Info */}
                   <div className="col-md-4 text-center mb-4">
-                    <img
-                      src={educatorData.avatar}
-                      alt={educatorData.name}
-                      className="rounded-circle mb-3"
-                      style={{ width: "120px", height: "120px", objectFit: "cover" }}
-                    />
-                    <h4 className="profile-main-title mb-1">{educatorData.name}</h4>
-                    <p className="about-subtitle mb-3">{educatorData.title}</p>
-                    
-                    <div className="d-flex justify-content-center align-items-center mb-2">
-                      <Star size={16} className="text-warning me-1" fill="currentColor" />
-                      <span className="fw-bold me-2">{educatorData.rating}</span>
-                      <small className="text-muted">({educatorData.totalStudents} students)</small>
+                    <div className="d-flex flex-column align-items-center">
+                      <div className="avatar-circle mb-3">
+                        <img
+                          src={educatorData.profile_picture || "https://placehold.co/150x180?text=Educator"}
+                          alt={educatorData.full_name || educatorData.username}
+                        />
+                      </div>
+                      <h4 className="profile-main-title mb-1">{educatorData.full_name || educatorData.username}</h4>
+                      <p className="about-subtitle mb-3">{educatorData.specialization || "Educator"}</p>
+                      
+                      <div className="d-flex justify-content-center align-items-center mb-2">
+                        <Star size={16} className="text-warning me-1" fill="currentColor" />
+                        <span className="fw-bold me-2">{educatorData.rating || 0}</span>
+                        <small className="text-muted">({educatorData.number_of_students || 0} students)</small>
+                      </div>
                     </div>
                   </div>
 
                   {/* Educator Details */}
                   <div className="col-md-8">
                     <h5 className="section-title mb-3">About Your Instructor</h5>
-                    <p className="profile-joined mb-3">{educatorData.bio}</p>
+                    <p className="profile-joined mb-3">{educatorData.bio || "No bio available."}</p>
 
                     <div className="row mb-3">
                       <div className="col-sm-6 mb-3">
@@ -102,7 +112,7 @@ function StudentHome() {
                             <BookOpen size={16} className="me-2 text-primary" />
                             <strong>Specialization</strong>
                           </div>
-                          <small>{educatorData.specialization}</small>
+                          <small>{educatorData.specialization || "Not specified"}</small>
                         </div>
                       </div>
                       <div className="col-sm-6 mb-3">
@@ -111,7 +121,7 @@ function StudentHome() {
                             <Clock size={16} className="me-2 text-primary" />
                             <strong>Experience</strong>
                           </div>
-                          <small>{educatorData.experience}</small>
+                          <small>{educatorData.experiance || "Not specified"}</small>
                         </div>
                       </div>
                       <div className="col-sm-6 mb-3">
@@ -120,7 +130,7 @@ function StudentHome() {
                             <Users size={16} className="me-2 text-primary" />
                             <strong>Students Taught</strong>
                           </div>
-                          <small>{educatorData.totalStudents}+</small>
+                          <small>{educatorData.number_of_students || 0}+</small>
                         </div>
                       </div>
                       <div className="col-sm-6 mb-3">
@@ -129,24 +139,26 @@ function StudentHome() {
                             <Award size={16} className="me-2 text-primary" />
                             <strong>Courses Created</strong>
                           </div>
-                          <small>{educatorData.totalCourses}</small>
+                          <small>{educatorData.number_of_courses || 0}</small>
                         </div>
                       </div>
                     </div>
 
-                    <div>
-                      <h6 className="about-subtitle mb-2">Achievements & Qualifications</h6>
-                      <div className="row">
-                        {educatorData.achievements.map((achievement, index) => (
-                          <div key={index} className="col-sm-6 mb-2">
-                            <div className="d-flex align-items-center">
-                              <Award size={14} className="me-2 text-success" />
-                              <small>{achievement}</small>
+                    {educatorData.achievements && educatorData.achievements.length > 0 && (
+                      <div>
+                        <h6 className="about-subtitle mb-2">Achievements & Qualifications</h6>
+                        <div className="row">
+                          {educatorData.achievements.map((achievement, index) => (
+                            <div key={index} className="col-sm-6 mb-2">
+                              <div className="d-flex align-items-center">
+                                <Award size={14} className="me-2 text-success" />
+                                <small>{achievement}</small>
+                              </div>
                             </div>
-                          </div>
-                        ))}
+                          ))}
+                        </div>
                       </div>
-                    </div>
+                    )}
                   </div>
                 </div>
               </div>
@@ -164,65 +176,61 @@ function StudentHome() {
 
                 <div className="space-y-3">
                   {/* Email */}
-                  <div className="about-bubble p-3 mb-3">
-                    <div className="d-flex align-items-center mb-2">
-                      <Mail size={16} className="me-2 text-primary" />
-                      <strong className="about-subtitle">Email</strong>
+                  {educatorData.user?.email && (
+                    <div className="about-bubble p-3 mb-3">
+                      <div className="d-flex align-items-center mb-2">
+                        <Mail size={16} className="me-2 text-primary" />
+                        <strong className="about-subtitle">Email</strong>
+                      </div>
+                      <a 
+                        href={`mailto:${educatorData.user.email}`}
+                        className="text-decoration-none small"
+                      >
+                        {educatorData.user.email}
+                      </a>
                     </div>
-                    <a 
-                      href={`mailto:${educatorData.contact.email}`}
-                      className="text-decoration-none small"
-                    >
-                      {educatorData.contact.email}
-                    </a>
-                  </div>
+                  )}
 
                   {/* Phone Numbers */}
-                  <div className="about-bubble p-3 mb-3">
-                    <div className="d-flex align-items-center mb-2">
-                      <Phone size={16} className="me-2 text-primary" />
-                      <strong className="about-subtitle">Phone</strong>
+                  {educatorData.user?.phone && (
+                    <div className="about-bubble p-3 mb-3">
+                      <div className="d-flex align-items-center mb-2">
+                        <Phone size={16} className="me-2 text-primary" />
+                        <strong className="about-subtitle">Phone</strong>
+                      </div>
+                      <div className="mb-1">
+                        <a 
+                          href={`tel:${educatorData.user.phone}`}
+                          className="text-decoration-none small"
+                        >
+                          {educatorData.user.phone}
+                        </a>
+                      </div>
                     </div>
-                    <div className="mb-1">
-                      <small className="text-muted">Primary:</small>
-                      <a 
-                        href={`tel:${educatorData.contact.phone}`}
-                        className="text-decoration-none small ms-2"
-                      >
-                        {educatorData.contact.phone}
-                      </a>
-                    </div>
-                    <div>
-                      <small className="text-muted">Office:</small>
-                      <a 
-                        href={`tel:${educatorData.contact.office}`}
-                        className="text-decoration-none small ms-2"
-                      >
-                        {educatorData.contact.office}
-                      </a>
-                    </div>
-                  </div>
+                  )}
 
                   {/* Location */}
-                  <div className="about-bubble p-3 mb-3">
-                    <div className="d-flex align-items-center mb-2">
-                      <MapPin size={16} className="me-2 text-primary" />
-                      <strong className="about-subtitle">Location</strong>
+                  {(educatorData.city || educatorData.country) && (
+                    <div className="about-bubble p-3 mb-3">
+                      <div className="d-flex align-items-center mb-2">
+                        <MapPin size={16} className="me-2 text-primary" />
+                        <strong className="about-subtitle">Location</strong>
+                      </div>
+                      <div className="small">
+                        <div className="mb-1">{educatorData.city && educatorData.country ? `${educatorData.city}, ${educatorData.country}` : educatorData.city || educatorData.country}</div>
+                        {educatorData.address && (
+                          <div className="text-muted">{educatorData.address}</div>
+                        )}
+                      </div>
                     </div>
-                    <div className="small">
-                      <div className="mb-1">{educatorData.contact.location}</div>
-                      <div className="text-muted">{educatorData.contact.address}</div>
-                    </div>
-                  </div>
+                  )}
 
-                  {/* Office Hours */}
-                  <div className="about-bubble p-3">
-                    <div className="d-flex align-items-center mb-2">
-                      <Clock size={16} className="me-2 text-primary" />
-                      <strong className="about-subtitle">Office Hours</strong>
+                  {/* Show message if no contact info */}
+                  {!educatorData.user?.email && !educatorData.user?.phone && !educatorData.city && !educatorData.country && (
+                    <div className="text-center text-muted">
+                      <p>Contact information not available</p>
                     </div>
-                    <small>{educatorData.contact.officeHours}</small>
-                  </div>
+                  )}
                 </div>
               </div>
             </div>
