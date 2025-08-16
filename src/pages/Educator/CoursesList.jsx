@@ -6,9 +6,8 @@ import useEducatorStudentsListData from "../../apis/hooks/educator/useEducatorSt
 import useEducatorTotalRevenue from "../../apis/hooks/educator/useEducatorTotalRevenue";
 import {pagePaths} from "../../pagePaths";
 export default function EducatorCoursesList() {
-  const navigate = useNavigate();
   const {data:educator} = useEducatorProfileData();
-  const {data:courses} = useEducatorCoursesData(educator?.user.username);
+  const {data:courses} = useEducatorCoursesData();
   const {studentsCount} = useEducatorStudentsListData()
   const {totalRevenue}= useEducatorTotalRevenue()
   const totalStudents = studentsCount;

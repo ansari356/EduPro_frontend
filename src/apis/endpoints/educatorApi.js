@@ -19,15 +19,14 @@ export const educatorEndpoints = {
 		update: (courseId) => `/course/update/${courseId}`,
 		delete: (courseId) => `/course/course-delete/${courseId}`,
 		searchFilter: `/course/course-search-filter/`,
-		teacherList: (educatorUsername) => `/course/teacher-list/${educatorUsername}`,
+		educatorCourses:`/course/list-by-teacher/`,
 		enrollments: (courseId) => `/get_student-enrollments/${courseId}`,
 	},
 	students: {
 		profile: (studentId) => `/teacher/get-student-profile/${studentId}`,
 		list: "/teacher/get_students/",
 		remove: (studentId) => `/teacher/students/remove/${studentId}/`,
-		block: (studentId) =>
-			`/teacher/students/toggle-block/${studentId}/`,
+		block: (studentId) => `/teacher/students/toggle-block/${studentId}/`,
 	},
 	coupon: {
 		used: "/coupon/used-coupons/",
