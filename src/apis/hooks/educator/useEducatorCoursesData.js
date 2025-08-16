@@ -2,10 +2,12 @@ import useSWR from "swr";
 import { educatorEndpoints } from "../../endpoints/educatorApi";
 import { swrFetcher } from "../../base";
 
-export default function useEducatorCoursesData(educatorUsername) {
+export default function useEducatorCoursesData() {
 	
   const { isLoading, error, data, mutate } = useSWR(
-   educatorUsername && educatorEndpoints.course.teacherList(educatorUsername), swrFetcher() );
+			educatorEndpoints.course.educatorCourses,
+		swrFetcher()
+	);
    /* 
    {
         "id": "6a186759-fdc7-4fac-b6fa-9e9fe2994694",
