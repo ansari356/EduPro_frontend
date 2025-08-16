@@ -5,12 +5,12 @@
   --color-secondary: #e3f2fd;
   --color-background: #f5f5f5;
   /* ---------------------------------- */
-  --color-primary: #1976d2;
+  --color-primary: var(--color-primary-dark);
   --color-text-muted: #5a6a92;
   --color-card-background: #ffffff;
   --color-border: #e3e8f6;
   --color-border-light: #cbe1f9;
-  --color-success: #4caf50;
+  --color-success: #87c489;
   --color-warning: #ff9800;
   --color-error: #f44336;
   
@@ -286,7 +286,7 @@ body {
   font-weight: 600;
   font-size: var(--font-size-sm);
   margin-top: var(--spacing-sm);
-  color: var(--color-primary);
+  color: var(--color-primary-dark);
 }
 
 /* QR Code styling */
@@ -330,6 +330,16 @@ body {
 
 .badge.bg-secondary {
   background-color: var(--color-secondary) !important;
+  color: white;
+}
+
+.badge-success-custom {
+  background-color: var(--color-success) !important;
+  color: white;
+}
+
+.badge-warning-custom {
+  background-color: var(--color-warning) !important;
   color: white;
 }
 
@@ -398,8 +408,8 @@ form .form-check-input {
 }
 
 form .form-check-input:checked {
-  background-color: var(--color-primary);
-  border-color: var(--color-primary);
+  background-color: var(--color-primary-dark);
+  border-color: var(--color-primary-dark);
 }
 
 /* Alert components */
@@ -541,7 +551,7 @@ form .form-check-input:checked {
   position: absolute;
   bottom: 0;
   right: 0;
-  background-color: var(--color-primary);
+  background-color: var(--color-primary-dark);
   color: white;
   border-radius: var(--border-radius-full);
   width: 36px;
@@ -629,14 +639,14 @@ form .form-check-input:checked {
 }
 
 .eye-button:hover {
-  color: var(--color-primary);
+  color: var(--color-primary-dark);
 }
 
 /* Loading Spinner */
 .loading-spinner {
   width: 3rem;
   height: 3rem;
-  border: 0.25em solid var(--color-primary);
+  border: 0.25em solid var(--color-primary-dark);
   border-right-color: transparent;
   border-radius: 50%;
   animation: spinner-border 0.75s linear infinite;
@@ -940,14 +950,16 @@ form .form-check-input:checked {
 }
 
 .chapter-selection-btn.selected {
-  border-color: var(--color-primary);
-  background-color: var(--color-primary);
+  border-color: var(--color-primary-dark);
+  background-color: var(--color-primary-dark);
+  color: white;
+  background-color: var(--color-primary-dark);
   color: white;
 }
 
 /* Coupon Input Styling */
 .coupon-input-group .form-control:focus {
-  border-color: var(--color-primary);
+  border-color: var(--color-primary-dark);
   box-shadow: var(--shadow-focus);
 }
 
@@ -960,7 +972,7 @@ form .form-check-input:checked {
   width: 3rem;
   height: 3rem;
   border: 0.25em solid var(--color-border-light);
-  border-top: 0.25em solid var(--color-primary);
+  border-top: 0.25em solid var(--color-primary-dark);
   border-radius: 50%;
   animation: spin 1s linear infinite;
 }
@@ -999,7 +1011,9 @@ form .form-check-input:checked {
 }
 
 .video-modal-header {
-  background: var(--color-primary);
+  background: var(--color-primary-dark);
+  color: white;
+  background: var(--color-primary-dark);
   color: white;
   padding: 1rem 1.5rem;
   display: flex;
@@ -1062,7 +1076,7 @@ form .form-check-input:checked {
 
 .video-modal-description h5 {
   margin: 0 0 0.5rem 0;
-  color: var(--color-primary);
+  color: var(--color-primary-dark);
   font-size: 1.1rem;
 }
 
@@ -1110,4 +1124,32 @@ form .form-check-input:checked {
   .video-modal-actions {
     align-self: flex-end;
   }
+}
+
+/* Pagination Styling */
+.pagination .page-item .page-link {
+  color: var(--color-primary-dark);
+  background-color: var(--color-card-background);
+  border: 1px solid var(--color-border);
+  border-radius: var(--border-radius-sm);
+  margin: 0 0.25rem;
+  transition: all var(--transition-fast);
+}
+
+.pagination .page-item .page-link:hover {
+  background-color: var(--color-secondary);
+  border-color: var(--color-primary-light);
+}
+
+.pagination .page-item.active .page-link {
+  background-color: var(--color-primary-dark) !important;
+  border-color: var(--color-primary-dark) !important;
+  color: var(--color-card-background) !important;
+}
+
+.pagination .page-item.disabled .page-link {
+  color: var(--color-text-muted);
+  background-color: var(--color-background);
+  border-color: var(--color-border);
+  cursor: not-allowed;
 }

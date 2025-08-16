@@ -6,8 +6,10 @@ import { pagePaths } from "../../pagePaths";
 export default function StudentProtectedRoutes() {
 	const { educatorUsername } = useParams();
 	const{isLoading,error}=useRefreshToken()
-	if (!isLoading) {
-		return error ? <Navigate to={pagePaths.student.login(educatorUsername)} /> : <Outlet />;
+	if (error) {
+		return <Navigate to={pagePaths.student.login(educatorUsername)} /> ;
 	}
-	return <MainLoader text="checking authentication ..."/>;
+	if (isLoading) return <MainLoader text="checking authentication ..."/>;
+
+	return <Outlet	 />
 }
