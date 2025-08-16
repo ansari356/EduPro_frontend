@@ -33,7 +33,7 @@ export default function HomeHeader() {
           <Nav className="ms-auto">
             <Link
               to={pagePaths.educator.login}
-              className="btn btn-edit-profile px-4 me-2"
+              className="btn-edit-profile px-4 me-2"
               style={{ textDecoration: "none" }}
             >
               <i className="bi bi-person me-2"></i>
@@ -41,7 +41,7 @@ export default function HomeHeader() {
             </Link>
             <Link
               to={pagePaths.educator.signup}
-              className="btn btn-edit-profile px-4"
+              className="btn-edit-profile px-4"
               style={{ textDecoration: "none" }}
             >
               <i className="bi bi-person-plus me-2"></i>
