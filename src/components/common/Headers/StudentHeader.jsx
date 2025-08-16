@@ -2,11 +2,11 @@ import { Navbar, Nav, Dropdown, Container } from "react-bootstrap";
 import { NavLink, useParams, useNavigate } from "react-router-dom";
 import { pagePaths } from "../../../pagePaths";
 import logoutUser from "../../../apis/actions/logoutUser";
-import useRefreshToken from "../../../apis/hooks/useRefreshToken";
 import useStudentProfileData from "../../../apis/hooks/student/useStudentProfileData";
+import useStudentRefreshToken from "../../../apis/hooks/student/useStudentRefreshToken";
 
 export default function StudentHeader() {
-  const { mutate } = useRefreshToken();
+  const { mutate } = useStudentRefreshToken();
   const navigate = useNavigate();
   const { educatorUsername } = useParams();
   const { data: studentData, isLoading, error } = useStudentProfileData();

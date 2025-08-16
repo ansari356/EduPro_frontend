@@ -6,7 +6,7 @@ import { authEndpoints } from "../../endpoints/authApi";
 import { useParams } from "react-router-dom";
 import { swrPostFetcher } from "../../base";
 
-export default function useRefreshToken() {
+export default function useStudentRefreshToken() {
 	const { educatorUsername } = useParams();
 	const { isLoading, error, mutate } = useSWR(
 		educatorUsername && authEndpoints.studnetTokenRefresh(educatorUsername),

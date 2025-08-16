@@ -4,7 +4,7 @@ import { useNavigate, useParams } from "react-router-dom";
 import useEducatorPublicData from '../../apis/hooks/student/useEducatorPublicData';
 import loginStudent from '../../apis/actions/student/loginStudent';
 import { pagePaths } from '../../pagePaths';
-import useRefreshToken from '../../apis/hooks/useRefreshToken';
+import useStudentRefreshToken from '../../apis/hooks/student/useStudentRefreshToken';
 
 
 const StudentLoginPage = () => {
@@ -19,7 +19,7 @@ const StudentLoginPage = () => {
   const navigate = useNavigate();
   const { educatorUsername } = useParams();
   const { data: educatorData, error, isLoading } = useEducatorPublicData(educatorUsername);
-  const {mutate}=useRefreshToken()
+  const {mutate}=useStudentRefreshToken()
 
   const validateForm = () => {
     const newErrors = {};
