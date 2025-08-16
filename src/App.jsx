@@ -4,7 +4,7 @@ import EducatorSignupPage from "./pages/Educator/educatorSignupPage";
 import EducatorLoginPage from "./pages/Educator/educatorLoginPage";
 import StudentSignupPage from "./pages/Student/studentSignupPage";
 import StudentLoginPage from "./pages/Student/studentLoginPage";
-import EducatorProfile from "./pages/Educator/EducatorProfile";
+import EducatorProfile from "./pages/Educator/EducatorProfile"; 
 import StudentProfile from "./pages/Student/StudentProfile";
 import CoursesList from "./pages/Educator/CoursesList";
 import EducatorNavbarLayout from "./components/layout/EducatorNavbarLayout";
