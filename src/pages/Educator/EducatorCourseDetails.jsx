@@ -1,5 +1,7 @@
+//EducatorCourseDetails.jsx
 import React, { useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
+import getCoursesDetails from "../../apis/hooks/educator/getCoursesDetails";
 import {
   LibraryBig,
   Users,
@@ -17,181 +19,254 @@ import {
   ArrowBigLeft,
 } from "lucide-react";
 
-const courses = [
-  {
-    id: 1,
-    title: "Data Analysis Fundamentals",
-    description:
-      "Master the art of data analysis with Python, pandas, and statistical methods. Learn to extract meaningful insights from complex datasets.",
-    fullDescription:
-      "This comprehensive Data Analysis course is designed to take students from complete beginners to confident data analysts. The course covers essential statistical concepts, data cleaning techniques, exploratory data analysis, and how to draw meaningful insights from complex datasets. Students work with real-world data from various industries including finance, healthcare, and marketing. By the end of this course, students will be able to confidently analyze data, create compelling visualizations, and present their findings to stakeholders.",
-    status: "Published",
-    image: "https://placehold.co/600x300?text=Data+Analysis+Fundamentals",
-    duration: "12 weeks",
-    lessonsno: 45,
-    enrolledStudents: 1247,
-    completedStudents: 892,
-    activeStudents: 355,
-    rating: 4.8,
-    reviews: 234,
-    level: "Beginner",
-    category: "Data Science",
-    lastUpdated: "2 days ago",
-    createdDate: "2024-01-15",
-    publishedDate: "2024-01-20",
-    revenue: "$18,705",
-    averageProgress: "67%",
-    completionRate: "71.5%",
-    tags: ["Python", "Pandas", "Statistics", "Visualization"],
-    price: "$149",
-    language: "English",
-    prerequisites: "Basic computer skills",
-    certificate: true,
-    tableOfContents: [
-      {
-        chapter: "Chapter 1: Introduction to Data Analysis",
-        topics: [
-          "What is Data Analysis?",
-          "Types of Data",
-          "Data Analysis Process",
-          "Tools Overview",
-        ],
-        lessons: 8,
-      },
-      {
-        chapter: "Chapter 2: Statistical Foundations",
-        topics: [
-          "Descriptive Statistics",
-          "Probability Basics",
-          "Distributions",
-          "Hypothesis Testing",
-        ],
-        lessons: 9,
-      },
-      {
-        chapter: "Chapter 3: Data Collection & Cleaning",
-        topics: [
-          "Data Sources",
-          "Data Quality Assessment",
-          "Cleaning Techniques",
-          "Missing Data Handling",
-        ],
-        lessons: 7,
-      },
-      {
-        chapter: "Chapter 4: Exploratory Data Analysis",
-        topics: [
-          "EDA Process",
-          "Pattern Recognition",
-          "Correlation Analysis",
-          "Outlier Detection",
-        ],
-        lessons: 8,
-      },
-      {
-        chapter: "Chapter 5: Data Visualization",
-        topics: [
-          "Visualization Principles",
-          "Chart Types",
-          "Interactive Dashboards",
-          "Storytelling with Data",
-        ],
-        lessons: 7,
-      },
-      {
-        chapter: "Chapter 6: Advanced Analytics",
-        topics: [
-          "Predictive Modeling",
-          "Time Series Analysis",
-          "Classification",
-          "Clustering",
-        ],
-        lessons: 6,
-      },
-    ],
-    lessons: [
-      {
-        id: 1,
-        title: "Welcome to Data Analysis",
-        duration: "15 min",
-        type: "video",
-        views: 1247,
-        avgRating: 4.9,
-      },
-      {
-        id: 2,
-        title: "Understanding Data Types",
-        duration: "20 min",
-        type: "video",
-        views: 1198,
-        avgRating: 4.8,
-      },
-      {
-        id: 3,
-        title: "Data Analysis Tools Overview",
-        duration: "25 min",
-        type: "video",
-        views: 1156,
-        avgRating: 4.7,
-      },
-      {
-        id: 4,
-        title: "Basic Statistics Quiz",
-        duration: "10 min",
-        type: "quiz",
-        views: 1089,
-        avgRating: 4.6,
-      },
-      {
-        id: 5,
-        title: "Descriptive Statistics Deep Dive",
-        duration: "30 min",
-        type: "video",
-        views: 1034,
-        avgRating: 4.8,
-      },
-    ],
-    recentReviews: [
-      {
-        id: 1,
-        student: "John Smith",
-        rating: 5,
-        comment: "Excellent course! Very comprehensive and easy to follow.",
-        date: "2 days ago",
-      },
-      {
-        id: 2,
-        student: "Sarah Johnson",
-        rating: 4,
-        comment: "Great content, would love more practical exercises.",
-        date: "1 week ago",
-      },
-      {
-        id: 3,
-        student: "Mike Chen",
-        rating: 5,
-        comment:
-          "Perfect for beginners. The instructor explains everything clearly.",
-        date: "1 week ago",
-      },
-    ],
-    analytics: {
-      totalViews: 45623,
-      completionRate: "71.5%",
-      avgTimeSpent: "8.5 hours",
-      dropoffPoint: "Chapter 3 - Data Cleaning",
-      peakEngagement: "Chapter 1 - Introduction",
-    },
-  },
-];
+//fixed_data
+// const courses = [
+//   {
+//     id: courseData.id,
+//     title: courseData.title,
+//     description:
+//       "Master the art of data analysis with Python, pandas, and statistical methods. Learn to extract meaningful insights from complex datasets.",
+//     fullDescription:
+//       "This comprehensive Data Analysis course is designed to take students from complete beginners to confident data analysts. The course covers essential statistical concepts, data cleaning techniques, exploratory data analysis, and how to draw meaningful insights from complex datasets. Students work with real-world data from various industries including finance, healthcare, and marketing. By the end of this course, students will be able to confidently analyze data, create compelling visualizations, and present their findings to stakeholders.",
+//     status: "Published",
+//     image: "https://placehold.co/600x300?text=Data+Analysis+Fundamentals",
+//     duration: "12 weeks",
+//     lessonsno: 45,
+//     enrolledStudents: 1247,
+//     completedStudents: 892,
+//     activeStudents: 355,
+//     rating: 4.8,
+//     reviews: 234,
+//     level: "Beginner",
+//     category: "Data Science",
+//     lastUpdated: "2 days ago",
+//     createdDate: "2024-01-15",
+//     publishedDate: "2024-01-20",
+//     revenue: "$18,705",
+//     averageProgress: "67%",
+//     completionRate: "71.5%",
+//     tags: ["Python", "Pandas", "Statistics", "Visualization"],
+//     price: "$149",
+//     language: "English",
+//     prerequisites: "Basic computer skills",
+//     certificate: true,
+//     tableOfContents: [
+//       {
+//         chapter: "Chapter 1: Introduction to Data Analysis",
+//         topics: [
+//           "What is Data Analysis?",
+//           "Types of Data",
+//           "Data Analysis Process",
+//           "Tools Overview",
+//         ],
+//         lessons: 8,
+//       },
+//       {
+//         chapter: "Chapter 2: Statistical Foundations",
+//         topics: [
+//           "Descriptive Statistics",
+//           "Probability Basics",
+//           "Distributions",
+//           "Hypothesis Testing",
+//         ],
+//         lessons: 9,
+//       },
+//       {
+//         chapter: "Chapter 3: Data Collection & Cleaning",
+//         topics: [
+//           "Data Sources",
+//           "Data Quality Assessment",
+//           "Cleaning Techniques",
+//           "Missing Data Handling",
+//         ],
+//         lessons: 7,
+//       },
+//       {
+//         chapter: "Chapter 4: Exploratory Data Analysis",
+//         topics: [
+//           "EDA Process",
+//           "Pattern Recognition",
+//           "Correlation Analysis",
+//           "Outlier Detection",
+//         ],
+//         lessons: 8,
+//       },
+//       {
+//         chapter: "Chapter 5: Data Visualization",
+//         topics: [
+//           "Visualization Principles",
+//           "Chart Types",
+//           "Interactive Dashboards",
+//           "Storytelling with Data",
+//         ],
+//         lessons: 7,
+//       },
+//       {
+//         chapter: "Chapter 6: Advanced Analytics",
+//         topics: [
+//           "Predictive Modeling",
+//           "Time Series Analysis",
+//           "Classification",
+//           "Clustering",
+//         ],
+//         lessons: 6,
+//       },
+//     ],
+//     lessons: [
+//       {
+//         id: 1,
+//         title: "Welcome to Data Analysis",
+//         duration: "15 min",
+//         type: "video",
+//         views: 1247,
+//         avgRating: 4.9,
+//       },
+//       {
+//         id: 2,
+//         title: "Understanding Data Types",
+//         duration: "20 min",
+//         type: "video",
+//         views: 1198,
+//         avgRating: 4.8,
+//       },
+//       {
+//         id: 3,
+//         title: "Data Analysis Tools Overview",
+//         duration: "25 min",
+//         type: "video",
+//         views: 1156,
+//         avgRating: 4.7,
+//       },
+//       {
+//         id: 4,
+//         title: "Basic Statistics Quiz",
+//         duration: "10 min",
+//         type: "quiz",
+//         views: 1089,
+//         avgRating: 4.6,
+//       },
+//       {
+//         id: 5,
+//         title: "Descriptive Statistics Deep Dive",
+//         duration: "30 min",
+//         type: "video",
+//         views: 1034,
+//         avgRating: 4.8,
+//       },
+//     ],
+//     recentReviews: [
+//       {
+//         id: 1,
+//         student: "John Smith",
+//         rating: 5,
+//         comment: "Excellent course! Very comprehensive and easy to follow.",
+//         date: "2 days ago",
+//       },
+//       {
+//         id: 2,
+//         student: "Sarah Johnson",
+//         rating: 4,
+//         comment: "Great content, would love more practical exercises.",
+//         date: "1 week ago",
+//       },
+//       {
+//         id: 3,
+//         student: "Mike Chen",
+//         rating: 5,
+//         comment:
+//           "Perfect for beginners. The instructor explains everything clearly.",
+//         date: "1 week ago",
+//       },
+//     ],
+//     analytics: {
+//       totalViews: 45623,
+//       completionRate: "71.5%",
+//       avgTimeSpent: "8.5 hours",
+//       dropoffPoint: "Chapter 3 - Data Cleaning",
+//       peakEngagement: "Chapter 1 - Introduction",
+//     },
+//   },
+// ];
+
 
 export default function EducatorCourseDetailsPage() {
   const { id } = useParams();
   const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState("overview");
 
-  const course = courses.find((c) => c.id === Number(id));
+    // Fetch course details from API
+  const {
+    data: courseData,
+    error: courseError,
+    isLoading: courseLoading,
+  } = getCoursesDetails(id);
 
+   if (courseLoading) {
+    return (
+      <div className="profile-root">
+        <div className="container py-5 text-center">
+          <div className="spinner-border text-primary" role="status">
+            <span className="visually-hidden">Loading...</span>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+
+   // Error state
+  if (courseError || !courseData) {
+    return (
+      <div className="profile-root">
+        <div className="card border-0 shadow-sm">
+          <div className="container py-3">
+            <div className="d-flex align-items-center">
+              <div className="header-avatar me-2">
+                <TriangleAlert size={20} />
+              </div>
+              <div>
+                <span className="section-title mb-0">Course Not Found</span>
+                <p className="profile-role mb-0">
+                  The requested course could not be found
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div className="container py-5">
+          <div className="row justify-content-center">
+            <div className="col-lg-6">
+              <div className="card">
+                <div className="card-body text-center">
+                  <div className="avatar-circle mb-4 mx-auto w-fit">
+                    <TriangleAlert size={40} />
+                  </div>
+                  <h2 className="main-title mb-3">Course Not Found</h2>
+                  <p className="profile-joined mb-4">
+                    Sorry, we couldn't find the course you're looking for.
+                  </p>
+                  <button
+                    className="btn-edit-profile"
+                    onClick={() => navigate("/educator")}
+                  >
+                    <i className="bi bi-arrow-left me-2"></i>
+                    Back to Profile
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+
+    // const course = courses.find((c) => c.id === Number(id));
+  
+    const course = courseData;
+  
   if (!course) {
     return (
       <div className="profile-root">
@@ -278,7 +353,7 @@ export default function EducatorCourseDetailsPage() {
                   <Users size={20} />
                 </div>
                 <h5 className="section-title mb-1">
-                  {course.enrolledStudents}
+                  {course.total_enrollments}
                 </h5>
                 <small className="profile-joined">Enrolled</small>
               </div>
@@ -291,9 +366,9 @@ export default function EducatorCourseDetailsPage() {
                   <Award size={20} />
                 </div>
                 <h5 className="section-title mb-1">
-                  {course.completedStudents}
+                  {course.total_lessons}
                 </h5>
-                <small className="profile-joined">Completed</small>
+                <small className="profile-joined">Total Lesson</small>
               </div>
             </div>
           </div>
@@ -303,8 +378,8 @@ export default function EducatorCourseDetailsPage() {
                 <div className="avatar-circle mb-2 mx-auto w-fit">
                   <TrendingUp size={20} />
                 </div>
-                <h5 className="section-title mb-1">{course.activeStudents}</h5>
-                <small className="profile-joined">Active</small>
+                <h5 className="section-title mb-1">{course.total_durations}</h5>
+                <small className="profile-joined">Total Duration</small>
               </div>
             </div>
           </div>
@@ -314,8 +389,8 @@ export default function EducatorCourseDetailsPage() {
                 <div className="avatar-circle mb-2 mx-auto w-fit">
                   <Star size={20} />
                 </div>
-                <h5 className="section-title mb-1">{course.rating}</h5>
-                <small className="profile-joined">Rating</small>
+                <h5 className="section-title mb-1">{course.average_rating}</h5>
+                <small className="profile-joined">Average Rating</small>
               </div>
             </div>
           </div>
@@ -325,7 +400,7 @@ export default function EducatorCourseDetailsPage() {
                 <div className="avatar-circle mb-2 mx-auto w-fit">
                   <MessageCircle size={20} />
                 </div>
-                <h5 className="section-title mb-1">{course.reviews}</h5>
+                <h5 className="section-title mb-1">{course.total_reviews}</h5>
                 <small className="profile-joined">Reviews</small>
               </div>
             </div>
@@ -348,7 +423,7 @@ export default function EducatorCourseDetailsPage() {
             {/* Course Image */}
             <div className="mb-4">
               <img
-                src={course.image}
+                src={course.thumbnail}
                 alt={course.title}
                 className="course-detail-image"
               />
@@ -420,14 +495,14 @@ export default function EducatorCourseDetailsPage() {
 
                   <div className="mb-4">
                     <h4 className="about-subtitle mb-2">Description</h4>
-                    <p className="profile-joined">{course.fullDescription}</p>
+                    <p className="profile-joined">{course.description}</p>
                   </div>
 
                   <div className="row mb-4">
                     <div className="col-md-6 mb-3">
                       <div className="about-bubble">
                         <Clock size={16} className="me-2" />
-                        <strong>Duration:</strong> {course.duration}
+                        <strong>Duration:</strong> {course.total_durations}
                       </div>
                     </div>
                     <div className="col-md-6 mb-3">
@@ -453,11 +528,15 @@ export default function EducatorCourseDetailsPage() {
                   <div className="mb-4">
                     <h4 className="about-subtitle mb-2">Tags</h4>
                     <div className="d-flex flex-wrap gap-2">
-                      {course.tags.map((tag, index) => (
-                        <span key={index} className="about-bubble">
-                          {tag}
-                        </span>
-                      ))}
+                     {course?.tags?.length > 0 ? (
+                        course.tags.map((tag, index) => (
+                          <span key={index} className="about-bubble">
+                            {tag}
+                          </span>
+                        ))
+                      ) : (
+                        <span className="profile-joined">No tags available</span>
+                      )}
                     </div>
                   </div>
                 </div>
@@ -907,14 +986,14 @@ export default function EducatorCourseDetailsPage() {
                 <div className="mb-3">
                   <div className="d-flex justify-content-between mb-1">
                     <span className="about-subtitle">Status</span>
-                    <span className="text-accent fw-bold">{course.status}</span>
+                    <span className="text-accent fw-bold">{course?.is_free ? "Free" : "Paid"}</span>
                   </div>
                 </div>
 
                 <div className="mb-3">
                   <div className="d-flex justify-content-between mb-1">
                     <span className="about-subtitle">Created</span>
-                    <span className="profile-joined">{course.createdDate}</span>
+                    <span className="profile-joined">    {course?.created_at ? course.created_at.split("T")[0] : ""} </span>
                   </div>
                 </div>
 
@@ -922,7 +1001,7 @@ export default function EducatorCourseDetailsPage() {
                   <div className="d-flex justify-content-between mb-1">
                     <span className="about-subtitle">Published</span>
                     <span className="profile-joined">
-                      {course.publishedDate}
+                      {course?.is_published ? "Published" : "Unpublished"}
                     </span>
                   </div>
                 </div>
@@ -959,14 +1038,14 @@ export default function EducatorCourseDetailsPage() {
                   <div className="d-flex justify-content-between">
                     <span className="about-subtitle">Total enrollments</span>
                     <span className="profile-joined">
-                      {course.enrolledStudents}
+                      {course.total_enrollments}
                     </span>
                   </div>
                 </div>
 
                 <div className="mb-2">
                   <div className="d-flex justify-content-between">
-                    <span className="about-subtitle">Completion rate</span>
+                    <span className="about-subtitle">Total Revenue</span>
                     <span className="profile-joined">
                       {course.completionRate}
                     </span>

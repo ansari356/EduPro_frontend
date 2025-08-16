@@ -1,7 +1,8 @@
+// EducatorProfile.jsx
 import React, { useState, useEffect } from "react";
 import "bootstrap/dist/css/bootstrap.min.css";
 import "bootstrap-icons/font/bootstrap-icons.css";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import useEducatorProfileData from "../../apis/hooks/educator/useEducatorProfileData";
 import updateEducatorProfile from "../../apis/actions/educator/updateEducatorProfile";
 import useEducatorCoursesData from "../../apis/hooks/educator/useEducatorCoursesData";
@@ -9,30 +10,9 @@ import { pagePaths } from "../../pagePaths";
 import { QRCodeSVG } from "qrcode.react";
 import { CircleUserRound } from "lucide-react";
 
-// profile data:
-// {
-//     full_name: "",
-//     bio: "",
-//     profile_picture: null,
-//     date_of_birth: "",
-//     address: "",
-//     country: "",
-//     city: "",
-//     specialization: "",
-//     institution: "",
-//     experiance: "",
-//     gender: "",
-//     logo: null,
-//     primary_color: "",
-//     primary_color_light: "",
-//     primary_color_dark: "",
-//     secondary_color: "",
-//     accent_color: "",
-//     background_color: ""
-//   }
 function EducatorProfile() {
   const [showEditForm, setShowEditForm] = useState(false);
-
+  const navigate = useNavigate();
 
   const {
     isLoading,
@@ -42,17 +22,15 @@ function EducatorProfile() {
   } = useEducatorProfileData();
 
   const {
-  data: coursesData,
-  error: coursesError,
-  isLoading: coursesLoading,
-} = useEducatorCoursesData(educatorData?.user?.username);
-
-
+    data: coursesData,
+    error: coursesError,
+    isLoading: coursesLoading,
+  } = useEducatorCoursesData(educatorData?.user?.username);
 
   const [formData, setFormData] = useState({
     full_name: educatorData?.full_name || "",
     bio: educatorData?.bio || "",
-    profile_picture: null, // Will be set when a new file is selected
+    profile_picture: null,
     date_of_birth: educatorData?.date_of_birth || "",
     address: educatorData?.address || "",
     country: educatorData?.country || "",
@@ -61,7 +39,7 @@ function EducatorProfile() {
     institution: educatorData?.institution || "",
     experiance: educatorData?.experiance || "",
     gender: educatorData?.gender || "",
-    logo: null, // Will be set when a new file is selected
+    logo: null,
     primary_color: educatorData?.primary_color,
     primary_color_light: educatorData?.primary_color_light,
     primary_color_dark: educatorData?.primary_color_dark,
@@ -70,14 +48,12 @@ function EducatorProfile() {
     background_color: educatorData?.background_color,
   });
 
-  // Add state for the profile image URL
   const [profileImageUrl, setProfileImageUrl] = useState(
     educatorData?.profile_picture ||
       "https://placehold.co/120x120?text=Educator"
   );
   const [logoImageUrl, setLogoImageUrl] = useState(educatorData?.logo || null);
 
-  // Effect to update formData and image previews when educatorData changes
   useEffect(() => {
     if (educatorData) {
       setFormData({
@@ -115,7 +91,6 @@ function EducatorProfile() {
       [name]: type === "file" ? files[0] : value,
     }));
 
-    // Handle profile image preview
     if (name === "profile_picture" && files?.[0]) {
       const reader = new FileReader();
       reader.onloadend = () => {
@@ -134,7 +109,6 @@ function EducatorProfile() {
   const handleSubmitRequest = async (e) => {
     e.preventDefault();
 
-    // Basic Validation
     if (!formData.full_name.trim()) {
       alert("Please enter a valid full name.");
       return;
@@ -159,32 +133,41 @@ function EducatorProfile() {
       }
     }
 
-    
-	  await updateEducatorProfile(dataToSubmit)
-			.then((res) => {
-				console.log(res.data);
-				mutate();
-				setShowEditForm(false);
-			})
-			.catch((err) => {
-				console.error("Error updating profile:", err);
-				alert("Failed to update profile. Please try again.");
-			});
-      // Optionally, re-fetch profile data to ensure UI is updated
-      // useEducatorProfileData hook might have a re-fetch mechanism or you can trigger it
-    
+    await updateEducatorProfile(dataToSubmit)
+      .then((res) => {
+        console.log(res.data);
+        mutate();
+        setShowEditForm(false);
+      })
+      .catch((err) => {
+        console.error("Error updating profile:", err);
+        alert("Failed to update profile. Please try again.");
+      });
   };
 
   const courses = 
-   coursesData?.map((course) => ({
-    name: course.title, // اسم الكورس من الـ API
-    students: course.total_enrollments, // عدد الطلبة
-    status: course.is_published ? "Active" : "Inactive", // الحالة
-  })) || [];
+    coursesData?.map((course) => ({
+      id: course.id,
+      name: course.title, 
+      students: course.total_enrollments, 
+      status: course.is_published ? "Active" : "Inactive",
+    })) || [];
   
-  const handleRowClick = (courseName) => {
-    window.location.href = `/courses/${encodeURIComponent(courseName)}`;
+  const handleRowClick = (courseId) => {
+    navigate(`/courses/${courseId}`);
   };
+
+  // Handle eye button click - navigate to course details
+  const handleViewCourse = (e, courseId) => {
+    e.stopPropagation(); // Prevent row click event
+    navigate(`/courses/${courseId}`);
+  };
+
+  // Handle edit button click
+  const handleEditCourse = (e, courseId) => {
+  e.stopPropagation();
+  navigate(`/courses/edit/${courseId}`);
+};
 
   return (
     <div className="min-vh-100 profile-root p-4">
@@ -776,7 +759,7 @@ function EducatorProfile() {
                               key={idx}
                               className="border-bottom"
                               style={{ cursor: "pointer" }}
-                              onClick={() => handleRowClick(course.name)}
+                              onClick={() => handleRowClick(course.id)}
                             >
                               <td className="fw-medium text-primary">
                                 {course.name}
@@ -804,6 +787,7 @@ function EducatorProfile() {
                                         "1px solid var(--color-border-light)",
                                       borderRadius: "0.5rem",
                                     }}
+                                    onClick={(e) => handleViewCourse(e, course.id)}
                                   >
                                     <i className="bi bi-eye"></i>
                                   </button>
@@ -816,6 +800,7 @@ function EducatorProfile() {
                                         "1px solid var(--color-border-light)",
                                       borderRadius: "0.5rem",
                                     }}
+                                    onClick={(e) => handleEditCourse(e, course.id)}
                                   >
                                     <i className="bi bi-pencil"></i>
                                   </button>
@@ -838,3 +823,4 @@ function EducatorProfile() {
 }
 
 export default EducatorProfile;
+
