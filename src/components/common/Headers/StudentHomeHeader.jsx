@@ -1,11 +1,12 @@
 import React from "react";
 import { Navbar, Container, Nav } from "react-bootstrap";
-import { Link } from "react-router-dom";
+import { Link, useParams } from "react-router-dom";
 import "bootstrap-icons/font/bootstrap-icons.css";
 import { pagePaths } from "../../../pagePaths";
 
 
-export default function StudentHeader() {
+export default function StudentHomeHeader() {
+  const { educatorUsername } = useParams();
   return (
     <Navbar
       expand="lg"
@@ -32,7 +33,7 @@ export default function StudentHeader() {
           {/* Navigation buttons on the right */}
           <Nav className="ms-auto">
             <Link
-              to={pagePaths.student.login}
+              to={pagePaths.student.login(educatorUsername)}
               className="btn-edit-profile me-2"
               style={{ textDecoration: "none" }}
             >
@@ -40,7 +41,7 @@ export default function StudentHeader() {
               Login as Student
             </Link>
             <Link
-              to={pagePaths.student.signup}
+              to={pagePaths.student.signup(educatorUsername)}
               className="btn-edit-profile"
               style={{ textDecoration: "none" }}
             >

@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Eye, EyeOff, User, Lock, Phone, Mail, BookOpen, ArrowRight, UserPlus } from 'lucide-react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 import useEducatorPublicData from '../../apis/hooks/student/useEducatorPublicData';
 import { pagePaths } from '../../pagePaths';
 import registerStudent from '../../apis/actions/student/registerStudent';
@@ -14,16 +14,92 @@ const StudentSignupPage = () => {
     email: '',
     password: '',
     confirmPassword: '',
-    parentPhone: '',
-    avatar: null,
-    avatarPreview: null
+    parentPhone: ''
   });
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [errors, setErrors] = useState({});
   const [registerLoading, setRegisterLoading] = useState(false);
+  const [passwordStrength, setPasswordStrength] = useState('');
+  const [successMessage, setSuccessMessage] = useState('');
+  const [showSuccess, setShowSuccess] = useState(false);
   const navigate = useNavigate();
-  const { data: educatorData, error, isLoading } = useEducatorPublicData();
+  const { educatorUsername } = useParams();
+  const { data: educatorData, error, isLoading } = useEducatorPublicData(educatorUsername);
+
+  const validateForm = () => {
+    const newErrors = {};
+    
+    // First Name validation
+    if (!formData.firstName.trim()) {
+      newErrors.firstName = 'First name is required';
+    } else if (formData.firstName.trim().length < 2) {
+      newErrors.firstName = 'First name must be at least 2 characters';
+    } else if (!/^[a-zA-Z\s]+$/.test(formData.firstName.trim())) {
+      newErrors.firstName = 'First name can only contain letters and spaces';
+    }
+    
+    // Last Name validation
+    if (!formData.lastName.trim()) {
+      newErrors.lastName = 'Last name is required';
+    } else if (formData.lastName.trim().length < 2) {
+      newErrors.lastName = 'Last name must be at least 2 characters';
+    } else if (!/^[a-zA-Z\s]+$/.test(formData.lastName.trim())) {
+      newErrors.lastName = 'Last name can only contain letters and spaces';
+    }
+
+    // Username validation
+    if (!formData.username.trim()) {
+      newErrors.username = 'Username (Student ID) is required';
+    } else if (formData.username.trim().length < 3) {
+      newErrors.username = 'Username must be at least 3 characters';
+    } else if (!/^[a-zA-Z0-9_-]+$/.test(formData.username.trim())) {
+      newErrors.username = 'Username can only contain letters, numbers, underscores, and hyphens';
+    }
+        
+    // Phone validation
+    if (!formData.phone.trim()) {
+      newErrors.phone = 'Phone number is required';
+    } else if (!/^01[0125][0-9]{8}$/.test(formData.phone.trim())) {
+      newErrors.phone = 'Please enter a valid Egyptian phone number (e.g., 01012345678)';
+    }
+        
+    // Email validation
+    if (!formData.email.trim()) {
+      newErrors.email = 'Email is required';
+    } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email.trim())) {
+      newErrors.email = 'Please enter a valid email address';
+    }
+    
+    // Password validation
+    if (!formData.password) {
+      newErrors.password = 'Password is required';
+    } else if (formData.password.length < 8) {
+      newErrors.password = 'Password must be at least 8 characters long';
+    } else if (!/(?=.*[a-z])/.test(formData.password)) {
+      newErrors.password = 'Password must contain at least one lowercase letter';
+    } else if (!/(?=.*[A-Z])/.test(formData.password)) {
+      newErrors.password = 'Password must contain at least one uppercase letter';
+    } else if (!/(?=.*\d)/.test(formData.password)) {
+      newErrors.password = 'Password must contain at least one number';
+    }
+    
+    // Confirm Password validation
+    if (!formData.confirmPassword) {
+      newErrors.confirmPassword = 'Please confirm your password';
+    } else if (formData.password !== formData.confirmPassword) {
+      newErrors.confirmPassword = 'Passwords do not match';
+    }
+    
+    // Parent Phone validation
+    if (!formData.parentPhone.trim()) {
+      newErrors.parentPhone = 'Parent phone number is required';
+    } else if (!/^01[0125][0-9]{8}$/.test(formData.parentPhone.trim())) {
+      newErrors.parentPhone = 'Please enter a valid Egyptian phone number (e.g., 01012345678)';
+    }
+    
+    return newErrors;
+  };
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -39,72 +115,30 @@ const StudentSignupPage = () => {
         [name]: ''
       }));
     }
-  };
-
-  const handleAvatarChange = (e) => {
-    const file = e.target.files[0];
-    if (file) {
-      setFormData(prev => ({
-        ...prev,
-        avatar: file,
-        avatarPreview: URL.createObjectURL(file)
-      }));
-    } else {
-      setFormData(prev => ({
-        ...prev,
-        avatar: null,
-        avatarPreview: null
-      }));
+    
+    // Check password strength in real-time
+    if (name === 'password') {
+      const strength = checkPasswordStrength(value);
+      setPasswordStrength(strength);
     }
   };
 
-  const validateForm = () => {
-    const newErrors = {};
+  const checkPasswordStrength = (password) => {
+    if (!password) return '';
     
-    if (!formData.firstName.trim()) {
-      newErrors.firstName = 'First name is required';
-    }
+    let score = 0;
+    if (password.length >= 8) score++;
+    if (/(?=.*[a-z])/.test(password)) score++;
+    if (/(?=.*[A-Z])/.test(password)) score++;
+    if (/(?=.*\d)/.test(password)) score++;
+    if (/(?=.*[!@#$%^&*])/.test(password)) score++;
     
-    if (!formData.lastName.trim()) {
-      newErrors.lastName = 'Last name is required';
-    }
-
-    if (!formData.username.trim()) {
-      newErrors.username = 'Username (Student ID) is required';
-    }
-        
-    if (!formData.phone.trim()) {
-      newErrors.phone = 'Phone number is required';
-    } else if (!/^01[0125][0-9]{8}$/.test(formData.phone)) {
-      newErrors.phone = 'Please enter a valid phone number';
-    }
-        
-    if (!formData.email.trim()) {
-      newErrors.email = 'Email is required';
-    } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email)) {
-      newErrors.email = 'Please enter a valid email address';
-    }
-    
-    if (!formData.password) {
-      newErrors.password = 'Password is required';
-    } else if (formData.password.length < 6) {
-      newErrors.password = 'Password must be at least 6 characters';
-    }
-    
-    if (!formData.confirmPassword) {
-      newErrors.confirmPassword = 'Please confirm your password';
-    } else if (formData.password !== formData.confirmPassword) {
-      newErrors.confirmPassword = 'Passwords do not match';
-    }
-    
-    if (!formData.parentPhone.trim()) {
-      newErrors.parentPhone = 'Parent phone number is required';
-    } else if (!/^01[0125][0-9]{8}$/.test(formData.parentPhone)) {
-      newErrors.parentPhone = 'Please enter a valid parent phone number';
-    }
-    
-    return newErrors;
+    if (score <= 2) return 'weak';
+    if (score <= 3) return 'medium';
+    return 'strong';
   };
+
+
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -113,6 +147,13 @@ const StudentSignupPage = () => {
     const validationErrors = validateForm();
     if (Object.keys(validationErrors).length > 0) {
       setErrors(validationErrors);
+      // Scroll to first error
+      const firstErrorField = Object.keys(validationErrors)[0];
+      const errorElement = document.querySelector(`[name="${firstErrorField}"]`);
+      if (errorElement) {
+        errorElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        errorElement.focus();
+      }
       return;
     }
     
@@ -124,15 +165,17 @@ const StudentSignupPage = () => {
       phone: formData.phone,
       parent_phone: formData.parentPhone,
       password1: formData.password,
-      password2: formData.confirmPassword,
-      avatar: formData.avatar // Use the selected avatar file
+      password2: formData.confirmPassword
     };
 
     setRegisterLoading(true);
     try {
-      const response = await registerStudent(registrationData,educatorData?.user.username);
+      const response = await registerStudent(registrationData, educatorUsername);
       console.log('Student registration successful:', response.data);
-      alert(`Registration successful! Welcome to ${educatorData.full_name}'s ${educatorData.specialization} class!`);
+      
+      // Show success message
+      setSuccessMessage(`Registration successful! Welcome to ${educatorData.full_name}'s ${educatorData.specialization} class!`);
+      setShowSuccess(true);
       
       // Reset form
       setFormData({
@@ -143,16 +186,53 @@ const StudentSignupPage = () => {
         email: '',
         password: '',
         confirmPassword: '',
-        parentPhone: '',
-        avatar: null,
-        avatarPreview: null
+        parentPhone: ''
       });
       setErrors({});
-      navigate(pagePaths.student.login(educatorData?.user.username)); // Redirect to login page
+      
+      // Redirect after 3 seconds
+      setTimeout(() => {
+        navigate(pagePaths.student.login(educatorUsername));
+      }, 3000);
+      
     } catch (err) {
       console.error('Student registration failed:', err);
-      alert(`Registration failed: ${err.response?.data?.detail || err.message}`);
-      setErrors(err.response?.data || {}); // Set errors from API response
+      
+      // Handle different types of errors
+      if (err.response?.status === 400) {
+        // Handle validation errors from API
+        const apiErrors = err.response.data;
+        const newErrors = {};
+        
+        // Map API error fields to form fields
+        if (apiErrors.username) {
+          newErrors.username = Array.isArray(apiErrors.username) ? apiErrors.username[0] : apiErrors.username;
+        }
+        if (apiErrors.email) {
+          newErrors.email = Array.isArray(apiErrors.email) ? apiErrors.email[0] : apiErrors.email;
+        }
+        if (apiErrors.phone) {
+          newErrors.phone = Array.isArray(apiErrors.phone) ? apiErrors.phone[0] : apiErrors.phone;
+        }
+        if (apiErrors.password1) {
+          newErrors.password = Array.isArray(apiErrors.password1) ? apiErrors.password1[0] : apiErrors.password1;
+        }
+        if (apiErrors.non_field_errors) {
+          newErrors.general = Array.isArray(apiErrors.non_field_errors) ? apiErrors.non_field_errors[0] : apiErrors.non_field_errors;
+        }
+        
+        if (Object.keys(newErrors).length > 0) {
+          setErrors(newErrors);
+        } else {
+          setErrors({ general: err.response?.data?.detail || err.message || 'Registration failed. Please try again.' });
+        }
+      } else if (err.response?.status === 500) {
+        setErrors({ general: 'Server error. Please try again later.' });
+      } else if (err.message === 'Network Error') {
+        setErrors({ general: 'Connection error. Please check your internet connection.' });
+      } else {
+        setErrors({ general: err.response?.data?.detail || err.message || 'Registration failed. Please try again.' });
+      }
     } finally {
       setRegisterLoading(false);
     }
@@ -210,7 +290,7 @@ const StudentSignupPage = () => {
           <div className="d-flex align-items-center justify-content-between">
             <div className="d-flex align-items-center">
               <div className="header-avatar">
-                <img src={educatorData.profile_picture} alt="Educator Profile" className="rounded-circle" style={{ width: '50px', height: '50px', objectFit: 'cover' }} />
+                <img src={educatorData.profile_picture} alt="Educator Profile" style={{ borderRadius: '10px', width: '50px', height: '50px', objectFit: 'cover' }} />
               </div>
               <div>
                 <span className="section-title mb-0">
@@ -225,7 +305,7 @@ const StudentSignupPage = () => {
             <div className="d-flex align-items-center gap-2">
               <button 
                 className="btn-edit-profile d-flex align-items-center"
-                onClick={() => navigate(pagePaths.student.login(educatorData.username))}
+                onClick={() => navigate(pagePaths.student.login(educatorUsername))}
               >
                 <ArrowRight size={16} className="me-2" />
                 Student Login
@@ -244,8 +324,8 @@ const StudentSignupPage = () => {
             <div className="card">
               <div className="card-body">
                 <div className="text-center mb-4">
-                  <div className="avatar-circle">
-                    <img src={educatorData.profile_picture} alt="Educator Profile" className="rounded-circle" style={{ width: '80px', height: '80px', objectFit: 'cover' }} />
+                  <div className="avatar-rectangle">
+                    <img src={educatorData.profile_picture} alt="Educator Profile" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
                   </div>
                   <h1 className="section-title mb-2">
                     Join
@@ -253,41 +333,37 @@ const StudentSignupPage = () => {
                   <h2 className="profile-name text-accent mb-2">
                     {educatorData.full_name}'s Class
                   </h2>
-                  <p className="profile-role mb-2">
-                    {educatorData.bio}
-                  </p>
                   <p className="profile-joined">
-                    {educatorData.experiance} years experience • {educatorData.number_of_students} registered students
+                    {educatorData.experience} years experience • {educatorData.number_of_students} registered students
                   </p>
                 </div>
 
                 <form onSubmit={handleSubmit}>
-                  {/* Avatar */}
-                  <div className="mb-4 text-center">
-                    <label htmlFor="avatar-upload" className="d-block mb-2 form-label">
-                      Profile Picture
-                    </label>
-                    <div className="avatar-upload-container mx-auto position-relative">
-                      <img 
-                        src={formData.avatarPreview || "https://placehold.co/120x120?text=Studnet"} 
-                        alt="Avatar Preview" 
-                        className="rounded-circle avatar-preview" 
-                        style={{ width: '100px', height: '100px', objectFit: 'cover', border: '2px solid var(--color-border)' }}
-                      />
-                      <input
-                        type="file"
-                        id="avatar-upload"
-                        name="avatar"
-                        accept="image/*"
-                        onChange={handleAvatarChange}
-                        className="d-none"
-                      />
-                      <label htmlFor="avatar-upload" className="avatar-upload-button">
-                        <UserPlus size={20} />
-                      </label>
+                  {/* Success Message Display */}
+                  {showSuccess && (
+                    <div className="alert alert-success alert-dismissible fade show mb-4" role="alert">
+                      <i className="fas fa-check-circle me-2"></i>
+                      {successMessage}
+                      <button 
+                        type="button" 
+                        className="btn-close" 
+                        onClick={() => setShowSuccess(false)}
+                      ></button>
                     </div>
-                  </div>
+                  )}
 
+                  {/* General Error Display */}
+                  {errors.general && (
+                    <div className="alert alert-danger alert-dismissible fade show mb-4" role="alert">
+                      <i className="fas fa-exclamation-triangle me-2"></i>
+                      {errors.general}
+                      <button 
+                        type="button" 
+                        className="btn-close" 
+                        onClick={() => setErrors(prev => ({ ...prev, general: '' }))}
+                      ></button>
+                    </div>
+                  )}
                   {/* First Name */}
                   <div className="mb-3">
                     <label className="form-label">
@@ -425,6 +501,16 @@ const StudentSignupPage = () => {
                         {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
                       </button>
                       {errors.password && <div className="invalid-feedback">{errors.password}</div>}
+                      {passwordStrength && (
+                        <div className={`password-strength ${passwordStrength} mt-2`}>
+                          <small>
+                            Password strength: <strong className="text-capitalize">{passwordStrength}</strong>
+                            {passwordStrength === 'weak' && ' - Add more characters and complexity'}
+                            {passwordStrength === 'medium' && ' - Good, but could be stronger'}
+                            {passwordStrength === 'strong' && ' - Excellent password strength!'}
+                          </small>
+                        </div>
+                      )}
                     </div>
                   </div>
 
@@ -480,7 +566,7 @@ const StudentSignupPage = () => {
                     Already have an account? 
                     <button 
                       className="btn-link-custom text-accent ms-1"
-                      onClick={() => navigate(pagePaths.student.login(educatorData.username))}
+                      onClick={() => navigate(pagePaths.student.login(educatorUsername))}
                     >
                       Login here
                     </button>

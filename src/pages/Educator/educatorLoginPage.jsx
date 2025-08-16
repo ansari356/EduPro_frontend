@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Eye, EyeOff, User, Lock } from "lucide-react";
+import { Eye, EyeOff, User, Lock, GraduationCap } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import loginEducator from "../../apis/actions/educator/loginEducator";
 import { pagePaths } from "../../pagePaths";
@@ -69,7 +69,7 @@ export default function EducatorLoginPage() {
               <div className="card-body">
                 <div className="text-center mb-5">
                   <div className="avatar-circle">
-                    <span>🎓</span>
+                    <GraduationCap size={40} />
                   </div>
                   <h1 className="section-title mb-2">Welcome Educator</h1>
                   <p className="profile-role mb-2">

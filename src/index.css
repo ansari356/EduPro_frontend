@@ -502,10 +502,40 @@ form .form-check-input:checked {
 /* --------------------------------------- */
 
 /* Avatar Components */
-.avatar-circle {
+.avatar-rectangle {
   width: 150px;
   height: 180px;
   border-radius: 15px;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 2px solid var(--color-border-light);
+  box-shadow: var(--shadow-light);
+  transition: box-shadow var(--transition-fast);
+  margin: 0 auto;
+  margin-bottom: 2rem !important;
+}
+
+.avatar-rectangle.profile-avatar {
+  margin: 0;
+  margin-bottom: 0 !important;
+}
+
+.avatar-rectangle.instructor-avatar {
+  margin: 0;
+  margin-bottom: 0 !important;
+  width: 60px;
+  height: 80px;
+  border-radius: 8px;
+}
+
+.avatar-circle {
+  width: 120px;
+  height: 120px;
+  padding: 2rem;
+  margin-bottom: 2rem !important;
+  border-radius: 50%;
   overflow: hidden;
   display: flex;
   align-items: center;
@@ -514,6 +544,7 @@ form .form-check-input:checked {
   border: 2px solid var(--color-border-light);
   box-shadow: var(--shadow-light);
   transition: box-shadow var(--transition-fast);
+  margin: 0 auto;
 }
 
 .avatar-circle:hover {
@@ -523,7 +554,8 @@ form .form-check-input:checked {
 .avatar-circle img {
   width: 100%;
   height: 100%;
-  object-fit: cover;
+  object-fit: contain;
+  border-radius: 50%;
 }
 
 .avatar-upload-container {
@@ -768,9 +800,84 @@ form .form-check-input:checked {
 .show > .dropdown-toggle {
   background-color: var(--color-primary-dark); 
 }
+/* User Avatar Styles */
 .user-avatar {
-  font-size: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background-color: var(--color-primary);
+  color: white;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.user-avatar:hover {
+  background-color: var(--color-primary-dark);
+  transform: scale(1.05);
+}
+
+.user-avatar-img {
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 2px solid white;
+}
+
+.user-dropdown-menu {
+  min-width: 200px;
+  border: none;
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+  border-radius: var(--border-radius-sm);
+  padding: 0.5rem 0;
+}
+
+.dropdown-header {
+  background-color: var(--color-secondary);
+  color: var(--color-text);
+  font-weight: 600;
+  padding: 0.75rem 1rem;
+  border-bottom: 1px solid var(--color-border-light);
+}
+
+.user-info {
+  display: flex;
+  align-items: center;
+  font-size: 0.9rem;
+}
+
+.user-info i {
   color: var(--color-primary);
+  font-size: 1.1rem;
+}
+
+.dropdown-item {
+  padding: 0.75rem 1rem;
+  color: var(--color-text);
+  transition: all 0.2s ease;
+  cursor: pointer;
+}
+
+.dropdown-item:hover {
+  background-color: var(--color-secondary);
+  color: var(--color-primary);
+}
+
+.dropdown-item i {
+  color: var(--color-text);
+  transition: color 0.2s ease;
+}
+
+.dropdown-item:hover i {
+  color: var(--color-primary);
+}
+
+.dropdown-divider {
+  margin: 0.5rem 0;
+  border-color: var(--color-border-light);
 }
 
 /* Clickable card variant */

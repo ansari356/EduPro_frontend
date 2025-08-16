@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Eye, EyeOff, User, Lock, Mail, UserPlus } from 'lucide-react';
+import { Eye, EyeOff, User, Lock, Mail, UserPlus, GraduationCap } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import registerEducator from '../../apis/actions/educator/registerEducator';
 import { pagePaths } from '../../pagePaths';
@@ -131,7 +131,7 @@ export default function EducatorSignupPage() {
               <div className="card-body">
                 <div className="text-center mb-4">
                   <div className="avatar-circle">
-                    <span>🎓</span>
+                  <GraduationCap size={40} />
                   </div>
                   <h1 className="section-title mb-2">
                     Join as Educator

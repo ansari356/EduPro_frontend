@@ -1,16 +1,53 @@
 import { Navbar, Nav, Dropdown, Container } from "react-bootstrap";
-import { NavLink, useParams } from "react-router-dom";
+import { NavLink, useParams, useNavigate } from "react-router-dom";
 import { pagePaths } from "../../../pagePaths";
 import logoutUser from "../../../apis/actions/logoutUser";
 import useRefreshToken from "../../../apis/hooks/useRefreshToken";
+import useStudentProfileData from "../../../apis/hooks/student/useStudentProfileData";
 
 export default function StudentHeader() {
   const { mutate } = useRefreshToken();
-  const { educatorUsername } = useParams(); // get from URL params or provide otherwise
+  const navigate = useNavigate();
+  const { educatorUsername } = useParams();
+  const { data: studentData, isLoading, error } = useStudentProfileData();
 
   if (!educatorUsername) {
-    return null; // or a fallback UI if username is not ready yet
+    return null;
   }
+
+  const handleSignOut = async () => {
+    try {
+      await logoutUser();
+      mutate();
+      // Redirect to login page after successful logout
+      navigate(pagePaths.student.login(educatorUsername));
+    } catch (error) {
+      console.error('Logout failed:', error);
+      // Even if logout fails, redirect to login page
+      navigate(pagePaths.student.login(educatorUsername));
+    }
+  };
+
+  // Get student name from data or show loading/fallback
+  const getStudentName = () => {
+    if (isLoading) return "Loading...";
+    if (error || !studentData?.student?.full_name) return "Student";
+    return studentData.student.full_name;
+  };
+
+  // Get student avatar or use default icon
+  const getStudentAvatar = () => {
+    if (studentData?.student?.profile_picture) {
+      return (
+        <img 
+          src={studentData.student.profile_picture} 
+          alt="Student Avatar" 
+          className="user-avatar-img"
+        />
+      );
+    }
+    return <i className="bi bi-person-circle custom-toggler"></i>;
+  };
 
   return (
     <Navbar expand="lg" className="custom-navbar shadow-sm">
@@ -48,7 +85,7 @@ export default function StudentHeader() {
               className="nav-link-custom"
             >
               <i className="bi bi-book me-2"></i>
-              My Courses
+              Courses
             </Nav.Link>
           </Nav>
 
@@ -61,7 +98,7 @@ export default function StudentHeader() {
                 aria-label="User menu"
               >
                 <div className="user-avatar">
-                  <i className="bi bi-person-circle custom-toggler"></i>
+                  {getStudentAvatar()}
                 </div>
               </Dropdown.Toggle>
 
@@ -69,16 +106,11 @@ export default function StudentHeader() {
                 <Dropdown.Header className="dropdown-header">
                   <div className="user-info">
                     <i className="bi bi-person-circle me-2"></i>
-                    <span>Mohamed Ali Hassan</span>
+                    <span>{getStudentName()}</span>
                   </div>
                 </Dropdown.Header>
                 <Dropdown.Divider />
-                <Dropdown.Item
-                  onClick={() => {
-                    logoutUser();
-                    mutate();
-                  }}
-                >
+                <Dropdown.Item onClick={handleSignOut}>
                   <i className="bi bi-box-arrow-right me-2"></i>
                   Sign out
                 </Dropdown.Item>

@@ -9,23 +9,6 @@ import enrollStudentInCourse from "../../apis/actions/student/enrollStudentInCou
 
 /**
  * Courses Component - Shows all courses created by the educator
- * 
- * HOOKS CONNECTED:
- * ✅ useListAllEducatorCourses() - All courses created by the educator
- * ✅ useListEnrolledCourses() - Courses the student is enrolled in
- * ✅ useEducatorPublicData() - Educator information
- * 
- * REAL DATA FROM BACKEND:
- * ✅ All educator courses (title, description, category, price, etc.)
- * ✅ Enrolled courses for comparison
- * ✅ Educator information (name, profile)
- * 
- * FEATURES:
- * ✅ Course filtering (All Courses vs Enrolled Courses)
- * ✅ Course search functionality
- * ✅ Enrollment options (Full Course vs Single Chapter)
- * ✅ Coupon validation system
- * ✅ Responsive course grid layout
  */
 function Courses() {
   const { educatorUsername } = useParams();
@@ -40,32 +23,19 @@ function Courses() {
   const [isValidatingCoupon, setIsValidatingCoupon] = useState(false);
   const [couponError, setCouponError] = useState("");
 
-  // ===== REAL DATA FROM HOOKS =====
+
   const { data: allCourses, isLoading: allCoursesLoading } = useListAllEducatorCourses();
   const { enrolledInCourses, isLoading: enrolledLoading } = useListEnrolledCourses();
   const { data: educatorData } = useEducatorPublicData();
 
-  // ===== DUMMY DATA - NO BACKEND RESPONSE YET =====
-  // These fields don't have backend responses, so keeping dummy data for now
-  const dummyCourseData = {
-    rating: 4.8,
-    enrolledStudents: 1247,
-    level: "Beginner to Intermediate",
-    chapters: [
-      { id: 1, title: "Introduction", lessons: 4, duration: "2 weeks" },
-      { id: 2, title: "Fundamentals", lessons: 6, duration: "3 weeks" },
-      { id: 3, title: "Advanced Topics", lessons: 8, duration: "4 weeks" },
-      { id: 4, title: "Final Project", lessons: 3, duration: "3 weeks" }
-    ]
-  };
 
-  // ===== PROCESSED COURSES DATA =====
-  // Combine real course data with dummy data for missing fields
+
+
+
   const processedAllCourses = allCourses ? 
     (Array.isArray(allCourses) ? allCourses : allCourses.results || allCourses.data || [])
       .map(course => ({
         ...course,
-        // Real data from backend
         id: course.id,
         title: course.title || course.name || "Untitled Course",
         description: course.description || "No description available",
@@ -76,14 +46,9 @@ function Courses() {
         duration: course.total_durations ? `${course.total_durations} weeks` : "N/A",
         price: course.price || "0.00",
         isFree: course.is_free || course.price === "0.00" || course.price === 0,
-        
-        // Real data from backend (with fallbacks)
         rating: course.average_rating || course.rating || "0.00",
         enrolledStudents: course.total_enrollments || 0,
-        
-        // Dummy data for missing backend fields
-        level: dummyCourseData.level,
-        chapters: dummyCourseData.chapters
+
       })) : [];
 
   // Check if a course is enrolled
@@ -149,13 +114,11 @@ function Courses() {
       const response = await enrollStudentInCourse(selectedCourse.id, couponCode.trim());
       
       // Debug the API response
-      console.log("🔍 Enrollment API Response:", response);
-      console.log("🔍 Response Status:", response.status);
-      console.log("🔍 Response Data:", response.data);
+      
       
       // Check if enrollment was successful (status 201 Created)
       if (response.status === 201 || response.data) {
-        console.log("✅ Enrollment successful!");
+
         setCouponError(""); // Clear any previous errors
         closeEnrollmentModal();
         
@@ -168,7 +131,7 @@ function Courses() {
           });
         }
       } else {
-        console.log("❌ Enrollment failed - invalid response");
+
         setCouponError("Invalid coupon code. Please try again.");
       }
     } catch (error) {

@@ -83,8 +83,13 @@ function StudentHome() {
                   {/* Educator Info */}
                   <div className="col-md-4 text-center mb-4">
                     <div className="d-flex flex-column align-items-center">
-                      <div className="avatar-circle mb-3">
+                      <div style={{width: "250px", height: "320px"}} className="avatar-rectangle mb-3">
                         <img
+                          style={{
+                            width: "100%",
+                            height: "100%",
+                            objectFit: "cover",
+                          }}
                           src={educatorData.profile_picture || "https://placehold.co/150x180?text=Educator"}
                           alt={educatorData.full_name || educatorData.username}
                         />
@@ -121,7 +126,7 @@ function StudentHome() {
                             <Clock size={16} className="me-2 text-primary" />
                             <strong>Experience</strong>
                           </div>
-                          <small>{educatorData.experiance || "Not specified"}</small>
+                          <small>{educatorData.experiance || "Not specified"}+</small>
                         </div>
                       </div>
                       <div className="col-sm-6 mb-3">

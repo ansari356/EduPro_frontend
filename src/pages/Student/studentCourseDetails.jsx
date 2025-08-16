@@ -25,130 +25,78 @@ import {
 import useGetCourseDetails from "../../apis/hooks/student/useGetCourseDetails";
 import useListCourseModules, { useModuleLessons } from "../../apis/hooks/student/useListCourseModules";
 import useEducatorPublicData from "../../apis/hooks/student/useEducatorPublicData";
+import useLessonProgress from "../../apis/hooks/student/useLessonProgress";
+import useLessonStatus from "../../apis/hooks/student/useLessonStatus";
+import submitCourseRating from "../../apis/actions/student/submitCourseRating";
 
 /**
- * StudentCourseDetails Component - Connected to Backend Hooks
- * 
- * HOOKS CONNECTED:
- * ✅ useGetCourseDetails() - Course details and information
- * ✅ useListCourseModules() - Course modules and lessons
- * ✅ useEducatorPublicData() - Educator information
- * 
- * REAL DATA FROM BACKEND:
- * ✅ Course basic info (title, description, category, price, etc.)
- * ✅ Course modules and lessons
- * ✅ Educator information (name, profile)
- * ✅ Lessons for each module
- * 
- * DUMMY DATA (NO BACKEND RESPONSE YET):
- * ❌ Course progress calculations
- * ❌ Lesson completion status
- * ❌ Next lesson details
- * ❌ Course ratings and reviews
- * ❌ Student progress tracking
+ * StudentCourseDetails Component
  */
 function StudentCourseDetails() {
   const params = useParams();
-  const courseId = params.id; 
+  const courseId = params.id;
   const educatorUsername = params.educatorUsername;
   const navigate = useNavigate();
-  
-  // Debug all available params
-  console.log("🔍 All URL Params:", params);
-  console.log("🔍 Course ID from params.id:", courseId);
-  console.log("🔍 Educator Username from params.educatorUsername:", educatorUsername);
-  
-  // ===== REAL DATA FROM HOOKS =====
+
+
+
+
   const { data: courseDetails, isLoading: courseLoading, error: courseError } = useGetCourseDetails(courseId);
   const { courseModules, isLoading: modulesLoading } = useListCourseModules(courseId);
   const { data: educatorData } = useEducatorPublicData(educatorUsername);
+  const {
+    markLessonAsComplete,
+    calculateProgress,
+    getNextLesson,
+    getCompletedLessonsCount,
+    getTotalLessonsCount,
+    getAttendedSessions,
+    getRemainingLessons,
+    getLessonStats,
+    lessonProgress,
+    refreshProgress,
+    isUpdating: lessonUpdating,
+    error: lessonError
+  } = useLessonProgress(courseId);
 
-  // Fetch lessons for the first module (Chapter 1) only
-  const firstModuleId = courseModules && courseModules.length > 0 ? courseModules[0].id : null;
+  // Fetch lessons for all modules
+  const allModuleIds = courseModules && courseModules.length > 0 ? courseModules.map(module => module.id) : [];
+  
+  // Fetch lessons for each module individually
+  const firstModuleId = allModuleIds[0] || null;
+  const secondModuleId = allModuleIds[1] || null;
+  const thirdModuleId = allModuleIds[2] || null;
+  const fourthModuleId = allModuleIds[3] || null;
+  
   const { lessons: firstModuleLessons, isLoading: firstModuleLessonsLoading, error: firstModuleLessonsError } = useModuleLessons(firstModuleId);
+  const { lessons: secondModuleLessons, isLoading: secondModuleLessonsLoading, error: secondModuleLessonsError } = useModuleLessons(secondModuleId);
+  const { lessons: thirdModuleLessons, isLoading: thirdModuleLessonsLoading, error: thirdModuleLessonsError } = useModuleLessons(thirdModuleId);
+  const { lessons: fourthModuleLessons, isLoading: fourthModuleLessonsLoading, error: fourthModuleLessonsError } = useModuleLessons(fourthModuleId);
+  
+  // Combine all lessons from all modules
+  const allModuleLessonsCombined = [
+    ...(firstModuleLessons || []),
+    ...(secondModuleLessons || []),
+    ...(thirdModuleLessons || []),
+    ...(fourthModuleLessons || [])
+  ];
+  
+  // Define loading and error states
+  const lessonsLoading = firstModuleLessonsLoading || secondModuleLessonsLoading || thirdModuleLessonsLoading || fourthModuleLessonsLoading;
+  const lessonsError = firstModuleLessonsError || secondModuleLessonsError || thirdModuleLessonsError || fourthModuleLessonsError;
 
-  // Debug the hook calls
-  console.log("🔍 Hook Debug:");
-  console.log("useGetCourseDetails called with courseId:", courseId);
-  console.log("useListCourseModules called with courseId:", courseId);
-  console.log("useEducatorPublicData called with educatorUsername:", educatorUsername);
-  console.log("First Module ID:", firstModuleId);
-  console.log("First Module Lessons:", firstModuleLessons);
-  console.log("First Module Lessons Loading:", firstModuleLessonsLoading);
-  console.log("First Module Lessons Error:", firstModuleLessonsError);
+  // Use the new lesson status hook for real-time analytics with all lessons
+  const lessonStatuses = useLessonStatus(courseId, allModuleLessonsCombined);
 
-  // Debug logging
-  console.log("🔍 Course Details Debug:");
-  console.log("courseId from params:", courseId);
-  console.log("courseDetails:", courseDetails);
-  console.log("courseError:", courseError);
-  console.log("courseModules:", courseModules);
-  console.log("educatorData:", educatorData);
 
-  // ===== DUMMY DATA - NO BACKEND RESPONSE YET =====
-  // These fields don't have backend responses, so keeping dummy data for now
-  const dummyCourseData = {
-    progress: 75,
-    status: "Active",
-    nextLesson: {
-      id: 6,
-      title: "Next Lesson Topic",
-      date: "2025-01-20",
-      time: "10:00 AM"
-    },
-    completedLessons: 18,
-    enrolledStudents: 1247,
-    level: "Beginner to Intermediate",
-    tableOfContents: [
-      {
-        chapter: "Chapter 1: Introduction",
-        topics: ["What is this course?", "Course Overview", "Getting Started"],
-        lessons: 3,
-        completed: 3
-      },
-      {
-        chapter: "Chapter 2: Fundamentals",
-        topics: ["Basic Concepts", "Core Principles", "Foundation Skills"],
-        lessons: 4,
-        completed: 2
-      }
-    ],
-    lessons: [
-      { 
-        id: 1, 
-        title: "Welcome to the Course", 
-        duration: "15 min", 
-        type: "video", 
-        completed: true,
-        videoUrl: "https://sample-videos.com/zip/10/mp4/SampleVideo_1280x720_1mb.mp4",
-        description: "An introduction to the course and what you'll learn."
-      },
-      { 
-        id: 2, 
-        title: "Getting Started", 
-        duration: "20 min", 
-        type: "video", 
-        completed: true,
-        videoUrl: "https://sample-videos.com/zip/10/mp4/SampleVideo_1280x720_1mb.mp4",
-        description: "Learn how to get started with the course materials."
-      },
-      { 
-        id: 3, 
-        title: "First Lesson", 
-        duration: "25 min", 
-        type: "video", 
-        completed: false,
-        videoUrl: "https://sample-videos.com/zip/10/mp4/SampleVideo_1280x720_1mb.mp4",
-        description: "Your first real lesson in the course."
-      }
-    ]
-  };
 
-  // ===== PROCESSED COURSE DATA =====
-  // Combine real course data with dummy data for missing fields
+
+
+
+
+
   const course = courseDetails ? {
     ...courseDetails,
-    // Real data from backend - handle different possible field names
     id: courseDetails.id || courseDetails.course_id,
     title: courseDetails.title || courseDetails.course || courseDetails.name || "Untitled Course",
     description: courseDetails.description || courseDetails.course_description || "Course description not available",
@@ -158,44 +106,41 @@ function StudentCourseDetails() {
     duration: courseDetails.total_durations || courseDetails.duration ? `${courseDetails.total_durations || courseDetails.duration} weeks` : "N/A",
     price: courseDetails.price || courseDetails.course_price || "0.00",
     isFree: courseDetails.is_free || courseDetails.free || false,
-    
-    // Real course modules data from backend
     modules: courseModules || [],
-    
-    // Dummy data for missing backend fields
-    progress: dummyCourseData.progress,
-    status: dummyCourseData.status,
-    nextLesson: dummyCourseData.nextLesson,
-    completedLessons: dummyCourseData.completedLessons,
-    enrolledStudents: dummyCourseData.enrolledStudents,
-    level: dummyCourseData.level,
-    
-    // Use real modules for table of contents if available, otherwise fall back to dummy
-    tableOfContents: courseModules && courseModules.length > 0 ? 
+
+    tableOfContents: courseModules && courseModules.length > 0 ?
       courseModules.map((module, index) => {
         const chapterTitle = `Chapter ${index + 1}: ${module.title || `Module ${index + 1}`}`;
-        
-        // Get real lessons for this module (only Chapter 1 has lessons for now)
-        const moduleLessons = index === 0 ? (firstModuleLessons || []) : [];
+        // Get lessons for this specific module
+        const moduleLessons = index === 0 ? (firstModuleLessons || []) : 
+                              index === 1 ? (secondModuleLessons || []) :
+                              index === 2 ? (thirdModuleLessons || []) :
+                              index === 3 ? (fourthModuleLessons || []) : [];
         const lessonsCount = moduleLessons.length;
-        const hasPermissionError = index === 0 && firstModuleLessonsError;
-        
+        const hasPermissionError = index === 0 && firstModuleLessonsError || 
+                                  index === 1 && secondModuleLessonsError ||
+                                  index === 2 && thirdModuleLessonsError ||
+                                  index === 3 && fourthModuleLessonsError;
+
         return {
           id: module.id || index + 1,
           chapter: chapterTitle,
           topics: [module.description || "Chapter Introduction"],
           lessons: lessonsCount,
-          completed: 0, // TODO: Get completion status from backend when available
-          module: module, // Store the full module data for reference
+          completed: 0, 
+          module: module, 
           hasLessons: lessonsCount > 0,
           hasPermissionError: hasPermissionError,
-          // Use real lesson data from API
           chapterLessons: moduleLessons.map((lesson, lessonIndex) => ({
             id: lesson.id,
             title: lesson.title,
             duration: lesson.duration,
             type: "video", // Default to video, can be enhanced based on lesson data
-            completed: false, // TODO: Get from backend when available
+            // Preserve existing progress data from backend (Chapter 1 lessons have this)
+            completed: lesson.completed || lesson.is_completed || false,
+            is_completed: lesson.is_completed || lesson.completed || false,
+            progress: lesson.progress || 0,
+            completed_at: lesson.completed_at || null,
             videoUrl: lesson.playback_info || "https://sample-videos.com/zip/10/mp4/SampleVideo_1280x720_1mb.mp4",
             description: lesson.description || "Lesson description not available",
             order: lesson.order || lessonIndex + 1,
@@ -208,18 +153,24 @@ function StudentCourseDetails() {
             created_at: lesson.created_at
           }))
         };
-      }) : dummyCourseData.tableOfContents,
-    
+      }) : [],
+
     // Create a flat lessons array grouped by chapters for the lessons tab
-    lessons: courseModules && courseModules.length > 0 ? 
+    lessons: courseModules && courseModules.length > 0 ?
       courseModules.flatMap((module, index) => {
         const chapterTitle = `Chapter ${index + 1}: ${module.title || `Module ${index + 1}`}`;
-        
-        // Get real lessons for this module (only Chapter 1 has lessons for now)
-        const moduleLessons = index === 0 ? (firstModuleLessons || []) : [];
+
+        // Get real lessons for this module
+        const moduleLessons = index === 0 ? (firstModuleLessons || []) : 
+                              index === 1 ? (secondModuleLessons || []) :
+                              index === 2 ? (thirdModuleLessons || []) :
+                              index === 3 ? (fourthModuleLessons || []) : [];
         const hasLessons = moduleLessons.length > 0;
-        const hasPermissionError = index === 0 && firstModuleLessonsError;
-        
+        const hasPermissionError = index === 0 && firstModuleLessonsError || 
+                                  index === 1 && secondModuleLessonsError ||
+                                  index === 2 && thirdModuleLessonsError ||
+                                  index === 3 && fourthModuleLessonsError;
+
         const result = [
           // Chapter header
           {
@@ -232,7 +183,7 @@ function StudentCourseDetails() {
             hasPermissionError: hasPermissionError
           }
         ];
-        
+
         // Add lessons only if this chapter has them
         if (hasLessons) {
           // Add real lessons from API
@@ -241,7 +192,11 @@ function StudentCourseDetails() {
             title: lesson.title,
             duration: lesson.duration,
             type: "video", // Default to video, can be enhanced based on lesson data
-            completed: false, // TODO: Get from backend when available
+            // Preserve existing progress data from backend (Chapter 1 lessons have this)
+            completed: lesson.completed || lesson.is_completed || false,
+            is_completed: lesson.is_completed || lesson.completed || false,
+            progress: lesson.progress || 0,
+            completed_at: lesson.completed_at || null,
             videoUrl: lesson.playback_info || "https://sample-videos.com/zip/10/mp4/SampleVideo_1280x720_1mb.mp4",
             description: lesson.description || "Lesson description not available",
             order: lesson.order || lessonIndex + 1,
@@ -256,7 +211,7 @@ function StudentCourseDetails() {
             playback_info: lesson.playback_info,
             created_at: lesson.created_at
           }));
-          
+
           result.push(...chapterLessons);
         } else if (hasPermissionError) {
           // Add permission error message
@@ -280,10 +235,10 @@ function StudentCourseDetails() {
             isEmpty: true
           });
         }
-        
+
         return result;
-      }) : dummyCourseData.lessons,
-    
+      }) : [],
+
     // Educator information
     educator: {
       name: educatorData?.full_name || educatorData?.name || "Instructor",
@@ -294,38 +249,22 @@ function StudentCourseDetails() {
     }
   } : null;
 
-  // Debug the processed course data
-  console.log("🔍 Processed Course Data:", course);
-  console.log("🔍 Course Details Raw:", courseDetails);
-  console.log("🔍 Course Modules Raw:", courseModules);
-  console.log("🔍 First Module Lessons Raw:", firstModuleLessons);
-  console.log("🔍 Educator Data Raw:", educatorData);
-  
+
   // Check if modules are available
   const hasModules = courseModules && courseModules.length > 0;
-  console.log("🔍 Has Modules:", hasModules);
-  
-  // Debug module structure
-  if (hasModules) {
-    console.log("🔍 First Module Structure:", courseModules[0]);
-    console.log("🔍 All Modules:", courseModules);
-    console.log("🔍 First Module Lessons Count:", firstModuleLessons ? firstModuleLessons.length : 0);
-    if (firstModuleLessons && firstModuleLessons.length > 0) {
-      console.log("🔍 First Lesson Structure:", firstModuleLessons[0]);
-    }
-  }
 
   // Video player states
   const [showVideoModal, setShowVideoModal] = useState(false);
   const [currentLesson, setCurrentLesson] = useState(null);
   const [isPlaying, setIsPlaying] = useState(false);
-  
+
   // Review system states
   const [showReviewForm, setShowReviewForm] = useState(false);
   const [reviewRating, setReviewRating] = useState(0);
   const [reviewComment, setReviewComment] = useState('');
   const [hoverRating, setHoverRating] = useState(0);
   const [reviewSubmitted, setReviewSubmitted] = useState(false);
+
 
   // Tab state
   const [activeTab, setActiveTab] = useState('overview');
@@ -335,7 +274,23 @@ function StudentCourseDetails() {
     if (course?.studentReview) {
       setReviewSubmitted(true);
     }
-  }, [course]);
+
+    // Also check localStorage for existing review
+    if (courseId) {
+      const existingReview = localStorage.getItem(`courseReview_${courseId}`);
+      if (existingReview) {
+        try {
+          const reviewData = JSON.parse(existingReview);
+          setReviewRating(reviewData.rating);
+          setReviewComment(reviewData.comment);
+          setReviewSubmitted(true);
+
+        } catch (error) {
+          console.error("Failed to parse existing review:", error);
+        }
+      }
+    }
+  }, [course, courseId]);
 
   // Handle keyboard shortcuts for video player
   useEffect(() => {
@@ -357,10 +312,9 @@ function StudentCourseDetails() {
     return () => document.removeEventListener('keydown', handleKeyPress);
   }, [showVideoModal, isPlaying]);
 
-  // ===== LOADING AND ERROR STATES =====
-  // Check if lessons are still loading
-  const lessonsLoading = firstModuleLessonsLoading;
-  
+
+
+
   if (courseLoading || modulesLoading || lessonsLoading) {
     return (
       <div className="profile-root min-vh-100 d-flex align-items-center justify-content-center">
@@ -373,6 +327,10 @@ function StudentCourseDetails() {
       </div>
     );
   }
+
+  // Check if student has access to course content (enrolled or course is free)
+  const hasCourseAccess = courseDetails?.is_free || false; // TODO: Add enrollment check
+  const showEnrollmentMessage = !hasCourseAccess && !lessonsError;
 
   if (courseError || !course) {
     return (
@@ -389,14 +347,14 @@ function StudentCourseDetails() {
           )}
           <div className="mb-3">
             <small className="text-muted">
-              Course ID: {courseId}<br/>
-              Educator: {educatorUsername}<br/>
-              Course Details: {courseDetails ? 'Loaded' : 'Not loaded'}<br/>
+              Course ID: {courseId}<br />
+              Educator: {educatorUsername}<br />
+              Course Details: {courseDetails ? 'Loaded' : 'Not loaded'}<br />
               Educator Data: {educatorData ? 'Loaded' : 'Not loaded'}
             </small>
           </div>
-          <button 
-            className="btn-edit-profile" 
+          <button
+            className="btn-edit-profile"
             onClick={() => navigate(-1)}
           >
             <ArrowLeft size={16} className="me-2" />
@@ -407,15 +365,26 @@ function StudentCourseDetails() {
     );
   }
 
-  // Video player functions
+
   const openVideoPlayer = (lesson) => {
-    if (lesson.type === 'video' && lesson.videoUrl) {
-      setCurrentLesson(lesson);
+    const lessonWithProgress = lessonsWithProgress.find(l => l.id === lesson.id) || lesson;
+
+    const lessonForVideo = {
+      ...lessonWithProgress,
+      type: lessonWithProgress.type || 'video',
+      videoUrl: lessonWithProgress.videoUrl || `https://sample-videos.com/zip/10/mp4/SampleVideo_1280x720_1mb.mp4`,
+      duration: lessonWithProgress.duration || '15 min'
+    };
+
+
+
+    if (lessonForVideo.type === 'video' && lessonForVideo.videoUrl) {
+      setCurrentLesson(lessonForVideo);
       setShowVideoModal(true);
       setIsPlaying(true);
-    } else if (lesson.type === 'quiz') {
+    } else if (lessonForVideo.type === 'quiz') {
       // Handle quiz opening - you can implement quiz modal here
-      alert(`Opening quiz: ${lesson.title}`);
+      alert(`Opening quiz: ${lessonForVideo.title}`);
     }
   };
 
@@ -428,14 +397,14 @@ function StudentCourseDetails() {
   const handleContinueLearning = () => {
     // Find the next incomplete lesson or the next lesson based on course.nextLesson
     let nextLesson = null;
-    
+
     if (course.nextLesson && course.nextLesson.id) {
       nextLesson = course.lessons.find(lesson => lesson.id === course.nextLesson.id);
     } else {
       // Find first incomplete lesson
       nextLesson = course.lessons.find(lesson => !lesson.completed);
     }
-    
+
     if (nextLesson) {
       openVideoPlayer(nextLesson);
     } else {
@@ -443,58 +412,85 @@ function StudentCourseDetails() {
     }
   };
 
-  const markLessonComplete = (lessonId) => {
-    // In a real app, this would call an API
-    const lessonIndex = course.lessons.findIndex(lesson => lesson.id === lessonId);
-    if (lessonIndex !== -1) {
-      course.lessons[lessonIndex].completed = true;
-      // Update progress calculation
-      const newCompletedCount = course.lessons.filter(lesson => lesson.completed).length;
-      course.progress = Math.round((newCompletedCount / course.lessons.length) * 100);
+  const markLessonComplete = async (lessonId) => {
+    try {
+      // Mark lesson as complete in backend
+      await markLessonAsComplete(lessonId, true);
+
+    } catch (error) {
+      console.error('Failed to mark lesson as complete:', error);
     }
   };
 
-  const handleReviewSubmit = (e) => {
+  const handleReviewSubmit = async (e) => {
     e.preventDefault();
     if (reviewRating === 0) {
       alert("Please select a rating");
       return;
     }
 
-    console.log("Review submitted:", {
-      rating: reviewRating,
-      comment: reviewComment
-    });
+    try {
+      const ratingData = {
+        rating: reviewRating,
+        comment: reviewComment
+      };
 
-    setReviewSubmitted(true);
-    setShowReviewForm(false);
-    
-    course.studentReview = {
-      rating: reviewRating,
-      comment: reviewComment,
-      date: new Date().toISOString()
-    };
+      const response = await submitCourseRating(courseId, ratingData);
 
-    alert("Thank you for your review! Your feedback helps us improve.");
+      // Update local state
+      setReviewSubmitted(true);
+      setShowReviewForm(false);
+
+      // Store the submitted review locally
+      const submittedReview = {
+        rating: reviewRating,
+        comment: reviewComment,
+        date: new Date().toISOString()
+      };
+
+      // Save to localStorage for persistence
+      localStorage.setItem(`courseReview_${courseId}`, JSON.stringify(submittedReview));
+
+      alert("Thank you for your review! Your feedback helps us improve.");
+
+    } catch (error) {
+      console.error('Failed to submit review:', error);
+      alert(`Failed to submit review: ${error.response?.data?.detail || error.message}`);
+    }
   };
 
-  const completedLessons = course.lessons.filter(lesson => lesson.completed).length;
-  const totalLessons = course.lessons.length;
+  // Calculate real progress from lessons data
+  // Use all lessons from all modules
+  let allLessons = allModuleLessonsCombined || [];
+
+  // Use lesson statuses from the backend instead of localStorage
+  const lessonsWithProgress = allLessons.map(lesson => ({
+    ...lesson,
+    is_completed: lessonStatuses?.isLessonCompleted?.(lesson.id) || false,
+    completed: lessonStatuses?.isLessonCompleted?.(lesson.id) || false,
+    status: lessonStatuses?.isLessonCompleted?.(lesson.id) ? 'completed' : 'not_started'
+  }));
+
+  // Use real-time analytics from lesson statuses
+  const completedLessons = lessonStatuses?.completedLessons || 0;
+  const totalLessons = lessonStatuses?.totalLessons || 0;
+  const courseProgress = lessonStatuses?.progress || 0;
+  const nextLesson = lessonStatuses?.nextLesson || null;
 
   return (
     <div className="profile-root">
       {/* Video Player Modal */}
       {showVideoModal && currentLesson && (
-        <div 
+        <div
           className="position-fixed top-0 start-0 w-100 h-100 d-flex align-items-center justify-content-center"
-          style={{ 
-            backgroundColor: 'rgba(0,0,0,0.9)', 
+          style={{
+            backgroundColor: 'rgba(0,0,0,0.9)',
             zIndex: 1050,
             backdropFilter: 'blur(5px)'
           }}
           onClick={closeVideoPlayer}
         >
-          <div 
+          <div
             className="position-relative bg-secondary rounded"
             style={{ maxWidth: '90vw', maxHeight: '90vh' }}
             onClick={(e) => e.stopPropagation()}
@@ -523,9 +519,17 @@ function StudentCourseDetails() {
                 autoPlay={isPlaying}
                 className="d-block"
                 style={{ maxWidth: '90vw', maxHeight: '60vh' }}
-                onEnded={() => {
-                  markLessonComplete(currentLesson.id);
-                  setIsPlaying(false);
+                onEnded={async () => {
+                                      try {
+                      await markLessonComplete(currentLesson.id);
+                      // TODO: Refresh lesson statuses when backend endpoint is available
+                      // lessonStatuses?.refreshStatuses?.();
+                      setIsPlaying(false);
+                      // You can add a success notification here
+                    } catch (error) {
+                      console.error('Failed to mark lesson complete:', error);
+                      // You can add an error notification here
+                    }
                 }}
               >
                 <source src={currentLesson.videoUrl} type="video/mp4" />
@@ -540,25 +544,35 @@ function StudentCourseDetails() {
                   <p className="mb-1 small">{currentLesson.description}</p>
                 </div>
                 <div className="d-flex gap-2">
-                  {!currentLesson.completed && (
+                  {!(currentLesson.is_completed || currentLesson.completed || currentLesson.status === 'completed') && (
                     <button
-                      className="btn btn-secondary-action btn-sm"
-                      onClick={() => {
-                        markLessonComplete(currentLesson.id);
-                        alert("Lesson marked as complete!");
+                      className="btn-secondary-action"
+                      onClick={async () => {
+                        try {
+                          await markLessonComplete(currentLesson.id);
+                          // Refresh lesson statuses from backend
+                          lessonStatuses?.refreshStatuses?.();
+                          // Close video player and show success
+                          closeVideoPlayer();
+                          // You can add a success notification here
+                        } catch (error) {
+                          console.error('Failed to mark lesson complete:', error);
+                          // You can add an error notification here
+                        }
                       }}
+                      disabled={lessonUpdating}
                     >
                       <CheckCircle size={16} className="me-1" />
-                      Mark Complete
+                      {lessonUpdating ? 'Marking...' : 'Mark Complete'}
                     </button>
                   )}
                   <button
-                    className="btn btn-edit-profile btn-sm"
+                    className="btn-edit-profile"
                     onClick={() => {
                       closeVideoPlayer();
-                      // Find next lesson
-                      const currentIndex = course.lessons.findIndex(l => l.id === currentLesson.id);
-                      const nextLesson = course.lessons[currentIndex + 1];
+                      // Find next lesson from lessons with progress
+                      const currentIndex = lessonsWithProgress.findIndex(l => l.id === currentLesson.id);
+                      const nextLesson = lessonsWithProgress[currentIndex + 1];
                       if (nextLesson) {
                         setTimeout(() => openVideoPlayer(nextLesson), 100);
                       }
@@ -652,38 +666,25 @@ function StudentCourseDetails() {
               <div className="card">
                 <div className="card-body">
                   <h3 className="section-title mb-4">Course Overview</h3>
-                  
-                  <div className="mb-4">
-                    <h4 className="about-subtitle mb-2">Description</h4>
-                    <p className="profile-joined">{course.fullDescription}</p>
-                  </div>
 
-                  <div className="row mb-4">
-                    <div className="col-md-6 mb-3">
-                      <div className="about-bubble p-3">
-                        <Clock size={16} className="me-2 text-primary" />
-                        <strong>Duration:</strong> {course.duration}
-                      </div>
-                    </div>
-                    <div className="col-md-6 mb-3">
-                      <div className="about-bubble p-3">
-                        <BookOpen size={16} className="me-2 text-primary" />
-                        <strong>Level:</strong> {course.level}
-                      </div>
-                    </div>
-                    <div className="col-md-6 mb-3">
-                      <div className="about-bubble p-3">
-                        <User size={16} className="me-2 text-primary" />
-                        <strong>Students:</strong> {course.enrolledStudents}
-                      </div>
-                    </div>
-                    <div className="col-md-6 mb-3">
-                      <div className="about-bubble p-3">
-                        <Star size={16} className="me-2 text-primary" />
-                        <strong>Rating:</strong> {course.educator.rating}/5.0
-                      </div>
-                    </div>
-                  </div>
+                                     {/* Enrollment Required Message */}
+                   {showEnrollmentMessage && (
+                     <div className="alert alert-info mb-4">
+                       <div className="d-flex align-items-center">
+                         <BookOpen size={20} className="me-2" />
+                         <div>
+                           <strong>Enrollment Required</strong>
+                           <br />
+                           <small>You need to enroll in this course to access the full content, including lessons and progress tracking.</small>
+                         </div>
+                       </div>
+                     </div>
+                   )}
+
+                   <div className="mb-4">
+                     <h4 className="about-subtitle mb-2">Description</h4>
+                     <p className="about-bubble">{course.description}</p>
+                   </div>
                 </div>
               </div>
             )}
@@ -692,7 +693,21 @@ function StudentCourseDetails() {
               <div className="card">
                 <div className="card-body">
                   <h3 className="section-title mb-4">Course Curriculum</h3>
-                  
+
+                  {/* Enrollment Required Message */}
+                  {showEnrollmentMessage && (
+                    <div className="alert alert-info">
+                      <div className="d-flex align-items-center">
+                        <BookOpen size={16} className="me-2" />
+                        <div>
+                          <strong>Enrollment Required</strong>
+                          <br />
+                          <small>You need to enroll in this course to view the detailed curriculum and lesson structure.</small>
+                        </div>
+                      </div>
+                    </div>
+                  )}
+
                   {hasModules ? (
                     course.tableOfContents.map((chapter, index) => (
                       <div key={chapter.id} className="mb-4">
@@ -702,22 +717,16 @@ function StudentCourseDetails() {
                             <span className="badge bg-secondary me-2">
                               {chapter.completed}/{chapter.lessons} completed
                             </span>
-                            <div className="progress" style={{ width: "100px", height: "6px" }}>
-                              <div
-                                className="progress-bar progress-bar-filled"
-                                style={{ width: `${(chapter.completed / chapter.lessons) * 100}%` }}
-                              />
-                            </div>
                           </div>
                         </div>
-                        
+
                         {/* Chapter Description */}
                         {chapter.module && chapter.module.description && (
                           <div className="ms-3 mb-3">
                             <p className="text-muted mb-2">{chapter.module.description}</p>
                           </div>
                         )}
-                        
+
                         {/* Chapter Topics */}
                         <div className="ms-3 mb-3">
                           {chapter.topics.map((topic, topicIndex) => (
@@ -733,7 +742,7 @@ function StudentCourseDetails() {
                             </div>
                           ))}
                         </div>
-                        
+
                         {/* Chapter Lessons */}
                         {chapter.chapterLessons && chapter.chapterLessons.length > 0 ? (
                           <div className="ms-4">
@@ -752,11 +761,6 @@ function StudentCourseDetails() {
                                   <Clock size={12} className="me-1" />
                                   {typeof lesson.duration === 'number' ? `${lesson.duration} min` : lesson.duration}
                                 </small>
-                                {lesson.order && (
-                                  <small className="text-muted ms-2">
-                                    Order: {lesson.order}
-                                  </small>
-                                )}
                                 {lesson.is_free && (
                                   <small className="badge bg-success ms-2">
                                     Free
@@ -790,7 +794,7 @@ function StudentCourseDetails() {
                             </div>
                           </div>
                         )}
-                        
+
                         {/* Chapter Metadata */}
                         {chapter.module && (
                           <div className="ms-3 mt-2">
@@ -822,7 +826,21 @@ function StudentCourseDetails() {
               <div className="card">
                 <div className="card-body">
                   <h3 className="section-title mb-4">Course Lessons</h3>
-                  
+
+                  {/* Enrollment Required Message */}
+                  {showEnrollmentMessage && (
+                    <div className="alert alert-info">
+                      <div className="d-flex align-items-center">
+                        <BookOpen size={16} className="me-2" />
+                        <div>
+                          <strong>Enrollment Required</strong>
+                          <br />
+                          <small>You need to enroll in this course to access the lessons and track your progress.</small>
+                        </div>
+                      </div>
+                    </div>
+                  )}
+
                   {hasModules ? (
                     course.lessons.map((lesson) => {
                       if (lesson.isChapter) {
@@ -859,7 +877,7 @@ function StudentCourseDetails() {
                             </div>
                           );
                         }
-                        
+
                         if (lesson.isPermissionError) {
                           // Render permission error message
                           return (
@@ -877,40 +895,36 @@ function StudentCourseDetails() {
                             </div>
                           );
                         }
-                        
+
                         return (
-                          <div 
-                            key={lesson.id} 
+                          <div
+                            key={lesson.id}
                             className="d-flex align-items-center p-3 mb-2 about-bubble position-relative ms-4"
-                            style={{ 
-                              cursor: lesson.type === 'video' ? 'pointer' : 'default',
+                            style={{
+                              cursor: 'pointer', // All lessons are clickable
                               transition: 'all 0.2s ease'
                             }}
                             onClick={() => openVideoPlayer(lesson)}
                             onMouseEnter={(e) => {
-                              if (lesson.type === 'video') {
-                                e.currentTarget.style.transform = 'translateX(5px)';
-                                e.currentTarget.style.boxShadow = '0 4px 12px rgba(0,0,0,0.15)';
-                              }
+                              e.currentTarget.style.transform = 'translateX(5px)';
+                              e.currentTarget.style.boxShadow = '0 4px 12px rgba(0,0,0,0.15)';
                             }}
                             onMouseLeave={(e) => {
-                              if (lesson.type === 'video') {
-                                e.currentTarget.style.transform = 'translateX(0)';
-                                e.currentTarget.style.boxShadow = 'none';
-                              }
+                              e.currentTarget.style.transform = 'translateX(0)';
+                              e.currentTarget.style.boxShadow = 'none';
                             }}
                           >
                             <div className="me-3">
-                              {lesson.completed ? (
+                              {lesson.completed || lesson.is_completed ? (
                                 <CheckCircle size={20} className="text-success" />
                               ) : (
-                                <Play 
-                                  size={20} 
-                                  className={lesson.type === 'video' ? "text-primary" : "text-muted"} 
+                                <Play
+                                  size={20}
+                                  className="text-primary" // All lessons are treated as video lessons
                                 />
                               )}
                             </div>
-                            
+
                             <div className="flex-grow-1">
                               <h6 className="about-subtitle mb-1">{lesson.title}</h6>
                               <div className="d-flex align-items-center gap-3">
@@ -918,20 +932,15 @@ function StudentCourseDetails() {
                                   <Clock size={14} className="me-1" />
                                   {typeof lesson.duration === 'number' ? `${lesson.duration} min` : lesson.duration}
                                 </small>
-                                <small 
-                                  className="border rounded px-2 py-1" 
-                                  style={{ 
-                                    color: lesson.type === 'video' ? "var(--color-primary)" : "var(--color-secondary)",
-                                    borderColor: lesson.type === 'video' ? "var(--color-primary)" : "var(--color-secondary)"
+                                <small
+                                  className="border rounded px-2 py-1"
+                                  style={{
+                                    color: "var(--color-primary)",
+                                    borderColor: "var(--color-primary)"
                                   }}
                                 >
-                                  {lesson.type.charAt(0).toUpperCase() + lesson.type.slice(1)}
+                                  Video
                                 </small>
-                                {lesson.order && (
-                                  <small className="text-muted">
-                                    Order: {lesson.order}
-                                  </small>
-                                )}
                                 {lesson.is_free && (
                                   <small className="badge bg-success">
                                     Free
@@ -944,14 +953,14 @@ function StudentCourseDetails() {
                                 </small>
                               )}
                             </div>
-                            
+
                             <div className="d-flex align-items-center">
-                              {lesson.completed && (
+                              {(lesson.completed || lesson.is_completed) && (
                                 <div className="text-success me-2">
                                   <CheckCircle size={20} />
                                 </div>
                               )}
-                              {lesson.type === 'video' && !lesson.completed && (
+                              {!(lesson.completed || lesson.is_completed) && (
                                 <div className="text-primary opacity-75">
                                   <Play size={16} />
                                 </div>
@@ -975,8 +984,8 @@ function StudentCourseDetails() {
               <div className="card">
                 <div className="card-body">
                   <h3 className="section-title mb-4">Course Review</h3>
-                  
-                  {reviewSubmitted || course.studentReview ? (
+
+                  {reviewSubmitted ? (
                     <div className="alert alert-success">
                       <h5 className="alert-heading d-flex align-items-center">
                         <CheckCircle size={20} className="me-2" />
@@ -984,26 +993,22 @@ function StudentCourseDetails() {
                       </h5>
                       <p className="mb-0">
                         Thank you for your feedback! You've already reviewed this course.
-                        {course.studentReview && (
+                        <br />
+                        <strong>Your Rating:</strong>
+                        <span className="ms-2">
+                          {[...Array(5)].map((_, i) => (
+                            <Star
+                              key={i}
+                              size={16}
+                              className={i < reviewRating ? "text-warning" : "text-muted"}
+                              fill={i < reviewRating ? "currentColor" : "none"}
+                            />
+                          ))}
+                        </span>
+                        {reviewComment && (
                           <>
                             <br />
-                            <strong>Your Rating:</strong> 
-                            <span className="ms-2">
-                              {[...Array(5)].map((_, i) => (
-                                <Star
-                                  key={i}
-                                  size={16}
-                                  className={i < course.studentReview.rating ? "text-warning" : "text-muted"}
-                                  fill={i < course.studentReview.rating ? "currentColor" : "none"}
-                                />
-                              ))}
-                            </span>
-                            {course.studentReview.comment && (
-                              <>
-                                <br />
-                                <strong>Your Comment:</strong> {course.studentReview.comment}
-                              </>
-                            )}
+                            <strong>Your Comment:</strong> {reviewComment}
                           </>
                         )}
                       </p>
@@ -1013,7 +1018,7 @@ function StudentCourseDetails() {
                       <p className="profile-joined mb-4">
                         Share your experience with this course to help other students make informed decisions.
                       </p>
-                      
+
                       {!showReviewForm ? (
                         <button
                           className="btn-edit-profile"
@@ -1031,11 +1036,10 @@ function StudentCourseDetails() {
                                 <Star
                                   key={rating}
                                   size={32}
-                                  className={`cursor-pointer ${
-                                    rating <= (hoverRating || reviewRating)
+                                  className={`cursor-pointer ${rating <= (hoverRating || reviewRating)
                                       ? "text-warning"
                                       : "text-muted"
-                                  }`}
+                                    }`}
                                   fill={rating <= (hoverRating || reviewRating) ? "currentColor" : "none"}
                                   onMouseEnter={() => setHoverRating(rating)}
                                   onMouseLeave={() => setHoverRating(0)}
@@ -1096,64 +1100,91 @@ function StudentCourseDetails() {
 
           {/* Sidebar */}
           <div className="col-lg-4">
-            {/* Course Progress */}
-            <div className="card mb-4">
-              <div className="card-body">
-                <h4 className="section-title mb-3">Your Progress</h4>
-                
-                <div className="mb-3">
-                  <div className="d-flex justify-content-between mb-1">
-                    <span className="about-subtitle">Overall Progress</span>
-                    <span className="text-accent fw-bold">{course.progress}%</span>
-                  </div>
-                  <div className="progress mb-2">
-                    <div 
-                      className="progress-bar progress-bar-filled" 
-                      style={{width: `${course.progress}%`}}
-                    />
-                  </div>
-                  <small className="text-muted">
-                    {completedLessons}/{totalLessons} lessons completed
-                  </small>
-                </div>
+            {/* Course Progress - Only show if student has access */}
+            {!showEnrollmentMessage && (
+              <div className="card mb-4">
+                <div className="card-body">
+                  <h4 className="section-title mb-3">Your Progress</h4>
 
-                <div className="mb-3">
-                  <span className={`badge ${course.status === "Active" ? "bg-secondary" : ""} px-3 py-2`}>
-                    {course.status}
-                  </span>
-                </div>
-
-                {course.nextLesson && (
-                  <div className="about-bubble p-3">
-                    <h6 className="about-subtitle mb-2">Next Lesson</h6>
-                    <div className="mb-1">{course.nextLesson.title}</div>
+                  <div className="mb-3">
+                    <div className="d-flex justify-content-between mb-1">
+                      <span className="about-subtitle">Overall Progress</span>
+                      <span className="text-accent fw-bold">{courseProgress}%</span>
+                    </div>
+                    <div className="progress mb-2">
+                      <div
+                        className="progress-bar progress-bar-filled"
+                        style={{ width: `${courseProgress}%` }}
+                      />
+                    </div>
                     <small className="text-muted">
-                      <Calendar size={14} className="me-1" />
-                      {course.nextLesson.date} at {course.nextLesson.time}
+                      {completedLessons}/{totalLessons} lessons completed
                     </small>
                   </div>
-                )}
+
+                  <div className="mb-3">
+                    <span className={`badge ${courseProgress === 100 ? "bg-success" : courseProgress > 0 ? "bg-secondary" : "bg-warning"} px-3 py-2`}>
+                      {courseProgress === 100 ? "Completed" : courseProgress > 0 ? "In Progress" : "Not Started"}
+                    </span>
+                  </div>
+
+                  {nextLesson && (
+                    <div className="about-bubble p-3">
+                      <h6 className="about-subtitle mb-2">Next Lesson</h6>
+                      <div className="mb-1">{nextLesson.title}</div>
+                      <small className="text-muted">
+                        <Calendar size={14} className="me-1" />
+                        {nextLesson.duration || 'Continue learning'}
+                      </small>
+                    </div>
+                  )}
+                </div>
               </div>
-            </div>
+            )}
+
+            {/* Analytics - Only show if student has access */}
+            {!showEnrollmentMessage && (
+              <div className="card mb-4">
+                <div className="card-body">
+                  <h4 className="section-title mb-3">Analytics</h4>
+
+                  <div className="row g-3">
+                    <div className="col-6">
+                      <div className="about-bubble p-3 text-center">
+                        <CheckCircle size={20} className="text-success mb-2" />
+                        <div className="h5 mb-1 text-success">{lessonStatuses?.completedLessons || 0}</div>
+                        <div className="small text-muted">Attended Sessions</div>
+                      </div>
+                    </div>
+                    <div className="col-6">
+                      <div className="about-bubble p-3 text-center">
+                        <Clock size={20} className="text-warning mb-2" />
+                        <div className="h5 mb-1 text-warning">{lessonStatuses?.totalLessons - lessonStatuses?.completedLessons || 0}</div>
+                        <div className="small text-muted">Remaining Lessons</div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            )}
 
             {/* Instructor Info */}
             <div className="card mb-4">
               <div className="card-body">
                 <h4 className="section-title mb-3">Your Instructor</h4>
-                
+
                 <div className="d-flex align-items-center mb-3">
                   <img
                     src={course.educator.avatar}
                     alt={course.educator.name}
-                    className="avatar-circle me-3"
-                    style={{ width: "60px", height: "80px", objectFit: "cover" }}
+                    className="avatar-rectangle instructor-avatar me-3"
                   />
                   <div>
                     <h5 className="about-subtitle mb-1">{course.educator.name}</h5>
                     <p className="profile-joined mb-0">{course.educator.title}</p>
                   </div>
                 </div>
-                
+
                 <div className="row">
                   <div className="col-6">
                     <div className="about-bubble p-2 text-center">
@@ -1175,15 +1206,28 @@ function StudentCourseDetails() {
             <div className="card">
               <div className="card-body">
                 <div className="d-grid gap-2">
-                  {course.status === "Active" && (
-                    <button 
+                  {/* Show enrollment button if student doesn't have access */}
+                  {showEnrollmentMessage && (
+                    <button
+                      className="btn-edit-profile btn-primary"
+                      onClick={() => navigate(`/${educatorUsername}/student/courses`)}
+                    >
+                      <BookOpen size={16} className="me-2" />
+                      Enroll in Course
+                    </button>
+                  )}
+                  
+                  {/* Show continue learning button if student has access */}
+                  {nextLesson && courseProgress < 100 && !showEnrollmentMessage && (
+                    <button
                       className="btn-edit-profile"
-                      onClick={handleContinueLearning}
+                      onClick={() => openVideoPlayer(nextLesson)}
                     >
                       <Play size={16} className="me-2" />
                       Continue Learning
                     </button>
                   )}
+                  
                   <button className="btn-edit-profile">
                     <Download size={16} className="me-2" />
                     Download Materials

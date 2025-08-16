@@ -5,42 +5,17 @@ import { NavLink, useParams } from "react-router-dom";
 import { pagePaths } from "../../pagePaths";
 import useListEnrolledCourses from "../../apis/hooks/student/useListEnrolledCourses";
 import useEducatorPublicData from "../../apis/hooks/student/useEducatorPublicData";
+import useStudentCourseAnalytics from "../../apis/hooks/student/useStudentCourseAnalytics";
 
 /**
- * StudentProfile Component - Connected to Backend Hooks
- * 
- * HOOKS CONNECTED:
- * ✅ useStudentProfileData() - Student profile information, user details, enrollment data
- * ✅ useListEnrolledCourses() - List of courses the student is enrolled in
- * ✅ updateStudentProfile() - Action to update student profile
- * ✅ useEducatorPublicData() - Fetch educator details for the student's enrolled courses
- * 
- * REAL DATA FROM BACKEND:
- * ✅ Student basic info (name, bio, profile picture, DOB, address, country, city, gender)
- * ✅ User details (email, phone, parent phone, slug, created date)
- * ✅ Enrollment information (enrollment date, completed lessons, last activity)
- * ✅ Enrolled courses (title, description, category, total lessons, duration, etc.)
- * ✅ Course progress (completed lessons vs total lessons)
- * ✅ Educator information (full name, profile details)
- * 
- * DUMMY DATA (NO BACKEND RESPONSE YET):
- * ❌ Course session tracking (sessions attended, sessions total)
- * ❌ Assignment completion rates
- * ❌ Next lesson details (date, time, topic)
- * ❌ Overall progress percentage
- * ❌ Course-specific analytics (attendance, assignment rates)
- * 
- * TODO: Connect these fields when backend provides the data:
- * - Course session attendance tracking
- * - Assignment completion rates
- * - Next lesson scheduling details
- * - Overall learning analytics
+ * StudentProfile Component
  */
 function StudentProfile() {
   const { educatorUsername } = useParams();
   const { data: studentData, isLoading, error, mutate } = useStudentProfileData();
   const { enrolledInCourses, isLoading: coursesLoading } = useListEnrolledCourses();
   const { data: educatorData } = useEducatorPublicData(educatorUsername);
+  const { analytics, isLoading: analyticsLoading, error: analyticsError } = useStudentCourseAnalytics();
   
   const [showEditForm, setShowEditForm] = useState(false);
   const [formData, setFormData] = useState({
@@ -55,67 +30,36 @@ function StudentProfile() {
   });
   const [profilePicture, setProfilePicture] = useState(null);
 
-  // ===== DUMMY DATA - NO BACKEND RESPONSE YET =====
-  // These fields don't have backend responses, so keeping dummy data for now
-  const dummyAnalytics = {
-    sessions_attended: 12,
-    sessions_total: 20,
-    average_assignment_rate: 85,
-    next_lesson: { date: "2025-08-11", time: "10:00", topic: "Integrals" }
-  };
 
-  // ===== REAL DATA FROM HOOK =====
-  // Use real enrolled courses from API
-  const enrolledCourses = enrolledInCourses || [];
 
-  // ===== ANALYTICS CALCULATIONS =====
-  // Calculate analytics based on available data
-  const totalSessionsAttended = enrolledCourses.length > 0 ? 
-    enrolledCourses.reduce((sum, c) => sum + (c.sessions_attended || dummyAnalytics.sessions_attended), 0) : 
-    dummyAnalytics.sessions_attended;
-    
-  const totalSessionsPlanned = enrolledCourses.length > 0 ? 
-    enrolledCourses.reduce((sum, c) => sum + (c.sessions_total || dummyAnalytics.sessions_total), 0) : 
-    dummyAnalytics.sessions_total;
-    
-  const totalSessionsLeft = totalSessionsPlanned - totalSessionsAttended;
-  const avgAssignmentRate = enrolledCourses.length > 0 ?
-    (enrolledCourses.reduce((sum, c) => sum + (c.average_assignment_rate || dummyAnalytics.average_assignment_rate), 0) / enrolledCourses.length).toFixed(1) :
-    dummyAnalytics.average_assignment_rate;
 
-  // ===== DUMMY DATA - NO BACKEND RESPONSE YET =====
-  // Overall progress calculation - backend doesn't provide this yet
-  const progress = 100; // TODO: Calculate real progress when backend provides completion data
+  // Use analytics data from the new hook
+  const {
+    totalCourses,
+    totalLessons,
+    totalCompletedLessons,
+    overallProgress,
+    totalEnrollments,
+    averageRating,
+    totalReviews,
+    totalDuration,
+    nextLesson,
+    courses: enrolledCourses
+  } = analytics;
 
-  // ===== UPCOMING LESSONS =====
-  // Get all upcoming lessons sorted by date/time from available data
-  const now = new Date();
-  const upcomingLessons = enrolledCourses.length > 0 ? 
-    enrolledCourses
-      .map((course) => {
-        if (course.next_lesson && course.next_lesson.date) {
-          return {
-            ...course.next_lesson,
-            course: course.title || course.name,
-            instructor: educatorData?.full_name || educatorUsername,
-          };
-        }
-        return null;
-      })
-      .filter(
-        (lesson) =>
-          lesson && new Date(lesson.date + "T" + (lesson.time || "00:00")) > now
-      )
-      .sort(
-        (a, b) =>
-          new Date(a.date + "T" + (a.time || "00:00")) -
-          new Date(b.date + "T" + (b.time || "00:00"))
-      ) : 
-    [{
-      ...dummyAnalytics.next_lesson,
-      course: "Sample Course",
-      instructor: educatorData?.full_name || educatorUsername
-    }];
+  // Calculate remaining lessons
+  const totalSessionsLeft = totalLessons - totalCompletedLessons;
+  
+  // Calculate progress percentage
+  const progress = overallProgress;
+  // Prepare next lesson data
+  const upcomingLessons = nextLesson ? [{
+    topic: nextLesson.title,
+    course: nextLesson.course,
+    instructor: educatorData?.full_name || educatorUsername,
+    date: new Date().toDateString(),
+    time: "10:00 AM"
+  }] : [];
 
   // ===== FORM DATA INITIALIZATION =====
   useEffect(() => {
@@ -178,7 +122,7 @@ function StudentProfile() {
   };
 
   // ===== LOADING AND ERROR STATES =====
-  if (isLoading) {
+  if (isLoading || analyticsLoading) {
     return (
       <div className="profile-root min-vh-100 d-flex align-items-center justify-content-center">
         <div className="text-center">
@@ -191,11 +135,14 @@ function StudentProfile() {
     );
   }
 
-  if (error) {
+  if (error || analyticsError) {
     return (
       <div className="profile-root min-vh-100 d-flex align-items-center justify-content-center">
         <div className="text-center">
-          <p className="text-danger">Error loading profile data. Please try again later.</p>
+          <p className="text-danger">
+            {error ? 'Error loading profile data.' : 'Error loading analytics data.'} 
+            Please try again later.
+          </p>
         </div>
       </div>
     );
@@ -391,10 +338,10 @@ function StudentProfile() {
 												"https://placehold.co/120x120?text=Student"
 											}
 											alt="avatar"
-											className="rounded-circle me-3"
+											className="avatar-rectangle profile-avatar me-3"
 											style={{
-												width: "100px",
-												height: "100px",
+												width: "150px",
+												height: "150px",
 												objectFit: "cover",
 											}}
 											aria-label="User avatar"
@@ -487,33 +434,37 @@ function StudentProfile() {
 									<div className="d-flex justify-content-between align-items-center mb-3">
 										<h5 className="fw-bold section-title mb-0">Progress</h5>
 									</div>
-									<div className="d-flex justify-content-between mb-2">
-										<small className="fw-medium section-title">
-											Overall Course Completion
-										</small>
-										<small className="fw-medium">{progress}%</small>
-									</div>
-									<div
-										className="progress mb-3"
-										role="progressbar"
-										aria-valuenow={progress}
-										aria-valuemin="0"
-										aria-valuemax="100"
-										aria-label="Overall course completion progress"
-									>
-										<div
-											className="progress-bar progress-bar-filled"
-											style={{ width: `${progress}%` }}
-										/>
-									</div>
-									<small
-										className="d-block profile-progress-text section-title"
-										aria-live="polite"
-									>
-										{progress === 100
-											? "You're doing great! Keep up the momentum."
-											: "Careful! Missing a few assignments or classes"}
-									</small>
+									                    <div className="d-flex justify-content-between mb-2">
+                      <small className="fw-medium section-title">
+                        Progress Across All Courses
+                      </small>
+                      <small className="fw-medium">{progress}%</small>
+                    </div>
+                    <div
+                      className="progress mb-3"
+                      role="progressbar"
+                      aria-valuenow={progress}
+                      aria-valuemin="0"
+                      aria-valuemax="100"
+                      aria-label="Overall course completion progress"
+                    >
+                      <div
+                        className="progress-bar progress-bar-filled"
+                        style={{ width: `${progress}%` }}
+                      />
+                    </div>
+                    <small
+                      className="d-block profile-progress-text section-title"
+                      aria-live="polite"
+                    >
+                      {totalLessons === 0
+                        ? "No lessons available yet. Visit your courses to start learning!"
+                        : progress === 100
+                        ? "Excellent! You've completed all available lessons across all courses."
+                        : progress > 50
+                        ? `Great progress! You're ${progress}% through your learning journey (${totalCompletedLessons}/${totalLessons} lessons).`
+                        : `Keep going! You're ${progress}% through your enrolled courses (${totalCompletedLessons}/${totalLessons} lessons).`}
+                    </small>
 								</div>
 							</div>
 
@@ -521,9 +472,15 @@ function StudentProfile() {
 							<div className="card shadow-sm">
 								<div className="card-body">
 									<h5 className="fw-bold section-title mb-3">Next Lessons</h5>
-									{upcomingLessons.length === 0 ? (
-										<div className="alert alert-info">No upcoming lessons.</div>
-									) : (
+									                  {upcomingLessons.length === 0 ? (
+                    <div className="alert alert-info">
+                      {enrolledCourses.length === 0 
+                        ? "Not enrolled in any courses yet!" 
+                        : totalLessons === 0
+                        ? "No lessons available yet. Visit your courses to start learning!"
+                        : "All lessons completed! Great job!"}
+                    </div>
+                  ) : (
 										upcomingLessons.map((lesson, idx) => (
 											<div key={idx} className="mb-3 about-bubble p-3 rounded">
 												<div>
@@ -560,27 +517,30 @@ function StudentProfile() {
 								<div className="card-body text-center">
 									<div className="row">
 										{/* ===== REAL DATA FROM HOOKS ===== */}
-										<div className="col-md-3 section-title border-end">
-											<h4>{totalSessionsAttended}</h4>
-											<small>Sessions Attended</small>
-										</div>
-										<div className="col-md-3 section-title  border-end">
-											<h4>{totalSessionsLeft}</h4>
-											<small>Sessions Left</small>
-										</div>
-										<div className="col-md-3 section-title  border-end">
-											<h4>{avgAssignmentRate}%</h4>
-											<small>Avg. Assignment Rate</small>
-										</div>
-										{/* ===== DUMMY DATA - NO BACKEND RESPONSE YET ===== */}
-										<div className="col-md-3 section-title ">
-											<h4>
-												{upcomingLessons.length > 0
-													? upcomingLessons[0].topic
-													: "-"}
-											</h4>
-											<small>Next Lesson Topic</small>
-										</div>
+										                    <div className="col-md-3 section-title border-end">
+                      <h4>{totalCompletedLessons}</h4>
+                      <small>Total Lessons Completed</small>
+                    </div>
+                    <div className="col-md-3 section-title  border-end">
+                      <h4>{totalSessionsLeft}</h4>
+                      <small>Total Lessons Remaining</small>
+                    </div>
+                    <div className="col-md-3 section-title  border-end">
+                      <h4>{totalCourses}</h4>
+                      <small>Courses Enrolled</small>
+                    </div>
+										                    <div className="col-md-3 section-title ">
+                      <h4>
+                        {upcomingLessons.length > 0
+                          ? upcomingLessons[0].topic
+                          : "No upcoming lessons"}
+                      </h4>
+                      <small className="text-muted">
+                        {upcomingLessons.length > 0
+                          ? upcomingLessons[0].course
+                          : "No course"}
+                      </small>
+                    </div>
 									</div>
 								</div>
 							</div>
@@ -598,7 +558,6 @@ function StudentProfile() {
 												<div className="card h-100 shadow-sm d-flex flex-column">
 													<div className="card-body d-flex flex-column">
 														<h5 className="section-title mb-2">
-															{/* ===== REAL DATA FROM HOOK ===== */}
 															{course.title || course.name}
 														</h5>
 														<div
@@ -611,68 +570,58 @@ function StudentProfile() {
 															</span>
 														</div>
 
-														<div className="mb-2">
-															<strong>Progress:</strong>{" "}
-															{/* ===== REAL DATA FROM HOOK ===== */}
-															{studentData?.completed_lessons && course.total_lessons ? 
-																Math.round((+studentData.completed_lessons / +course.total_lessons) * 100) :
-																0
-															}%
-															<div
-																className="progress mt-1"
-																style={{
-																	height: 6,
-																	backgroundColor: "#e0e0e0",
-																	borderRadius: "var(--border-radius-sm)",
-																	overflow: "hidden",
-																}}
-															>
-																<div
-																	className="progress-bar progress-bar-filled"
-																	style={{
-																		width: `${
-																			studentData?.completed_lessons && course.total_lessons ?
-																				Math.min((+studentData.completed_lessons / +course.total_lessons) * 100, 100) :
-																				0
-																		}%`,
-																		backgroundColor:
-																			"var(--color-primary-dark)",
-																		borderRadius: "var(--border-radius-sm)",
-																	}}
-																/>
-															</div>
-														</div>
-														
-														{/* ===== REAL DATA FROM HOOK ===== */}
-														<div className="mb-1">
-															<strong>Total Lessons:&nbsp;</strong>
-															{course.total_lessons || 0}
-														</div>
-														<div className="mb-1">
-															<strong>Category:&nbsp;</strong>
-															{course.category?.name || "N/A"}
-														</div>
-														<div className="mb-1">
-															<strong>Duration:&nbsp;</strong>
-															{course.total_durations || "N/A"}
-														</div>
-														
-														{/* ===== DUMMY DATA - NO BACKEND RESPONSE YET ===== */}
-														<div className="mb-1">
-															<strong>Next Lesson:&nbsp;</strong>
-															{course.next_lesson && course.next_lesson.topic
-																? course.next_lesson.topic
-																: "No upcoming lessons"}
-														</div>
+														                        <div className="mb-2">
+                          <strong>Progress:</strong>{" "}
+                          {course.progress || 0}%
+                          <div
+                            className="progress mt-1"
+                            style={{
+                              height: 6,
+                              backgroundColor: "#e0e0e0",
+                              borderRadius: "var(--border-radius-sm)",
+                              overflow: "hidden",
+                            }}
+                          >
+                            <div
+                              className="progress-bar progress-bar-filled"
+                              style={{
+                                width: `${Math.min(course.progress || 0, 100)}%`,
+                                backgroundColor:
+                                  "var(--color-primary-dark)",
+                                borderRadius: "var(--border-radius-sm)",
+                              }}
+                            />
+                          </div>
+                        </div>
+                        
+                        <div className="mb-1">
+                          <strong>Lessons:&nbsp;</strong>
+                          {course.completed_lessons || 0}/{course.total_lessons || 0}
+                        </div>
+                        <div className="mb-1">
+                          <strong>Category:&nbsp;</strong>
+                          {course.category?.name || "N/A"}
+                        </div>
+                        <div className="mb-1">
+                          <strong>Total Duration:&nbsp;</strong>
+                          {totalDuration} min
+                        </div>
+                        
+                        <div className="mb-1">
+                          <strong>Next Lesson:&nbsp;</strong>
+                          {course.next_lesson && course.next_lesson.topic
+                            ? course.next_lesson.topic
+                            : "No upcoming lessons"}
+                        </div>
 														<NavLink
 															to={pagePaths.student.courseDetails(
 																educatorUsername,
 																course.id
 															)}
 															className="btn-edit-profile mt-auto"
-														>
-															View
-														</NavLink>
+														                        >
+                          View Course
+                        </NavLink>
 													</div>
 												</div>
 											</div>
