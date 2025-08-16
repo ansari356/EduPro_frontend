@@ -8,10 +8,6 @@ export default function EducatorPageDataٌٌٌRoutes() {
 	useEffect(() => {
 		if (data) {
 			document.documentElement.style.setProperty(
-				"--color-primary",
-				data.primary_color
-			);
-			document.documentElement.style.setProperty(
 				"--color-primary-light",
 				data.primary_color_light
 			);
@@ -22,10 +18,6 @@ export default function EducatorPageDataٌٌٌRoutes() {
 			document.documentElement.style.setProperty(
 				"--color-secondary",
 				data.secondary_color
-			);
-			document.documentElement.style.setProperty(
-				"--color-accent",
-				data.accent_color
 			);
 			document.documentElement.style.setProperty(
 				"--color-background",

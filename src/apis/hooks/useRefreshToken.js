@@ -8,8 +8,8 @@ export default function 	useRefreshToken() {
 		authEndpoints.refreshToken,
 		swrPostFetcher(),
 		{
-			refreshInterval: 5 * 60 * 1000,
-			errorRetryInterval: 5 * 60 * 1000,
+			refreshInterval: 45 * 60 * 1000,
+			errorRetryInterval: 10 * 60 * 1000,
 			revalidateOnFocus: false,
 		}
 	);
