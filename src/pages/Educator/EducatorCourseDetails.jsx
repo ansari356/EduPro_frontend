@@ -2,6 +2,8 @@
 import React, { useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import getCoursesDetails from "../../apis/hooks/educator/getCoursesDetails";
+import getModules from "../../apis/hooks/educator/getModules";
+import moduleDetails from "../../apis/hooks/educator/moduleDetails";
 import {
   LibraryBig,
   Users,
@@ -19,180 +21,182 @@ import {
   ArrowBigLeft,
 } from "lucide-react";
 
-//fixed_data
-// const courses = [
-//   {
-//     id: courseData.id,
-//     title: courseData.title,
-//     description:
-//       "Master the art of data analysis with Python, pandas, and statistical methods. Learn to extract meaningful insights from complex datasets.",
-//     fullDescription:
-//       "This comprehensive Data Analysis course is designed to take students from complete beginners to confident data analysts. The course covers essential statistical concepts, data cleaning techniques, exploratory data analysis, and how to draw meaningful insights from complex datasets. Students work with real-world data from various industries including finance, healthcare, and marketing. By the end of this course, students will be able to confidently analyze data, create compelling visualizations, and present their findings to stakeholders.",
-//     status: "Published",
-//     image: "https://placehold.co/600x300?text=Data+Analysis+Fundamentals",
-//     duration: "12 weeks",
-//     lessonsno: 45,
-//     enrolledStudents: 1247,
-//     completedStudents: 892,
-//     activeStudents: 355,
-//     rating: 4.8,
-//     reviews: 234,
-//     level: "Beginner",
-//     category: "Data Science",
-//     lastUpdated: "2 days ago",
-//     createdDate: "2024-01-15",
-//     publishedDate: "2024-01-20",
-//     revenue: "$18,705",
-//     averageProgress: "67%",
-//     completionRate: "71.5%",
-//     tags: ["Python", "Pandas", "Statistics", "Visualization"],
-//     price: "$149",
-//     language: "English",
-//     prerequisites: "Basic computer skills",
-//     certificate: true,
-//     tableOfContents: [
-//       {
-//         chapter: "Chapter 1: Introduction to Data Analysis",
-//         topics: [
-//           "What is Data Analysis?",
-//           "Types of Data",
-//           "Data Analysis Process",
-//           "Tools Overview",
-//         ],
-//         lessons: 8,
-//       },
-//       {
-//         chapter: "Chapter 2: Statistical Foundations",
-//         topics: [
-//           "Descriptive Statistics",
-//           "Probability Basics",
-//           "Distributions",
-//           "Hypothesis Testing",
-//         ],
-//         lessons: 9,
-//       },
-//       {
-//         chapter: "Chapter 3: Data Collection & Cleaning",
-//         topics: [
-//           "Data Sources",
-//           "Data Quality Assessment",
-//           "Cleaning Techniques",
-//           "Missing Data Handling",
-//         ],
-//         lessons: 7,
-//       },
-//       {
-//         chapter: "Chapter 4: Exploratory Data Analysis",
-//         topics: [
-//           "EDA Process",
-//           "Pattern Recognition",
-//           "Correlation Analysis",
-//           "Outlier Detection",
-//         ],
-//         lessons: 8,
-//       },
-//       {
-//         chapter: "Chapter 5: Data Visualization",
-//         topics: [
-//           "Visualization Principles",
-//           "Chart Types",
-//           "Interactive Dashboards",
-//           "Storytelling with Data",
-//         ],
-//         lessons: 7,
-//       },
-//       {
-//         chapter: "Chapter 6: Advanced Analytics",
-//         topics: [
-//           "Predictive Modeling",
-//           "Time Series Analysis",
-//           "Classification",
-//           "Clustering",
-//         ],
-//         lessons: 6,
-//       },
-//     ],
-//     lessons: [
-//       {
-//         id: 1,
-//         title: "Welcome to Data Analysis",
-//         duration: "15 min",
-//         type: "video",
-//         views: 1247,
-//         avgRating: 4.9,
-//       },
-//       {
-//         id: 2,
-//         title: "Understanding Data Types",
-//         duration: "20 min",
-//         type: "video",
-//         views: 1198,
-//         avgRating: 4.8,
-//       },
-//       {
-//         id: 3,
-//         title: "Data Analysis Tools Overview",
-//         duration: "25 min",
-//         type: "video",
-//         views: 1156,
-//         avgRating: 4.7,
-//       },
-//       {
-//         id: 4,
-//         title: "Basic Statistics Quiz",
-//         duration: "10 min",
-//         type: "quiz",
-//         views: 1089,
-//         avgRating: 4.6,
-//       },
-//       {
-//         id: 5,
-//         title: "Descriptive Statistics Deep Dive",
-//         duration: "30 min",
-//         type: "video",
-//         views: 1034,
-//         avgRating: 4.8,
-//       },
-//     ],
-//     recentReviews: [
-//       {
-//         id: 1,
-//         student: "John Smith",
-//         rating: 5,
-//         comment: "Excellent course! Very comprehensive and easy to follow.",
-//         date: "2 days ago",
-//       },
-//       {
-//         id: 2,
-//         student: "Sarah Johnson",
-//         rating: 4,
-//         comment: "Great content, would love more practical exercises.",
-//         date: "1 week ago",
-//       },
-//       {
-//         id: 3,
-//         student: "Mike Chen",
-//         rating: 5,
-//         comment:
-//           "Perfect for beginners. The instructor explains everything clearly.",
-//         date: "1 week ago",
-//       },
-//     ],
-//     analytics: {
-//       totalViews: 45623,
-//       completionRate: "71.5%",
-//       avgTimeSpent: "8.5 hours",
-//       dropoffPoint: "Chapter 3 - Data Cleaning",
-//       peakEngagement: "Chapter 1 - Introduction",
-//     },
-//   },
-// ];
+// fixed_data
+const fixedcourses = [
+  {
+    id: 1,
+    title: "python",
+    description:
+      "Master the art of data analysis with Python, pandas, and statistical methods. Learn to extract meaningful insights from complex datasets.",
+    fullDescription:
+      "This comprehensive Data Analysis course is designed to take students from complete beginners to confident data analysts. The course covers essential statistical concepts, data cleaning techniques, exploratory data analysis, and how to draw meaningful insights from complex datasets. Students work with real-world data from various industries including finance, healthcare, and marketing. By the end of this course, students will be able to confidently analyze data, create compelling visualizations, and present their findings to stakeholders.",
+    status: "Published",
+    image: "https://placehold.co/600x300?text=Data+Analysis+Fundamentals",
+    duration: "12 weeks",
+    lessonsno: 45,
+    enrolledStudents: 1247,
+    completedStudents: 892,
+    activeStudents: 355,
+    rating: 4.8,
+    reviews: 234,
+    level: "Beginner",
+    category: "Data Science",
+    lastUpdated: "2 days ago",
+    createdDate: "2024-01-15",
+    publishedDate: "2024-01-20",
+    revenue: "$18,705",
+    averageProgress: "67%",
+    completionRate: "71.5%",
+    tags: ["Python", "Pandas", "Statistics", "Visualization"],
+    price: "$149",
+    language: "English",
+    prerequisites: "Basic computer skills",
+    certificate: true,
+    tableOfContents: [
+      {
+        chapter: "Chapter 1: Introduction to Data Analysis",
+        topics: [
+          "What is Data Analysis?",
+          "Types of Data",
+          "Data Analysis Process",
+          "Tools Overview",
+        ],
+        lessons: 8,
+      },
+      {
+        chapter: "Chapter 2: Statistical Foundations",
+        topics: [
+          "Descriptive Statistics",
+          "Probability Basics",
+          "Distributions",
+          "Hypothesis Testing",
+        ],
+        lessons: 9,
+      },
+      {
+        chapter: "Chapter 3: Data Collection & Cleaning",
+        topics: [
+          "Data Sources",
+          "Data Quality Assessment",
+          "Cleaning Techniques",
+          "Missing Data Handling",
+        ],
+        lessons: 7,
+      },
+      {
+        chapter: "Chapter 4: Exploratory Data Analysis",
+        topics: [
+          "EDA Process",
+          "Pattern Recognition",
+          "Correlation Analysis",
+          "Outlier Detection",
+        ],
+        lessons: 8,
+      },
+      {
+        chapter: "Chapter 5: Data Visualization",
+        topics: [
+          "Visualization Principles",
+          "Chart Types",
+          "Interactive Dashboards",
+          "Storytelling with Data",
+        ],
+        lessons: 7,
+      },
+      {
+        chapter: "Chapter 6: Advanced Analytics",
+        topics: [
+          "Predictive Modeling",
+          "Time Series Analysis",
+          "Classification",
+          "Clustering",
+        ],
+        lessons: 6,
+      },
+    ],
+    lessons: [
+      {
+        id: 1,
+        title: "Welcome to Data Analysis",
+        duration: "15 min",
+        type: "video",
+        views: 1247,
+        avgRating: 4.9,
+      },
+      {
+        id: 2,
+        title: "Understanding Data Types",
+        duration: "20 min",
+        type: "video",
+        views: 1198,
+        avgRating: 4.8,
+      },
+      {
+        id: 3,
+        title: "Data Analysis Tools Overview",
+        duration: "25 min",
+        type: "video",
+        views: 1156,
+        avgRating: 4.7,
+      },
+      {
+        id: 4,
+        title: "Basic Statistics Quiz",
+        duration: "10 min",
+        type: "quiz",
+        views: 1089,
+        avgRating: 4.6,
+      },
+      {
+        id: 5,
+        title: "Descriptive Statistics Deep Dive",
+        duration: "30 min",
+        type: "video",
+        views: 1034,
+        avgRating: 4.8,
+      },
+    ],
+    recentReviews: [
+      {
+        id: 1,
+        student: "John Smith",
+        rating: 5,
+        comment: "Excellent course! Very comprehensive and easy to follow.",
+        date: "2 days ago",
+      },
+      {
+        id: 2,
+        student: "Sarah Johnson",
+        rating: 4,
+        comment: "Great content, would love more practical exercises.",
+        date: "1 week ago",
+      },
+      {
+        id: 3,
+        student: "Mike Chen",
+        rating: 5,
+        comment:
+          "Perfect for beginners. The instructor explains everything clearly.",
+        date: "1 week ago",
+      },
+    ],
+    analytics: {
+      totalViews: 45623,
+      completionRate: "71.5%",
+      avgTimeSpent: "8.5 hours",
+      dropoffPoint: "Chapter 3 - Data Cleaning",
+      peakEngagement: "Chapter 1 - Introduction",
+    },
+  },
+];
 
 
 export default function EducatorCourseDetailsPage() {
   const { id } = useParams();
   const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState("overview");
+  const [selectedModuleId, setSelectedModuleId] = useState(null);
+
 
     // Fetch course details from API
   const {
@@ -200,6 +204,27 @@ export default function EducatorCourseDetailsPage() {
     error: courseError,
     isLoading: courseLoading,
   } = getCoursesDetails(id);
+
+const {
+  data: moduleData,
+  error: moduleError,
+  isLoading: moduleLoading,
+} = getModules(id);
+
+const {
+  data: lessonData,
+  error: lessonError,
+  isLoading: lessonLoading,
+} = moduleDetails(selectedModuleId);
+
+
+
+  React.useEffect(() => {
+    if (moduleData && moduleData.length > 0 && !selectedModuleId) {
+      setSelectedModuleId(moduleData[0].id);
+    }
+  }, [moduleData, selectedModuleId]);
+
 
    if (courseLoading) {
     return (
@@ -263,9 +288,10 @@ export default function EducatorCourseDetailsPage() {
   }
 
 
-    // const course = courses.find((c) => c.id === Number(id));
+     const fixedcourse = fixedcourses.find((c) => c.id === Number(id));
   
-    const course = courseData;
+     const course = courseData;
+
   
   if (!course) {
     return (
@@ -411,7 +437,7 @@ export default function EducatorCourseDetailsPage() {
                 <div className="avatar-circle mb-2 mx-auto w-fit">
                   <DollarSign size={24} />
                 </div>
-                <h5 className="section-title mb-1">{course.revenue}</h5>
+                <h5 className="section-title mb-1">{course.total_revenue}</h5>
                 <small className="profile-joined">Revenue</small>
               </div>
             </div>
@@ -508,7 +534,7 @@ export default function EducatorCourseDetailsPage() {
                     <div className="col-md-6 mb-3">
                       <div className="about-bubble">
                         <i className="bi bi-bookmark me-2"></i>
-                        <strong>Level:</strong> {course.level}
+                        <strong>Category:</strong> {course.category.name}
                       </div>
                     </div>
                     <div className="col-md-6 mb-3">
@@ -520,7 +546,7 @@ export default function EducatorCourseDetailsPage() {
                     <div className="col-md-6 mb-3">
                       <div className="about-bubble">
                         <i className="bi bi-globe me-2"></i>
-                        <strong>Language:</strong> {course.language}
+                        <strong>Total Enrollments:</strong> {course.total_enrollments}
                       </div>
                     </div>
                   </div>
@@ -543,6 +569,8 @@ export default function EducatorCourseDetailsPage() {
               </div>
             )}
 
+
+
             {activeTab === "curriculum" && (
               <div className="card">
                 <div className="card-body">
@@ -550,58 +578,142 @@ export default function EducatorCourseDetailsPage() {
                     <h3 className="section-title mb-0">Course Curriculum</h3>
                     <button className="btn-edit-profile d-flex align-items-center">
                       <i className="bi bi-plus me-2"></i>
-                      Add Chapter
+                      Add Module
                     </button>
                   </div>
 
-                  {course.tableOfContents.map((chapter, index) => (
-                    <div key={index} className="card mb-3">
-                      <div className="card-body">
-                        <div className="d-flex justify-content-between align-items-start mb-3">
-                          <h4 className="about-subtitle mb-0">
-                            {chapter.chapter}
-                          </h4>
-                          <div className="d-flex gap-2">
-                            <button className="btn-edit-profile d-flex align-items-center">
-                              <Edit size={14} className="me-1" />
-                              Edit
-                            </button>
-                            <button className="btn-edit-profile d-flex align-items-center">
-                              <i className="bi bi-plus me-1"></i>
-                              Add Lesson
-                            </button>
-                          </div>
-                        </div>
-                        <small className="profile-joined mb-2">
-                          {chapter.lessons} lessons
-                        </small>
-                        <div className="ms-3">
-                          {chapter.topics.map((topic, topicIndex) => (
-                            <div
-                              key={topicIndex}
-                              className="about-bubble mb-2 d-flex justify-content-between align-items-center"
-                            >
-                              <span>
-                                <i className="bi bi-play-circle me-2"></i>
-                                {topic}
-                              </span>
-                              <div className="d-flex gap-1">
-                                <button className="btn p-0 border-0 bg-transparent">
-                                  <Edit size={12} />
-                                </button>
-                                <button className="btn p-0 border-0 bg-transparent text-danger">
-                                  <Trash2 size={12} />
-                                </button>
-                              </div>
-                            </div>
-                          ))}
-                        </div>
+                  {moduleLoading ? (
+                    <div className="text-center py-4">
+                      <div className="spinner-border" role="status">
+                        <span className="visually-hidden">Loading...</span>
                       </div>
                     </div>
-                  ))}
+                  ) : moduleError ? (
+                    <div className="alert alert-danger" role="alert">
+                      Error loading modules: {moduleError.message}
+                    </div>
+                  ) : (
+                    moduleData?.map((module) => (
+                      <div key={module.id} className="card mb-3">
+                        <div className="card-body">
+                          <div className="d-flex justify-content-between align-items-start mb-3">
+                            <div
+                              style={{ cursor: "pointer" }}
+                              onClick={() => setSelectedModuleId(module.id)}
+                            >
+                              <h4
+                                className={`about-subtitle mb-0 ${
+                                  selectedModuleId === module.id ? "text-primary" : ""
+                                }`}
+                              >
+                                {module.title}
+                              </h4>
+                              {module.is_free && (
+                                <span className="badge bg-success mt-1">Free</span>
+                              )}
+                              {module.price !== "0.00" && (
+                                <span className="badge bg-primary mt-1">${module.price}</span>
+                              )}
+                            </div>
+                            <div className="d-flex gap-2">
+                              <button className="btn-edit-profile d-flex align-items-center">
+                                <Edit size={14} className="me-1" />
+                                Edit
+                              </button>
+                              <button className="btn-edit-profile d-flex align-items-center">
+                                <i className="bi bi-plus me-1"></i>
+                                Add Lesson
+                              </button>
+                            </div>
+                          </div>
+                          
+                          {/* تم حذف عدد الدروس من هنا */}
+
+                          {/* Show lessons for selected module */}
+                          {selectedModuleId === module.id && (
+                            <div className="ms-3">
+                              {lessonLoading ? (
+                                <div className="text-center py-2">
+                                  <div className="spinner-border spinner-border-sm" role="status">
+                                    <span className="visually-hidden">Loading lessons...</span>
+                                  </div>
+                                </div>
+                              ) : lessonError ? (
+                                <div className="alert alert-warning alert-sm" role="alert">
+                                  Error loading lessons: {lessonError.message}
+                                </div>
+                              ) : lessonData?.lessons?.length > 0 ? (
+                                lessonData.lessons.map((lesson, lessonIndex) => (
+                                  <div
+                                    key={lesson.id}
+                                    className="about-bubble mb-2 d-flex justify-content-between align-items-center"
+                                  >
+                                    <span>
+                                      <i className="bi bi-play-circle me-2"></i>
+                                      {lesson.title}
+                                      {lesson.duration && (
+                                        <small className="text-muted ms-2">
+                                          ({Math.floor(lesson.duration / 60)}:{(lesson.duration % 60).toString().padStart(2, '0')})
+                                        </small>
+                                      )}
+                                    </span>
+                                    <div className="d-flex gap-1">
+                                      <button className="btn p-0 border-0 bg-transparent">
+                                        <Edit size={12} />
+                                      </button>
+                                      <button className="btn p-0 border-0 bg-transparent text-danger">
+                                        <Trash2 size={12} />
+                                      </button>
+                                    </div>
+                                  </div>
+                                ))
+                              ) : (
+                                <div className="text-muted text-center py-2">
+                                  No lessons in this module yet
+                                </div>
+                              )}
+                            </div>
+                          )}
+
+                          {/* Show expand/collapse button for modules with lessons */}
+                          {module.total_lessons > 0 && selectedModuleId !== module.id && (
+                            <button 
+                              className="btn btn-link p-0 text-decoration-none"
+                              onClick={() => setSelectedModuleId(module.id)}
+                            >
+                              <i className="bi bi-chevron-down me-1"></i>
+                              Show lessons
+                            </button>
+                          )}
+                          
+                          {/* {selectedModuleId === module.id && lessonData?.lessons?.length > 0 && (
+                            <button 
+                              className="btn btn-link p-0 text-decoration-none"
+                              onClick={() => setSelectedModuleId(null)}
+                            >
+                              <i className="bi bi-chevron-up me-1"></i>
+                              Hide lessons
+                            </button>
+                          )} */}
+                        </div>
+                      </div>
+                    ))
+                  )}
+
+                  {/* Show message if no modules */}
+                  {!moduleLoading && !moduleError && (!moduleData || moduleData.length === 0) && (
+                    <div className="text-center py-4">
+                      <p className="text-muted mb-3">No modules created yet</p>
+                      <button className="btn btn-primary">
+                        <i className="bi bi-plus me-2"></i>
+                        Create Your First Module
+                      </button>
+                    </div>
+                  )}
                 </div>
               </div>
             )}
+
 
             {activeTab === "students" && (
               <div className="card">
@@ -618,7 +730,7 @@ export default function EducatorCourseDetailsPage() {
                     <div className="col-md-4">
                       <div className="text-center">
                         <h4 className="section-title text-accent">
-                          {course.completionRate}
+                              {fixedcourses[0]?.completionRate}
                         </h4>
                         <p className="profile-joined">Completion Rate</p>
                       </div>
@@ -626,7 +738,7 @@ export default function EducatorCourseDetailsPage() {
                     <div className="col-md-4">
                       <div className="text-center">
                         <h4 className="section-title text-accent">
-                          {course.averageProgress}
+                          {fixedcourses[0]?.averageProgress}
                         </h4>
                         <p className="profile-joined">Average Progress</p>
                       </div>
@@ -634,7 +746,7 @@ export default function EducatorCourseDetailsPage() {
                     <div className="col-md-4">
                       <div className="text-center">
                         <h4 className="section-title text-accent">
-                          {course.analytics.avgTimeSpent}
+                            {fixedcourses[0]?.analytics?.totalViews}
                         </h4>
                         <p className="profile-joined">Avg. Time Spent</p>
                       </div>
@@ -720,7 +832,7 @@ export default function EducatorCourseDetailsPage() {
                   <div className="row mb-4">
                     <div className="col-md-4 text-center">
                       <h2 className="section-title text-accent">
-                        {course.rating}
+                        {fixedcourses[0]?.rating}
                       </h2>
                       <div className="mb-2">
                         {[...Array(5)].map((_, i) => (
@@ -728,7 +840,7 @@ export default function EducatorCourseDetailsPage() {
                             key={i}
                             size={20}
                             className={
-                              i < Math.floor(course.rating)
+                              i < Math.floor(fixedcourses[0]?.rating)
                                 ? "text-warning"
                                 : "text-muted"
                             }
@@ -736,7 +848,7 @@ export default function EducatorCourseDetailsPage() {
                         ))}
                       </div>
                       <p className="profile-joined">
-                        Based on {course.reviews} reviews
+                        Based on {fixedcourses[0]?.reviews} reviews
                       </p>
                     </div>
                     <div className="col-md-8">
@@ -782,7 +894,7 @@ export default function EducatorCourseDetailsPage() {
 
                   <div>
                     <h4 className="about-subtitle mb-3">Recent Reviews</h4>
-                    {course.recentReviews.map((review) => (
+                    {fixedcourses[0]?.recentReviews?.map((review) => (
                       <div key={review.id} className="card mb-3">
                         <div className="card-body">
                           <div className="d-flex justify-content-between align-items-start mb-2">
@@ -837,7 +949,7 @@ export default function EducatorCourseDetailsPage() {
                                 Total Views
                               </span>
                               <span className="text-accent fw-bold">
-                                {course.analytics.totalViews.toLocaleString()}
+                                {fixedcourses[0]?.analytics?.totalViews?.toLocaleString()}
                               </span>
                             </div>
                           </div>
@@ -847,7 +959,7 @@ export default function EducatorCourseDetailsPage() {
                                 Completion Rate
                               </span>
                               <span className="text-accent fw-bold">
-                                {course.analytics.completionRate}
+                                {fixedcourses[0]?.analytics?.completionRate}
                               </span>
                             </div>
                           </div>
@@ -857,7 +969,7 @@ export default function EducatorCourseDetailsPage() {
                                 Avg. Time Spent
                               </span>
                               <span className="text-accent fw-bold">
-                                {course.analytics.avgTimeSpent}
+                                {fixedcourses[0]?.analytics?.avgTimeSpent}
                               </span>
                             </div>
                           </div>
@@ -876,7 +988,7 @@ export default function EducatorCourseDetailsPage() {
                                 Peak Engagement
                               </span>
                               <span className="text-accent fw-bold">
-                                {course.analytics.peakEngagement}
+                                {fixedcourses[0]?.analytics?.peakEngagement}
                               </span>
                             </div>
                           </div>
@@ -886,7 +998,7 @@ export default function EducatorCourseDetailsPage() {
                                 Drop-off Point
                               </span>
                               <span className="text-warning fw-bold">
-                                {course.analytics.dropoffPoint}
+                                {fixedcourses[0]?.analytics?.dropoffPoint}
                               </span>
                             </div>
                           </div>
@@ -911,7 +1023,7 @@ export default function EducatorCourseDetailsPage() {
                             </tr>
                           </thead>
                           <tbody>
-                            {course.lessons.map((lesson) => (
+                            {(fixedcourses[0]?.lessons || []).map((lesson) => (
                               <tr key={lesson.id}>
                                 <td>{lesson.title}</td>
                                 <td>{lesson.views.toLocaleString()}</td>
@@ -931,7 +1043,7 @@ export default function EducatorCourseDetailsPage() {
                                       style={{
                                         width: `${
                                           (lesson.views /
-                                            course.enrolledStudents) *
+                                            fixedcourses[0]?.enrolledStudents) *
                                           100
                                         }%`,
                                       }}
@@ -1022,7 +1134,7 @@ export default function EducatorCourseDetailsPage() {
 
                 <div className="text-center mb-3">
                   <h3 className="section-title text-accent">
-                    {course.revenue}
+                    {course.total_revenue}
                   </h3>
                   <p className="profile-joined">Total Revenue</p>
                 </div>
@@ -1047,7 +1159,7 @@ export default function EducatorCourseDetailsPage() {
                   <div className="d-flex justify-content-between">
                     <span className="about-subtitle">Total Revenue</span>
                     <span className="profile-joined">
-                      {course.completionRate}
+                      {course.total_revenue}
                     </span>
                   </div>
                 </div>
