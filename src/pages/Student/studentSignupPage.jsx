@@ -9,7 +9,7 @@ const StudentSignupPage = () => {
   const [formData, setFormData] = useState({
     firstName: '',
     lastName: '',
-    username: '', // Mapping studentId to username
+    username: '',
     phone: '',
     email: '',
     password: '',
