@@ -15,7 +15,7 @@ export const educatorEndpoints = {
 	course: {
 		create: `/course/create/`,
 		list: `/course/list/`,
-		detail: (courseId) => `/course/course-detail/${courseId}`,
+		detail: (courseId) => `course/private-deatils/${courseId}`,
 		update: (courseId) => `/course/update/${courseId}`,
 		delete: (courseId) => `/course/course-delete/${courseId}`,
 		searchFilter: `/course/course-search-filter/`,
@@ -39,7 +39,7 @@ export const educatorEndpoints = {
 	module: {
 		list: (courseId) => `/courses/${courseId}/modules/`,
 		create: (courseId) => `/courses/${courseId}/modules/create/`,
-		detail: (moduleId) => `/modules/${moduleId}/`,
+		detail: (moduleId) => `/modules/${moduleId}/`, // Get module details (Lessons)
 		update: (moduleId) => `/modules/${moduleId}/update/`,
 		delete: (moduleId) => `/modules/${moduleId}/delete/`,
 	},
