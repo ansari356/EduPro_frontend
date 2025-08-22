@@ -3,7 +3,7 @@ import React, { useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import getCoursesDetails from "../../apis/hooks/educator/getCoursesDetails";
 import getModules from "../../apis/hooks/educator/getModules";
-import moduleDetails from "../../apis/hooks/educator/moduleDetails";
+import getLessonList from "../../apis/hooks/educator/getLessonList";
 import {
   LibraryBig,
   Users,
@@ -215,7 +215,7 @@ const {
   data: lessonData,
   error: lessonError,
   isLoading: lessonLoading,
-} = moduleDetails(selectedModuleId);
+} = getLessonList(selectedModuleId);
 
 
 
@@ -225,6 +225,7 @@ const {
     }
   }, [moduleData, selectedModuleId]);
 
+  
 
    if (courseLoading) {
     return (
@@ -584,36 +585,55 @@ const {
 
                   {moduleLoading ? (
                     <div className="text-center py-4">
-                      <div className="spinner-border" role="status">
-                        <span className="visually-hidden">Loading...</span>
+                      <div className="spinner-border text-primary" role="status">
+                        <span className="visually-hidden">Loading modules...</span>
                       </div>
                     </div>
-                  ) : moduleError ? (
-                    <div className="alert alert-danger" role="alert">
-                      Error loading modules: {moduleError.message}
+                  ) : moduleError || !moduleData ? (
+                    <div className="card mb-3">
+                      <div className="card-body text-center">
+                        <TriangleAlert size={40} className="text-muted mb-3" />
+                        <h5 className="section-title">No Modules Found</h5>
+                        <p className="profile-joined">This course doesn't have any modules yet.</p>
+                        <button className="btn-edit-profile">
+                          <i className="bi bi-plus me-2"></i>
+                          Create First Module
+                        </button>
+                      </div>
                     </div>
                   ) : (
-                    moduleData?.map((module) => (
+                    moduleData?.map((module, index) => (
                       <div key={module.id} className="card mb-3">
                         <div className="card-body">
                           <div className="d-flex justify-content-between align-items-start mb-3">
                             <div
+                              className="flex-grow-1"
                               style={{ cursor: "pointer" }}
                               onClick={() => setSelectedModuleId(module.id)}
                             >
-                              <h4
-                                className={`about-subtitle mb-0 ${
-                                  selectedModuleId === module.id ? "text-primary" : ""
-                                }`}
-                              >
+                              <h4 className={`about-subtitle mb-1 ${selectedModuleId === module.id ? "text-primary" : ""}`}>
                                 {module.title}
                               </h4>
-                              {module.is_free && (
-                                <span className="badge bg-success mt-1">Free</span>
-                              )}
-                              {module.price !== "0.00" && (
-                                <span className="badge bg-primary mt-1">${module.price}</span>
-                              )}
+                              <div className="d-flex gap-3 mb-2">
+                                <small className="profile-joined">
+                                  <i className="bi bi-list-ol me-1"></i>
+                                  Order: {module.order}
+                                </small>
+                                <small className="profile-joined">
+                                  <i className="bi bi-play-circle me-1"></i>
+                                  {module.total_lessons} lessons
+                                </small>
+
+                                
+                                <small className="profile-joined">
+                                  <Clock size={12} className="me-1" />
+                                  {Math.floor(module.total_duration / 60)}min
+                                </small>
+                                <small className={`${module.is_free ? 'text-success' : 'text-accent'}`}>
+                                  <i className={`bi ${module.is_free ? 'bi-unlock' : 'bi-lock'} me-1`}></i>
+                                  {module.is_free ? 'Free' : `$${module.price}`}
+                                </small>
+                              </div>
                             </div>
                             <div className="d-flex gap-2">
                               <button className="btn-edit-profile d-flex align-items-center">
@@ -626,88 +646,151 @@ const {
                               </button>
                             </div>
                           </div>
-                          
-                          {/* تم حذف عدد الدروس من هنا */}
 
-                          {/* Show lessons for selected module */}
-                          {selectedModuleId === module.id && (
-                            <div className="ms-3">
-                              {lessonLoading ? (
-                                <div className="text-center py-2">
-                                  <div className="spinner-border spinner-border-sm" role="status">
-                                    <span className="visually-hidden">Loading lessons...</span>
+                          {/* Module Lessons: تظهر فقط عند اختيار الموديول */}
+                   {selectedModuleId === module.id && (
+                              <div className="ms-3">
+                                {lessonLoading ? (
+                                  <div className="text-center py-2">
+                                    <small className="profile-joined">Loading lessons...</small>
                                   </div>
-                                </div>
-                              ) : lessonError ? (
-                                <div className="alert alert-warning alert-sm" role="alert">
-                                  Error loading lessons: {lessonError.message}
-                                </div>
-                              ) : lessonData?.lessons?.length > 0 ? (
-                                lessonData.lessons.map((lesson, lessonIndex) => (
-                                  <div
-                                    key={lesson.id}
-                                    className="about-bubble mb-2 d-flex justify-content-between align-items-center"
-                                  >
-                                    <span>
-                                      <i className="bi bi-play-circle me-2"></i>
-                                      {lesson.title}
-                                      {lesson.duration && (
-                                        <small className="text-muted ms-2">
-                                          ({Math.floor(lesson.duration / 60)}:{(lesson.duration % 60).toString().padStart(2, '0')})
-                                        </small>
-                                      )}
+                                ) : lessonError || !lessonData || !Array.isArray(lessonData) || lessonData.length === 0 ? (
+                                  <div className="about-bubble mb-2 text-center">
+                                    <span className="profile-joined">
+                                      <i className="bi bi-info-circle me-2"></i>
+                                      No lessons available for this module
                                     </span>
-                                    <div className="d-flex gap-1">
-                                      <button className="btn p-0 border-0 bg-transparent">
-                                        <Edit size={12} />
-                                      </button>
-                                      <button className="btn p-0 border-0 bg-transparent text-danger">
-                                        <Trash2 size={12} />
-                                      </button>
-                                    </div>
                                   </div>
-                                ))
-                              ) : (
-                                <div className="text-muted text-center py-2">
-                                  No lessons in this module yet
+                                ) : (
+                                  lessonData
+                                    ?.sort((a, b) => a.order - b.order)
+                                    ?.map((lesson, lessonIndex) => (
+                                      <div
+                                        key={lesson.id}
+                                        className="about-bubble mb-2 d-flex justify-content-between align-items-center"
+                                      >
+                                        <div className="flex-grow-1">
+                                          <span className="d-flex align-items-center">
+                                            <i className="bi bi-play-circle me-2"></i>
+                                            <span className="me-2">{lesson.title}</span>
+                                            <small className="profile-joined me-2">
+                                              ({Math.floor(lesson.duration / 60)}min)
+                                            </small>
+                                            <small className={`badge ${lesson.is_published ? 'bg-success' : 'bg-warning'}`}>
+                                              {lesson.is_published ? 'Published' : 'Draft'}
+                                            </small>
+                                            {/* {lesson.is_free && (
+                                              <small className="badge bg-info ms-1">Free</small>
+                                            )} */}
+                                          </span>
+                                          {lesson.description && (
+                                            <div className="mt-1">
+                                              <small className="profile-joined d-block">
+                                                {lesson.description}
+                                              </small>
+                                            </div>
+                                          )}
+                                        </div>
+                                        <div className="d-flex gap-1">
+                                          {/* <button 
+                                            className="btn p-0 border-0 bg-transparent"
+                                            title="Edit Lesson"
+                                          >
+                                            <Edit size={12} />
+                                          </button>
+                                          <button 
+                                            className="btn p-0 border-0 bg-transparent"
+                                            title="Preview Lesson"
+                                          >
+                                            <Eye size={12} />
+                                          </button>
+                                          <button 
+                                            className="btn p-0 border-0 bg-transparent text-danger"
+                                            title="Delete Lesson"
+                                          >
+                                            <Trash2 size={12} />
+                                          </button> */}
+                                        </div>
+                                      </div>
+                                    ))
+                                )}
+                              </div>
+                            )}
+
+                          {/* Module Summary */}
+                          {module.total_lessons > 0 && (
+                            <div className="mt-3 pt-2 border-top">
+                              <div className="row text-center">
+                                <div className="col-3">
+                                  <small className="profile-joined d-block">Total Lessons</small>
+                                  <strong className="text-accent">{module.total_lessons}</strong>
                                 </div>
-                              )}
+                                <div className="col-3">
+                                  <small className="profile-joined d-block">Duration</small>
+                                  <strong className="text-accent">
+                                    {Math.floor(module.total_duration / 3600)}h {Math.floor((module.total_duration % 3600) / 60)}m
+                                  </strong>
+                                </div>
+                                <div className="col-3">
+                                  <small className="profile-joined d-block">Price</small>
+                                  <strong className={module.is_free ? 'text-success' : 'text-accent'}>
+                                    {module.is_free ? 'Free' : `$${module.price}`}
+                                  </strong>
+                                </div>
+                                <div className="col-3">
+                                  <small className="profile-joined d-block">Order</small>
+                                  <strong className="text-accent">{module.order}</strong>
+                                </div>
+                              </div>
                             </div>
                           )}
-
-                          {/* Show expand/collapse button for modules with lessons */}
-                          {module.total_lessons > 0 && selectedModuleId !== module.id && (
-                            <button 
-                              className="btn btn-link p-0 text-decoration-none"
-                              onClick={() => setSelectedModuleId(module.id)}
-                            >
-                              <i className="bi bi-chevron-down me-1"></i>
-                              Show lessons
-                            </button>
-                          )}
-                          
-                          {/* {selectedModuleId === module.id && lessonData?.lessons?.length > 0 && (
-                            <button 
-                              className="btn btn-link p-0 text-decoration-none"
-                              onClick={() => setSelectedModuleId(null)}
-                            >
-                              <i className="bi bi-chevron-up me-1"></i>
-                              Hide lessons
-                            </button>
-                          )} */}
                         </div>
                       </div>
                     ))
                   )}
 
-                  {/* Show message if no modules */}
-                  {!moduleLoading && !moduleError && (!moduleData || moduleData.length === 0) && (
-                    <div className="text-center py-4">
-                      <p className="text-muted mb-3">No modules created yet</p>
-                      <button className="btn btn-primary">
-                        <i className="bi bi-plus me-2"></i>
-                        Create Your First Module
-                      </button>
+                  {/* Course Summary */}
+                  {moduleData && moduleData.length > 0 && (
+                    <div className="card border-primary">
+                      <div className="card-body">
+                        <h5 className="about-subtitle mb-3">Course Summary</h5>
+                        <div className="row text-center">
+                          <div className="col-md-3">
+                            <div className="mb-2">
+                              <i className="bi bi-collection text-primary" style={{fontSize: '1.5rem'}}></i>
+                            </div>
+                            <small className="profile-joined d-block">Total Modules</small>
+                            <strong className="text-accent">{moduleData.length}</strong>
+                          </div>
+                          <div className="col-md-3">
+                            <div className="mb-2">
+                              <i className="bi bi-play-circle text-primary" style={{fontSize: '1.5rem'}}></i>
+                            </div>
+                            <small className="profile-joined d-block">Total Lessons</small>
+                            <strong className="text-accent">
+                              {moduleData.reduce((total, module) => total + module.total_lessons, 0)}
+                            </strong>
+                          </div>
+                          <div className="col-md-3">
+                            <div className="mb-2">
+                              <Clock size={24} className="text-primary" />
+                            </div>
+                            <small className="profile-joined d-block">Total Duration</small>
+                            <strong className="text-accent">
+                              {Math.floor(moduleData.reduce((total, module) => total + module.total_duration, 0) / 3600)}h {Math.floor((moduleData.reduce((total, module) => total + module.total_duration, 0) % 3600) / 60)}m
+                            </strong>
+                          </div>
+                          <div className="col-md-3">
+                            <div className="mb-2">
+                              <DollarSign size={24} className="text-primary" />
+                            </div>
+                            <small className="profile-joined d-block">Free Modules</small>
+                            <strong className="text-success">
+                              {moduleData.filter(module => module.is_free).length} / {moduleData.length}
+                            </strong>
+                          </div>
+                        </div>
+                      </div>
                     </div>
                   )}
                 </div>
