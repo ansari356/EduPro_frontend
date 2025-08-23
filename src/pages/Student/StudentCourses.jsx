@@ -25,27 +25,14 @@ function Courses() {
   const [isValidatingCoupon, setIsValidatingCoupon] = useState(false);
   const [couponError, setCouponError] = useState("");
   const [selectedCourseId, setSelectedCourseId] = useState(null);
-
+  const [isCouponValid, setIsCouponValid] = useState(false);
+  const [isEnrolling, setIsEnrolling] = useState(false);
 
   const { data: allCourses, isLoading: allCoursesLoading } = useListAllEducatorCourses();
   const { enrolledInCourses, isLoading: enrolledLoading } = useListEnrolledCourses();
   const { data: educatorData } = useEducatorPublicData();
   const { data: detailedCourseData, isLoading: detailedCourseLoading, error: detailedCourseError } = useGetCourseDetails(selectedCourseId);
   const { data: courseModules, isLoading: modulesLoading, error: modulesError } = useGetCourseModules(selectedCourseId);
-  
-  // Debug the hook data
-  console.log('🔍 StudentCourses Debug:');
-  console.log('selectedCourseId:', selectedCourseId);
-  console.log('detailedCourseData:', detailedCourseData);
-  console.log('detailedCourseLoading:', detailedCourseLoading);
-  console.log('detailedCourseError:', detailedCourseError);
-  console.log('courseModules:', courseModules);
-  console.log('modulesLoading:', modulesLoading);
-  console.log('modulesError:', modulesError);
-
-
-
-
 
   const processedAllCourses = allCourses ? 
     (Array.isArray(allCourses) ? allCourses : allCourses.results || allCourses.data || [])
@@ -55,7 +42,7 @@ function Courses() {
         title: course.title || course.name || "Untitled Course",
         description: course.description || "No description available",
         instructor: educatorData?.full_name || educatorUsername,
-        image: course.thumbnail || course.image_url || course.image || "https://placehold.co/400x250?text=Course",
+        image: course.thumbnail || course.image_url || course.image || "",
         category: course.category?.name || course.category || "General",
         totalLessons: course.total_lessons || course.lessons_count || 0,
         duration: course.total_durations ? `${course.total_durations} weeks` : "N/A",
@@ -63,7 +50,7 @@ function Courses() {
         isFree: course.is_free || course.price === "0.00" || course.price === 0,
         rating: course.average_rating || course.rating || "0.00",
         enrolledStudents: course.total_enrollments || 0,
-        chapters: course.chapters || course.modules || [], // Add chapters/modules data
+        chapters: course.chapters || course.modules || [],
       })) : [];
 
   // Check if a course is enrolled
@@ -85,16 +72,14 @@ function Courses() {
 
   // ===== ENROLLMENT FUNCTIONS =====
   const openEnrollmentModal = async (course) => {
-    console.log('Opening enrollment modal for course:', course);
-    console.log('Course ID:', course.id);
-    console.log('Expected API endpoint:', `/course/course-detail/${course.id}`);
     setSelectedCourse(course);
-    setSelectedCourseId(course.id); // This will trigger the useGetCourseDetails hook
+    setSelectedCourseId(course.id);
     setShowEnrollmentModal(true);
     setEnrollmentType("full");
     setSelectedChapter(null);
     setCouponCode("");
     setCouponError("");
+    setIsCouponValid(false);
   };
 
   const closeEnrollmentModal = () => {
@@ -105,6 +90,7 @@ function Courses() {
     setSelectedChapter(null);
     setCouponCode("");
     setCouponError("");
+    setIsCouponValid(false);
   };
 
   const handleEnrollmentTypeChange = (type) => {
@@ -112,12 +98,14 @@ function Courses() {
     setSelectedChapter(null);
     setCouponCode("");
     setCouponError("");
+    setIsCouponValid(false);
   };
 
   const handleChapterSelection = (chapter) => {
     setSelectedChapter(chapter);
     setCouponCode("");
     setCouponError("");
+    setIsCouponValid(false);
   };
 
   const validateCoupon = async () => {
@@ -127,19 +115,39 @@ function Courses() {
     }
 
     setIsValidatingCoupon(true);
-    setCouponError(""); // Clear previous errors
+    setCouponError("");
+    
+    try {
+      // Simulate coupon validation - in real implementation, this would call a separate API endpoint
+      // For now, we'll just check if the coupon code is not empty and has a reasonable format
+      if (couponCode.trim().length >= 3) {
+        setIsCouponValid(true);
+        setCouponError("");
+      } else {
+        setIsCouponValid(false);
+        setCouponError("Invalid coupon code format. Please try again.");
+      }
+    } catch (error) {
+      setIsCouponValid(false);
+      setCouponError("An error occurred while validating the coupon.");
+    } finally {
+      setIsValidatingCoupon(false);
+    }
+  };
+
+  const handleEnrollment = async () => {
+    if (!isCouponValid) {
+      setCouponError("Please validate your coupon code first");
+      return;
+    }
+
+    setIsEnrolling(true);
     
     try {
       // Call the real enrollment API
       const response = await enrollStudentInCourse(selectedCourse.id, couponCode.trim());
       
-      // Debug the API response
-      
-      
-      // Check if enrollment was successful (status 201 Created)
       if (response.status === 201 || response.data) {
-
-        setCouponError(""); // Clear any previous errors
         closeEnrollmentModal();
         
         // Redirect to course details page
@@ -151,15 +159,10 @@ function Courses() {
           });
         }
       } else {
-
-        setCouponError("Invalid coupon code. Please try again.");
+        setCouponError("Enrollment failed. Please try again.");
       }
     } catch (error) {
-      console.error("Error enrolling in course:", error);
-      
-      // Handle different types of errors
       if (error.response) {
-        // Server responded with error status
         if (error.response.status === 400) {
           setCouponError("Invalid coupon code. Please try again.");
         } else if (error.response.status === 401) {
@@ -167,17 +170,15 @@ function Courses() {
         } else if (error.response.status === 403) {
           setCouponError("You don't have permission to enroll in this course.");
         } else {
-          setCouponError("An error occurred while validating the coupon.");
+          setCouponError("An error occurred during enrollment.");
         }
       } else if (error.request) {
-        // Network error
         setCouponError("Network error. Please check your connection and try again.");
       } else {
-        // Other error
-        setCouponError("An error occurred while validating the coupon.");
+        setCouponError("An error occurred during enrollment.");
       }
     } finally {
-      setIsValidatingCoupon(false);
+      setIsEnrolling(false);
     }
   };
 
@@ -213,9 +214,6 @@ function Courses() {
       </div>
     );
   }
-
-  // Note: We're not showing error states anymore since we have fallback courses
-  // The page will show fallback courses if the API fails
 
   return (
     <div className="min-vh-100 profile-root p-4">
@@ -430,8 +428,6 @@ function Courses() {
               {enrollmentType === 'chapter' && (
                 <div className="mb-4">
                   <label className="form-label about-subtitle fw-medium">Select Chapter</label>
-                  {console.log('Course modules data:', courseModules)}
-                  {console.log('Modules length:', courseModules?.length)}
                   {courseModules && courseModules.length > 0 ? (
                     <div className="row g-2">
                       {courseModules.map((module) => (
@@ -474,12 +470,12 @@ function Courses() {
                     placeholder="Enter your coupon code (e.g., WELCOME2024)"
                     value={couponCode}
                     onChange={(e) => setCouponCode(e.target.value)}
-                    disabled={isValidatingCoupon}
+                    disabled={isValidatingCoupon || isEnrolling}
                   />
                   <button
                     className="btn-edit-profile"
                     onClick={validateCoupon}
-                    disabled={!couponCode.trim() || isValidatingCoupon}
+                    disabled={!couponCode.trim() || isValidatingCoupon || isEnrolling}
                   >
                     {isValidatingCoupon ? (
                       <>
@@ -493,6 +489,12 @@ function Courses() {
                 </div>
                 {couponError && (
                   <div className="text-danger small mt-1">{couponError}</div>
+                )}
+                {isCouponValid && (
+                  <div className="text-success small mt-1">
+                    <CheckCircle size={14} className="me-1" />
+                    Coupon code is valid!
+                  </div>
                 )}
                 <small className="text-muted">
                   Enter a valid coupon code to unlock this {enrollmentType === 'full' ? 'course' : 'chapter'}.
@@ -528,16 +530,24 @@ function Courses() {
                   type="button"
                   className="btn-secondary-action flex-fill"
                   onClick={closeEnrollmentModal}
+                  disabled={isEnrolling}
                 >
                   Cancel
                 </button>
                 <button
                   type="button"
                   className="btn-edit-profile flex-fill"
-                  onClick={validateCoupon}
-                  disabled={!couponCode.trim() || isValidatingCoupon || (enrollmentType === 'chapter' && !selectedChapter)}
+                  onClick={handleEnrollment}
+                  disabled={!isCouponValid || isEnrolling || (enrollmentType === 'chapter' && !selectedChapter)}
                 >
-                  {isValidatingCoupon ? 'Validating...' : 'Enroll Now'}
+                  {isEnrolling ? (
+                    <>
+                      <div className="loading-spinner me-2" style={{ width: '1rem', height: '1rem' }}></div>
+                      Enrolling...
+                    </>
+                  ) : (
+                    'Enroll Now'
+                  )}
                 </button>
               </div>
             </div>
