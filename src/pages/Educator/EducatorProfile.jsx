@@ -374,14 +374,13 @@ function EducatorProfile() {
                   <option value="">Select Gender</option>
                   <option value="Male">Male</option>
                   <option value="Female">Female</option>
-                  <option value="Other">Other</option>
                 </select>
               </div>
 
               {/* Color Settings */}
               <h6 className="fw-bold mb-2">Theme Colors</h6>
               <div className="d-flex flex-wrap justify-content-between gap-3 mb-3">
-                <div className="flex-grow-1">
+                {/* <div className="flex-grow-1">
                   <label className="form-label about-subtitle fw-medium">
                     Primary Color
                   </label>
@@ -392,7 +391,7 @@ function EducatorProfile() {
                     value={formData.primary_color}
                     onChange={handleInputChange}
                   />
-                </div>
+                </div> */}
 
                 <div className="flex-grow-1">
                   <label className="form-label about-subtitle fw-medium">
@@ -433,7 +432,7 @@ function EducatorProfile() {
                   />
                 </div>
 
-                <div className="flex-grow-1">
+                {/* <div className="flex-grow-1">
                   <label className="form-label about-subtitle fw-medium">
                     Accent Color
                   </label>
@@ -444,7 +443,7 @@ function EducatorProfile() {
                     value={formData.accent_color}
                     onChange={handleInputChange}
                   />
-                </div>
+                </div> */}
 
                 <div className="flex-grow-1">
                   <label className="form-label about-subtitle fw-medium">
