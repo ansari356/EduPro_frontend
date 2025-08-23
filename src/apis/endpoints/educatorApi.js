@@ -15,6 +15,7 @@ export const educatorEndpoints = {
 	course: {
 		create: `/course/create/`,
 		list: `/course/list/`,
+
 		detail: (courseId) => `course/private-deatils/${courseId}`,
 		update: (courseId) => `/course/update/${courseId}`,
 		delete: (courseId) => `/course/course-delete/${courseId}`,
@@ -44,6 +45,7 @@ export const educatorEndpoints = {
 		delete: (moduleId) => `/modules/${moduleId}/delete/`,
 	},
 	lesson: {
+		videoStatus: (lessonId) => `video/check-status/${lessonId}`,
 		detail: (id) => `/lessons/${id}/`,
 		update: (id) => `/lessons/${id}/update/`,
 		delete: (id) => `/lessons/${id}/delete/`,

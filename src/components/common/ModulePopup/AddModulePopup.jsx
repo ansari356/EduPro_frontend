@@ -193,7 +193,7 @@ export default function AddModulePopup({ courseId, onClose, onModuleCreated, nex
                   <div className="mt-3">
                     <p className="mb-1">Image Preview:</p>
                     <img
-                      src={imagePreview || moduleData.image || 'https://placehold.co/120x120?text=Module'}
+                      src={imagePreview || moduleData?.image || 'https://placehold.co/120x120?text=Module'}
                       alt="Module Preview"
                       className="img-fluid rounded"
                       style={{ maxHeight: '100px' }}

@@ -11,8 +11,15 @@ export default function ModuleItem({ module, selectedModuleId, setSelectedModule
     mutate,
   } = getLessonList(module.id);
   const [isAddLessonPopupOpen, setIsAddLessonPopupOpen] = useState(false);
+  const [editingLesson, setEditingLesson] = useState(null);
 
   const handleAddLessonClick = () => {
+    setEditingLesson(null);
+    setIsAddLessonPopupOpen(true);
+  };
+
+  const handleEditLessonClick = (lesson) => {
+    setEditingLesson(lesson);
     setIsAddLessonPopupOpen(true);
   };
 
@@ -121,6 +128,7 @@ export default function ModuleItem({ module, selectedModuleId, setSelectedModule
                         className="btn p-0 border-0"
                         style={{ backgroundColor: 'transparent' }}
                         title="Edit Lesson"
+                        onClick={() => handleEditLessonClick(lesson)}
                       >
                         <Edit size={12} />
                       </button>
@@ -181,6 +189,8 @@ export default function ModuleItem({ module, selectedModuleId, setSelectedModule
           module={module}
           onClose={handleCloseAddLessonPopup}
           onLessonAdded={handleLessonAdded}
+          lessonsCount={lessonData?.length || 0}
+          lesson={editingLesson}
         />
       )}
     </div>
