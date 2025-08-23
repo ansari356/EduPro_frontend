@@ -328,6 +328,11 @@ body {
   color: white;
 }
 
+.badge.bg-success {
+  background-color: var(--color-success)!important;
+  color: white;
+}
+
 .badge.bg-secondary {
   background-color: var(--color-secondary) !important;
   color: white;
@@ -341,6 +346,31 @@ body {
 .badge-warning-custom {
   background-color: var(--color-warning) !important;
   color: white;
+}
+
+/* Bootstrap text color classes using CSS variables */
+.text-success {
+  color: var(--color-success) !important;
+}
+
+.text-warning {
+  color: var(--color-warning) !important;
+}
+
+.text-info {
+  color: var(--color-primary-light) !important;
+}
+
+.text-primary {
+  color: var(--color-primary-dark) !important;
+}
+
+.text-danger {
+  color: var(--color-error) !important;
+}
+
+.text-muted {
+  color: var(--color-text-muted) !important;
 }
 
 /* Table styling - improved readability */

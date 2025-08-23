@@ -289,7 +289,6 @@ const {
   }
 
 
-     const fixedcourse = fixedcourses.find((c) => c.id === Number(id));
   
      const course = courseData;
 
@@ -450,7 +449,7 @@ const {
             {/* Course Image */}
             <div className="mb-4">
               <img
-                src={course.thumbnail}
+                src={course.thumbnail || 'https://placehold.co/120x120?text=Course'}
                 alt={course.title}
                 className="course-detail-image"
               />
