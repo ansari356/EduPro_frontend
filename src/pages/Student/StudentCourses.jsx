@@ -5,6 +5,8 @@ import { pagePaths } from "../../pagePaths";
 import useListAllEducatorCourses from "../../apis/hooks/student/useListAllEducatorCourses";
 import useListEnrolledCourses from "../../apis/hooks/student/useListEnrolledCourses";
 import useEducatorPublicData from "../../apis/hooks/student/useEducatorPublicData";
+import useGetCourseDetails from "../../apis/hooks/student/useGetCourseDetails";
+import useGetCourseModules from "../../apis/hooks/student/useGetCourseModules";
 import enrollStudentInCourse from "../../apis/actions/student/enrollStudentInCourse";
 
 /**
@@ -22,11 +24,24 @@ function Courses() {
   const [couponCode, setCouponCode] = useState("");
   const [isValidatingCoupon, setIsValidatingCoupon] = useState(false);
   const [couponError, setCouponError] = useState("");
+  const [selectedCourseId, setSelectedCourseId] = useState(null);
 
 
   const { data: allCourses, isLoading: allCoursesLoading } = useListAllEducatorCourses();
   const { enrolledInCourses, isLoading: enrolledLoading } = useListEnrolledCourses();
   const { data: educatorData } = useEducatorPublicData();
+  const { data: detailedCourseData, isLoading: detailedCourseLoading, error: detailedCourseError } = useGetCourseDetails(selectedCourseId);
+  const { data: courseModules, isLoading: modulesLoading, error: modulesError } = useGetCourseModules(selectedCourseId);
+  
+  // Debug the hook data
+  console.log('🔍 StudentCourses Debug:');
+  console.log('selectedCourseId:', selectedCourseId);
+  console.log('detailedCourseData:', detailedCourseData);
+  console.log('detailedCourseLoading:', detailedCourseLoading);
+  console.log('detailedCourseError:', detailedCourseError);
+  console.log('courseModules:', courseModules);
+  console.log('modulesLoading:', modulesLoading);
+  console.log('modulesError:', modulesError);
 
 
 
@@ -48,7 +63,7 @@ function Courses() {
         isFree: course.is_free || course.price === "0.00" || course.price === 0,
         rating: course.average_rating || course.rating || "0.00",
         enrolledStudents: course.total_enrollments || 0,
-
+        chapters: course.chapters || course.modules || [], // Add chapters/modules data
       })) : [];
 
   // Check if a course is enrolled
@@ -69,8 +84,12 @@ function Courses() {
   });
 
   // ===== ENROLLMENT FUNCTIONS =====
-  const openEnrollmentModal = (course) => {
+  const openEnrollmentModal = async (course) => {
+    console.log('Opening enrollment modal for course:', course);
+    console.log('Course ID:', course.id);
+    console.log('Expected API endpoint:', `/course/course-detail/${course.id}`);
     setSelectedCourse(course);
+    setSelectedCourseId(course.id); // This will trigger the useGetCourseDetails hook
     setShowEnrollmentModal(true);
     setEnrollmentType("full");
     setSelectedChapter(null);
@@ -81,6 +100,7 @@ function Courses() {
   const closeEnrollmentModal = () => {
     setShowEnrollmentModal(false);
     setSelectedCourse(null);
+    setSelectedCourseId(null);
     setEnrollmentType("full");
     setSelectedChapter(null);
     setCouponCode("");
@@ -170,13 +190,13 @@ function Courses() {
   const getStatusBadge = (status) => {
     switch (status) {
       case "Active":
-        return "bg-secondary";
+        return "badge-success-custom";
       case "Completed":
-        return "";
+        return "badge-success-custom";
       case "Nearly Complete":
-        return "bg-secondary";
+        return "badge-warning-custom";
       default:
-        return "bg-secondary";
+        return "badge-warning-custom";
     }
   };
 
@@ -268,19 +288,19 @@ function Courses() {
                     />
                     <div className="position-absolute top-0 end-0 p-2">
                       {isCourseEnrolled(course.id) ? (
-                        <span className="badge bg-secondary px-2 py-1">
+                        <span className="badge bg-success px-2 py-1">
                           <CheckCircle size={14} className="me-1" />
                           Enrolled
                         </span>
                       ) : (
-                        <span className="badge bg-secondary px-2 py-1">
+                        <span className="badge bg-warning px-2 py-1">
                           <Lock size={14} className="me-1" />
                           Locked
                         </span>
                       )}
                     </div>
                     <div className="position-absolute bottom-0 start-0 p-2">
-                      <small className="badge bg-secondary bg-opacity-75 px-2 py-1">
+                      <small className="badge bg-secondary px-2 py-1">
                         {course.category}
                       </small>
                     </div>
@@ -307,13 +327,13 @@ function Courses() {
                     <div className="row mb-3">
                       <div className="col-6">
                         <div className="about-bubble p-2 text-center">
-                          <Clock size={14} className="text-primary mb-1" />
+                          <Clock size={14} className="text-main mb-1" />
                           <div className="small">{course.duration}</div>
                         </div>
                       </div>
                       <div className="col-6">
                         <div className="about-bubble p-2 text-center">
-                          <BarChart3 size={14} className="text-primary mb-1" />
+                          <BarChart3 size={14} className="text-main mb-1" />
                           <div className="small">★ {course.rating}</div>
                         </div>
                       </div>
@@ -324,9 +344,9 @@ function Courses() {
                       <div className="d-flex justify-content-between align-items-center">
                         <div>
                           {course.isFree ? (
-                            <span className="badge bg-secondary px-3 py-2">Free</span>
+                            <span className="badge bg-success px-3 py-2">Free</span>
                           ) : (
-                            <span className="badge bg-secondary px-3 py-2">${course.price}</span>
+                            <span className="badge bg-warning px-3 py-2">${course.price}</span>
                           )}
                         </div>
                         <div className="text-muted small">
@@ -374,7 +394,7 @@ function Courses() {
             className="card enrollment-modal-card"
             onClick={(e) => e.stopPropagation()}
           >
-            <div className="card-header bg-primary text-white">
+            <div className="card-header" style={{ backgroundColor: 'var(--color-primary)', color: 'white' }}>
               <h5 className="mb-0 d-flex align-items-center">
                 <BookOpen size={20} className="me-2" />
                 Enroll in Course
@@ -389,7 +409,7 @@ function Courses() {
                 <div className="d-flex gap-2">
                   <button
                     type="button"
-                    className={`btn ${enrollmentType === 'full' ? 'btn-primary' : 'btn-outline-primary'} flex-fill`}
+                    className={`${enrollmentType === 'full' ? 'btn-edit-profile' : 'btn-secondary-action'} flex-fill`}
                     onClick={() => handleEnrollmentTypeChange('full')}
                   >
                     <BookOpen size={16} className="me-2" />
@@ -397,7 +417,7 @@ function Courses() {
                   </button>
                   <button
                     type="button"
-                    className={`btn ${enrollmentType === 'chapter' ? 'btn-primary' : 'btn-outline-primary'} flex-fill`}
+                    className={`${enrollmentType === 'chapter' ? 'btn-edit-profile' : 'btn-secondary-action'} flex-fill`}
                     onClick={() => handleEnrollmentTypeChange('chapter')}
                   >
                     <Play size={16} className="me-2" />
@@ -410,20 +430,35 @@ function Courses() {
               {enrollmentType === 'chapter' && (
                 <div className="mb-4">
                   <label className="form-label about-subtitle fw-medium">Select Chapter</label>
-                  <div className="row g-2">
-                    {selectedCourse.chapters?.map((chapter) => (
-                      <div key={chapter.id} className="col-6">
-                        <button
-                          type="button"
-                          className={`btn w-100 chapter-selection-btn ${selectedChapter?.id === chapter.id ? 'selected' : ''}`}
-                          onClick={() => handleChapterSelection(chapter)}
-                        >
-                          <div className="small fw-bold">{chapter.title}</div>
-                          <div className="small text-muted">{chapter.lessons} lessons</div>
-                        </button>
-                      </div>
-                    ))}
-                  </div>
+                  {console.log('Course modules data:', courseModules)}
+                  {console.log('Modules length:', courseModules?.length)}
+                  {courseModules && courseModules.length > 0 ? (
+                    <div className="row g-2">
+                      {courseModules.map((module) => (
+                        <div key={module.id} className="col-6">
+                          <button
+                            type="button"
+                            className={`w-100 chapter-selection-btn ${selectedChapter?.id === module.id ? 'btn-edit-profile' : 'btn-secondary-action'}`}
+                            onClick={() => handleChapterSelection(module)}
+                          >
+                            <div className="small fw-bold">{module.title}</div>
+                            <div className="small text-muted">
+                              {module.total_lessons || 0} lessons • ${module.price}
+                            </div>
+                          </button>
+                        </div>
+                      ))}
+                    </div>
+                  ) : (
+                    <div className="text-center py-3">
+                      <p className="text-muted mb-2">
+                        {modulesLoading ? 'Loading chapters...' : 'No chapters available for this course.'}
+                      </p>
+                      <small className="text-muted">
+                        {modulesLoading ? 'Please wait while we load the course details.' : 'Please select "Full Course" enrollment instead.'}
+                      </small>
+                    </div>
+                  )}
                 </div>
               )}
 
@@ -442,15 +477,13 @@ function Courses() {
                     disabled={isValidatingCoupon}
                   />
                   <button
-                    className="btn btn-primary"
+                    className="btn-edit-profile"
                     onClick={validateCoupon}
                     disabled={!couponCode.trim() || isValidatingCoupon}
                   >
                     {isValidatingCoupon ? (
                       <>
-                        <div className="spinner-border spinner-border-sm me-2" role="status">
-                          <span className="visually-hidden">Validating...</span>
-                        </div>
+                        <div className="loading-spinner me-2" style={{ width: '1rem', height: '1rem' }}></div>
                         Validating...
                       </>
                     ) : (
@@ -479,9 +512,10 @@ function Courses() {
                 ) : selectedChapter ? (
                   <ul className="mb-0 small">
                     <li>Access to {selectedChapter.title} chapter</li>
-                    <li>{selectedChapter.lessons} focused lessons</li>
+                    <li>{selectedChapter.total_lessons || 0} focused lessons</li>
                     <li>Chapter-specific materials</li>
-                    <li>Duration: {selectedChapter.duration}</li>
+                    <li>Price: ${selectedChapter.price}</li>
+                    <li>Duration: {selectedChapter.total_duration || 0} minutes</li>
                   </ul>
                 ) : (
                   <p className="text-muted mb-0">Please select a chapter to see what's included.</p>
@@ -492,14 +526,14 @@ function Courses() {
               <div className="d-flex gap-2">
                 <button
                   type="button"
-                  className="btn btn-secondary flex-fill"
+                  className="btn-secondary-action flex-fill"
                   onClick={closeEnrollmentModal}
                 >
                   Cancel
                 </button>
                 <button
                   type="button"
-                  className="btn btn-primary flex-fill"
+                  className="btn-edit-profile flex-fill"
                   onClick={validateCoupon}
                   disabled={!couponCode.trim() || isValidatingCoupon || (enrollmentType === 'chapter' && !selectedChapter)}
                 >
