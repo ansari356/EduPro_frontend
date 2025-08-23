@@ -1,11 +1,11 @@
 import React, { useState } from "react";
-import { DollarSign, Plus, Copy } from "lucide-react"; // Import Copy icon
+import { DollarSign, Plus, Copy } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import useEducatorCouponsListData from "../../apis/hooks/educator/useEducatorCouponsListData";
 import useEducatorUsedCouponsListData from "../../apis/hooks/educator/useEducatorUsedCouponsListData";
 import useEducatorTotalRevenue from "../../apis/hooks/educator/useEducatorTotalRevenue";
-import createCoupon from "../../apis/actions/educator/createCoupon"; // Import the createCoupon action
-const COUPONS_PER_PAGE = 5; // Assuming 9 coupons per page for a grid layout
+import createCoupon from "../../apis/actions/educator/createCoupon"; 
+const COUPONS_PER_PAGE = 5; 
 
 export default function ManageCouponsPage() {
   const navigate = useNavigate();
@@ -87,7 +87,7 @@ export default function ManageCouponsPage() {
 							</div>
 
 							<button
-								className="btn btn-edit-profile"
+								className=" btn-edit-profile"
 								onClick={() => setShowAddForm((prev) => !prev)}
 								aria-expanded={showAddForm}
 								aria-controls="add-coupon-form"
@@ -201,14 +201,9 @@ export default function ManageCouponsPage() {
 
 				{/* Coupons Grid */}
 				<section>
-					<div className="d-flex align-items-center gap-2 mb-4">
-						<DollarSign size={28} />
-						<h2 className="main-title mb-0">Coupons Management</h2>
-					</div>
-
 					<div className="row g-4">
 						{coupons.length === 0 ? (
-							<div className="alert alert-info">
+							<div className="alert alert-primary">
 								No active coupons available.
 							</div>
 						) : (

@@ -4,7 +4,7 @@ import { useNavigate } from "react-router-dom";
 import { pagePaths } from "../../pagePaths";
 import useEducatorStudentsListData from "../../apis/hooks/educator/useEducatorStudentsListData";
 
-const STUDENTS_PER_PAGE = 5; // Assuming 9 students per page for a grid layout
+const STUDENTS_PER_PAGE = 5; 
 
 export default function EducatorStudentsList() {
   const navigate = useNavigate();
@@ -35,7 +35,7 @@ export default function EducatorStudentsList() {
 				{/* Header */}
 				<div className="card border-0 shadow-sm mb-4">
 					<div className="container py-3">
-						<div className="d-flex align-items-center justify-content-between">
+						<div className="d-flex align-items-center ">
 							<div className="d-flex align-items-center">
 								<div className="header-avatar me-2 mx-auto w-fit">
 									<Users size={20} />
@@ -50,7 +50,6 @@ export default function EducatorStudentsList() {
 						</div>
 					</div>
 				</div>
-
 				{/* Stats Overview */}
 				<div className="row g-3 mb-4">
 					<div className="col-md-4">
@@ -97,12 +96,6 @@ export default function EducatorStudentsList() {
 
 				{/* Students Grid */}
 				<section>
-					<div className="d-flex align-items-center gap-2 mb-4">
-						<div className="avatar-circle">
-							<Users size={28} />
-						</div>
-						<h2 className="main-title mb-0">Student Management</h2>
-					</div>
 
 					<div className="row g-4">
 						{students.map((student) => (

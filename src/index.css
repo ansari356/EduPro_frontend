@@ -531,9 +531,9 @@ form .form-check-input:checked {
 }
 
 .avatar-circle {
-  width: 120px;
-  height: 120px;
-  padding: 2rem;
+  width: 70px;
+  height: 70px;
+  padding: 5px;
   margin-bottom: 2rem !important;
   border-radius: 50%;
   overflow: hidden;

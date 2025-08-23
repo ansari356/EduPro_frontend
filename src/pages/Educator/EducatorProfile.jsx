@@ -510,18 +510,22 @@ function EducatorProfile() {
             <div className="col-lg-6">
               <div className="illustration-card shadow-sm">
                 <div className="container">
-                  <div className="d-flex align-items-start mb-4">
-                    <img
-                      src={profileImageUrl}
-                      alt="avatar"
-                      className="rounded-circle me-3"
-                      style={{
-                        width: "100px",
-                        height: "100px",
-                        objectFit: "cover",
-                      }}
-                      aria-label="Educator avatar"
-                    />
+                  <div className="d-flex align-items-start justify-content-start mb-4">
+                    <div className="d-flex align-items-start justify-content-start">
+                      <img
+                        src={profileImageUrl}
+                        alt="avatar"
+                        className="avatar-rectangle me-3"
+                        style={{ 
+                          alignSelf: 'flex-start', 
+                          justifySelf: 'flex-start',
+                          marginLeft: '0',
+                          marginRight: 'auto',
+                          display: 'block'
+                        }}
+                        aria-label="Educator avatar"
+                      />
+                    </div>
                     <div>
                       <h4 className="fw-bold mb-1 profile-main-title">
                         {educatorData?.user?.first_name || "__"}{" "}
@@ -546,7 +550,7 @@ function EducatorProfile() {
                     <div className="col-xl-8">
                       <div className="d-flex flex-column gap-2">
                         <div className="d-flex">
-                          <i className="bi bi-building text-primary"></i>
+                          <i className="bi bi-building"></i>
                           <div className="d-flex flex-sm-row flex-column px-3">
                             <strong className="me-2">username:</strong>
                             <span className="text-light small">
@@ -555,7 +559,7 @@ function EducatorProfile() {
                           </div>
                         </div>
                         <div className="d-flex">
-                          <i className="bi bi-envelope text-primary"></i>
+                          <i className="bi bi-envelope"></i>
                           <div className="d-flex flex-sm-row flex-column px-3">
                             <strong className="me-2">Email:</strong>
                             <span className="small">
@@ -564,7 +568,7 @@ function EducatorProfile() {
                           </div>
                         </div>
                         <div className="d-flex">
-                          <i className="bi bi-telephone text-primary"></i>
+                          <i className="bi bi-telephone"></i>
                           <div className="d-flex flex-sm-row flex-column px-3">
                             <strong className="me-2">Phone:</strong>
                             <span className="small">
@@ -573,7 +577,7 @@ function EducatorProfile() {
                           </div>
                         </div>
                         <div className="d-flex">
-                          <i className="bi bi-calendar-event text-primary"></i>
+                          <i className="bi bi-calendar-event"></i>
                           <div className="d-flex flex-sm-row flex-column px-3">
                             <strong className="me-2">Experience:</strong>
                             <span className="small">
@@ -582,7 +586,7 @@ function EducatorProfile() {
                           </div>
                         </div>
                         <div className="d-flex">
-                          <i className="bi bi-mortarboard text-primary"></i>
+                          <i className="bi bi-mortarboard"></i>
                           <div className="d-flex flex-sm-row flex-column px-3">
                             <strong className="me-2">Specialization:</strong>
                             <span className="small">
@@ -636,7 +640,7 @@ function EducatorProfile() {
                   <div className="row text-center">
                     <div className="col-4">
                       <div className="about-bubble p-3 text-center">
-                        <h4 className="fw-bold mb-1 text-primary">
+                        <h4 className="fw-bold mb-1">
                           {educatorData?.number_of_courses ?? "__"}
                         </h4>
                         <small className="about-subtitle fw-medium">
@@ -646,7 +650,7 @@ function EducatorProfile() {
                     </div>
                     <div className="col-4">
                       <div className="about-bubble p-3 text-center">
-                        <h4 className="fw-bold mb-1 text-primary">
+                        <h4 className="fw-bold mb-1">
                           {educatorData?.rating ?? "__"}
                         </h4>
                         <small className="about-subtitle fw-medium">
@@ -656,7 +660,7 @@ function EducatorProfile() {
                     </div>
                     <div className="col-4">
                       <div className="about-bubble p-3 text-center">
-                        <h4 className="fw-bold mb-1 text-primary">
+                        <h4 className="fw-bold mb-1">
                           {educatorData?.number_of_students ?? "__"}
                         </h4>
                         <small className="about-subtitle fw-medium">
@@ -679,13 +683,13 @@ function EducatorProfile() {
                     >
                       <div className="about-bubble px-3 py-2 d-flex align-items-center">
                         <i
-                          className="bi bi-plus-circle me-3 text-primary"
+                          className="bi bi-plus-circle me-3"
                           style={{ fontSize: "1.2rem" }}
                         ></i>
                         <div className="flex-grow-1">
                           <span className="fw-medium">Create New Course</span>
                         </div>
-                        <i className="bi bi-chevron-right text-primary"></i>
+                        <i className="bi bi-chevron-right"></i>
                       </div>
                     </Link>
                     <Link
@@ -694,13 +698,13 @@ function EducatorProfile() {
                     >
                       <div className="about-bubble px-3 py-2 d-flex align-items-center">
                         <i
-                          className="bi bi-people me-3 text-primary"
+                          className="bi bi-people me-3"
                           style={{ fontSize: "1.2rem" }}
                         ></i>
                         <div className="flex-grow-1">
                           <span className="fw-medium">Manage Students</span>
                         </div>
-                        <i className="bi bi-chevron-right text-primary"></i>
+                        <i className="bi bi-chevron-right"></i>
                       </div>
                     </Link>
                     <Link
@@ -709,13 +713,13 @@ function EducatorProfile() {
                     >
                       <div className="about-bubble px-3 py-2 d-flex align-items-center">
                         <i
-                          className="bi bi-calendar-check me-3 text-primary"
+                          className="bi bi-calendar-check me-3"
                           style={{ fontSize: "1.2rem" }}
                         ></i>
                         <div className="flex-grow-1">
                           <span className="fw-medium">Manage Coupons</span>
                         </div>
-                        <i className="bi bi-chevron-right text-primary"></i>
+                        <i className="bi bi-chevron-right"></i>
                       </div>
                     </Link>
                   </div>
@@ -731,7 +735,7 @@ function EducatorProfile() {
                 <div className="card-body p-4">
                   <h5 className="fw-bold mb-4 section-title">Courses Taught</h5>
                   {courses.length === 0 ? (
-                    <div className="alert alert-secondary">
+                    <div className="alert alert-primary">
                       No courses available.
                     </div>
                   ) : (

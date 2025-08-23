@@ -98,13 +98,6 @@ export default function EducatorCoursesList() {
 
 				{/* Courses Grid */}
 				<section>
-					<div className="d-flex align-items-center gap-2 mb-4">
-						<div className="avatar-circle">
-							<LibraryBig size={28} />
-						</div>
-						<h2 className="main-title mb-0">Course Management</h2>
-					</div>
-
 					<div className="row g-4">
 						{courses?.map((course) => (
 								<EducatorCourseCard course={course} key={course?.id} />
