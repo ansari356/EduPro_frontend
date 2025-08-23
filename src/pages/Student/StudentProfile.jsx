@@ -1,11 +1,12 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useMemo } from "react";
 import useStudentProfileData from "../../apis/hooks/student/useStudentProfileData";
 import updateStudentProfile from "../../apis/actions/student/updateStudentProfile";
 import { NavLink, useParams } from "react-router-dom";
 import { pagePaths } from "../../pagePaths";
 import useListEnrolledCourses from "../../apis/hooks/student/useListEnrolledCourses";
 import useEducatorPublicData from "../../apis/hooks/student/useEducatorPublicData";
-import useStudentCourseAnalytics from "../../apis/hooks/student/useStudentCourseAnalytics";
+import useListCourseModules, { useModuleLessons } from "../../apis/hooks/student/useListCourseModules";
+import baseApi from "../../apis/base";
 
 /**
  * StudentProfile Component
@@ -15,7 +16,6 @@ function StudentProfile() {
   const { data: studentData, isLoading, error, mutate } = useStudentProfileData();
   const { enrolledInCourses, isLoading: coursesLoading } = useListEnrolledCourses();
   const { data: educatorData } = useEducatorPublicData(educatorUsername);
-  const { analytics, isLoading: analyticsLoading, error: analyticsError } = useStudentCourseAnalytics();
   
   const [showEditForm, setShowEditForm] = useState(false);
   const [formData, setFormData] = useState({
@@ -33,32 +33,110 @@ function StudentProfile() {
 
 
 
-  // Use analytics data from the new hook
-  const {
-    totalCourses,
-    totalLessons,
-    totalCompletedLessons,
-    overallProgress,
-    totalEnrollments,
-    averageRating,
-    totalReviews,
-    totalDuration,
-    nextLesson,
-    courses: enrolledCourses
-  } = analytics;
-
+  // Calculate real combined analytics from enrolled courses
+  const totalCourses = enrolledInCourses?.length || 0;
+  
+  // State for storing real lesson data and progress
+  const [courseProgressData, setCourseProgressData] = useState({});
+  const [isCalculatingProgress, setIsCalculatingProgress] = useState(false);
+  
+  // Calculate real analytics by fetching lesson data for each course
+  const { totalLessons, totalCompletedLessons, progress } = useMemo(() => {
+    if (!enrolledInCourses || enrolledInCourses.length === 0) {
+      return { totalLessons: 0, totalCompletedLessons: 0, progress: 0 };
+    }
+    
+    const total = Object.values(courseProgressData).reduce((sum, courseData) => {
+      return sum + (courseData.totalLessons || 0);
+    }, 0);
+    
+    const completed = Object.values(courseProgressData).reduce((sum, courseData) => {
+      return sum + (courseData.completedLessons || 0);
+    }, 0);
+    
+    const progressPercent = total > 0 ? Math.round((completed / total) * 100) : 0;
+    
+    return {
+      totalLessons: total,
+      totalCompletedLessons: completed,
+      progress: progressPercent
+    };
+  }, [enrolledInCourses, courseProgressData]);
+  
   // Calculate remaining lessons
   const totalSessionsLeft = totalLessons - totalCompletedLessons;
   
-  // Calculate progress percentage
-  const progress = overallProgress;
+  // Fetch lesson data and progress for each enrolled course
+  useEffect(() => {
+    if (!enrolledInCourses || enrolledInCourses.length === 0) return;
+    
+    const fetchCourseProgress = async () => {
+      setIsCalculatingProgress(true);
+      const progressMap = {};
+      
+      for (const course of enrolledInCourses) {
+        try {
+          // Get course modules
+          const modulesResponse = await baseApi.get(`/courses/${course.id}/modules/`);
+          const modules = modulesResponse.data || [];
+          
+          let totalLessons = 0;
+          let completedLessons = 0;
+          
+          // Get lessons for each module
+          for (const module of modules) {
+            try {
+              const lessonsResponse = await baseApi.get(`/modules/${module.id}/lessons/`);
+              const lessons = lessonsResponse.data || [];
+              totalLessons += lessons.length;
+              
+              // Get lesson statuses
+              for (const lesson of lessons) {
+                try {
+                  const statusResponse = await baseApi.get(`/lessons/${lesson.id}/status/`);
+                  if (statusResponse.data?.is_completed) {
+                    completedLessons++;
+                  }
+                } catch (error) {
+                  console.error(`Failed to fetch lesson status for ${lesson.id}:`, error);
+                }
+              }
+            } catch (error) {
+              console.error(`Failed to fetch lessons for module ${module.id}:`, error);
+            }
+          }
+          
+          progressMap[course.id] = {
+            totalLessons,
+            completedLessons,
+            progress: totalLessons > 0 ? Math.round((completedLessons / totalLessons) * 100) : 0
+          };
+        } catch (error) {
+          console.error(`Failed to fetch progress for course ${course.id}:`, error);
+          progressMap[course.id] = { totalLessons: 0, completedLessons: 0, progress: 0 };
+        }
+      }
+      
+      setCourseProgressData(progressMap);
+      setIsCalculatingProgress(false);
+    };
+    
+    fetchCourseProgress();
+  }, [enrolledInCourses]);
+  
+  // Find the next lesson from any enrolled course
+  const nextCourse = enrolledInCourses?.find(course => {
+    const courseData = courseProgressData[course.id];
+    return courseData && courseData.completedLessons < courseData.totalLessons;
+  });
+  
   // Prepare next lesson data
-  const upcomingLessons = nextLesson ? [{
-    topic: nextLesson.title,
-    course: nextLesson.course,
+  const upcomingLessons = nextCourse ? [{
+    topic: "Continue learning",
+    course: nextCourse.title || nextCourse.name,
     instructor: educatorData?.full_name || educatorUsername,
     date: new Date().toDateString(),
-    time: "10:00 AM"
+    time: "Continue with your courses"
   }] : [];
 
   // ===== FORM DATA INITIALIZATION =====
@@ -122,7 +200,7 @@ function StudentProfile() {
   };
 
   // ===== LOADING AND ERROR STATES =====
-  if (isLoading || analyticsLoading) {
+  if (isLoading || coursesLoading || isCalculatingProgress) {
     return (
       <div className="profile-root min-vh-100 d-flex align-items-center justify-content-center">
         <div className="text-center">
@@ -135,7 +213,7 @@ function StudentProfile() {
     );
   }
 
-  if (error || analyticsError) {
+  if (error) {
     return (
       <div className="profile-root min-vh-100 d-flex align-items-center justify-content-center">
         <div className="text-center">
@@ -474,7 +552,7 @@ function StudentProfile() {
 									<h5 className="fw-bold section-title mb-3">Next Lessons</h5>
 									                  {upcomingLessons.length === 0 ? (
                     <div className="alert alert-info">
-                      {enrolledCourses.length === 0 
+                      {enrolledInCourses.length === 0 
                         ? "Not enrolled in any courses yet!" 
                         : totalLessons === 0
                         ? "No lessons available yet. Visit your courses to start learning!"
@@ -517,30 +595,18 @@ function StudentProfile() {
 								<div className="card-body text-center">
 									<div className="row">
 										{/* ===== REAL DATA FROM HOOKS ===== */}
-										                    <div className="col-md-3 section-title border-end">
-                      <h4>{totalCompletedLessons}</h4>
-                      <small>Total Lessons Completed</small>
-                    </div>
-                    <div className="col-md-3 section-title  border-end">
-                      <h4>{totalSessionsLeft}</h4>
-                      <small>Total Lessons Remaining</small>
-                    </div>
-                    <div className="col-md-3 section-title  border-end">
-                      <h4>{totalCourses}</h4>
-                      <small>Courses Enrolled</small>
-                    </div>
-										                    <div className="col-md-3 section-title ">
-                      <h4>
-                        {upcomingLessons.length > 0
-                          ? upcomingLessons[0].topic
-                          : "No upcoming lessons"}
-                      </h4>
-                      <small className="text-muted">
-                        {upcomingLessons.length > 0
-                          ? upcomingLessons[0].course
-                          : "No course"}
-                      </small>
-                    </div>
+										<div className="col-md-4 section-title border-end">
+											<h4>{totalCompletedLessons}</h4>
+											<small>Total Lessons Completed</small>
+										</div>
+										<div className="col-md-4 section-title border-end">
+											<h4>{totalSessionsLeft}</h4>
+											<small>Total Lessons Remaining</small>
+										</div>
+										<div className="col-md-4 section-title">
+											<h4>{totalCourses}</h4>
+											<small>Courses Enrolled</small>
+										</div>
 									</div>
 								</div>
 							</div>
@@ -548,80 +614,54 @@ function StudentProfile() {
 							<div className="mb-4">
 								<h5 className="fw-bold section-title mb-3">Enrolled Courses</h5>
 								<div className="row g-4">
-									{enrolledCourses.length === 0 ? (
+									{enrolledInCourses.length === 0 ? (
 										<div className="alert alert-info">
 											Not enrolled in any courses yet!
 										</div>
 									) : (
-										enrolledCourses.map((course) => (
+										enrolledInCourses.map((course) => (
 											<div className="col-md-6 col-lg-4" key={course.id}>
 												<div className="card h-100 shadow-sm d-flex flex-column">
+													{/* Course Image */}
+													{course.thumbnail && (
+														<img
+															src={course.thumbnail}
+															alt={course.title || course.name}
+															className="card-img-top"
+															style={{ height: '200px', objectFit: 'cover' }}
+														/>
+													)}
+													{!course.thumbnail && (
+														<div 
+															className="card-img-top d-flex align-items-center justify-content-center"
+															style={{ 
+																height: '200px', 
+																backgroundColor: '#f8f9fa',
+																color: '#6c757d'
+															}}
+														>
+															<BookOpen size={48} />
+														</div>
+													)}
+													
 													<div className="card-body d-flex flex-column">
 														<h5 className="section-title mb-2">
 															{course.title || course.name}
 														</h5>
-														<div
-															className="mb-1 text-muted"
-															style={{ fontSize: ".96em" }}
-														>
-															Instructor:{" "}
-															<span className="text-dark">
-																{educatorData?.full_name || educatorUsername}
-															</span>
-														</div>
-
-														                        <div className="mb-2">
-                          <strong>Progress:</strong>{" "}
-                          {course.progress || 0}%
-                          <div
-                            className="progress mt-1"
-                            style={{
-                              height: 6,
-                              backgroundColor: "#e0e0e0",
-                              borderRadius: "var(--border-radius-sm)",
-                              overflow: "hidden",
-                            }}
-                          >
-                            <div
-                              className="progress-bar progress-bar-filled"
-                              style={{
-                                width: `${Math.min(course.progress || 0, 100)}%`,
-                                backgroundColor:
-                                  "var(--color-primary-dark)",
-                                borderRadius: "var(--border-radius-sm)",
-                              }}
-                            />
-                          </div>
-                        </div>
-                        
-                        <div className="mb-1">
-                          <strong>Lessons:&nbsp;</strong>
-                          {course.completed_lessons || 0}/{course.total_lessons || 0}
-                        </div>
-                        <div className="mb-1">
-                          <strong>Category:&nbsp;</strong>
-                          {course.category?.name || "N/A"}
-                        </div>
-                        <div className="mb-1">
-                          <strong>Total Duration:&nbsp;</strong>
-                          {totalDuration} min
-                        </div>
-                        
-                        <div className="mb-1">
-                          <strong>Next Lesson:&nbsp;</strong>
-                          {course.next_lesson && course.next_lesson.topic
-                            ? course.next_lesson.topic
-                            : "No upcoming lessons"}
-                        </div>
+														
+														<p className="text-muted mb-3 flex-grow-1">
+															{course.description || "No description available"}
+														</p>
+														
 														<NavLink
 															to={pagePaths.student.courseDetails(
 																educatorUsername,
 																course.id
 															)}
 															className="btn-edit-profile mt-auto"
-														                        >
-                          View Course
-                        </NavLink>
+														>
+															View Course
+														</NavLink>
 													</div>
 												</div>
 											</div>

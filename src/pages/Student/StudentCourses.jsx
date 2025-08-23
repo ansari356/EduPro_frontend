@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { useParams, useNavigate, NavLink } from "react-router-dom";
 import { Search, Filter, BookOpen, Play, Lock, Star, Clock, Users, ArrowRight, User, BarChart3, CheckCircle, Plus } from "lucide-react";
+
 import { pagePaths } from "../../pagePaths";
 import useListAllEducatorCourses from "../../apis/hooks/student/useListAllEducatorCourses";
 import useListEnrolledCourses from "../../apis/hooks/student/useListEnrolledCourses";
@@ -8,6 +9,8 @@ import useEducatorPublicData from "../../apis/hooks/student/useEducatorPublicDat
 import useGetCourseDetails from "../../apis/hooks/student/useGetCourseDetails";
 import useGetCourseModules from "../../apis/hooks/student/useGetCourseModules";
 import enrollStudentInCourse from "../../apis/actions/student/enrollStudentInCourse";
+
+
 
 /**
  * Courses Component - Shows all courses created by the educator
@@ -347,9 +350,7 @@ function Courses() {
                             <span className="badge bg-warning px-3 py-2">${course.price}</span>
                           )}
                         </div>
-                        <div className="text-muted small">
-                          {course.totalLessons} lessons
-                        </div>
+
                       </div>
                     </div>
 
