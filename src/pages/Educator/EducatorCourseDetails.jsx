@@ -462,7 +462,7 @@ const {
                   <button
                     className={`btn-link-custom flex-fill text-center py-3 ${
                       activeTab === "overview"
-                        ? "text-accent border-bottom border-primary border-3"
+                        ? "text-accent border-main"
                         : "profile-joined"
                     }`}
                     onClick={() => setActiveTab("overview")}
@@ -472,7 +472,7 @@ const {
                   <button
                     className={`btn-link-custom flex-fill text-center py-3 ${
                       activeTab === "curriculum"
-                        ? "text-accent border-bottom border-primary border-3"
+                        ? "text-accent border-main"
                         : "profile-joined"
                     }`}
                     onClick={() => setActiveTab("curriculum")}
@@ -482,7 +482,7 @@ const {
                   <button
                     className={`btn-link-custom flex-fill text-center py-3 ${
                       activeTab === "students"
-                        ? "text-accent border-bottom border-primary border-3"
+                        ? "text-accent border-main"
                         : "profile-joined"
                     }`}
                     onClick={() => setActiveTab("students")}
@@ -492,7 +492,7 @@ const {
                   <button
                     className={`btn-link-custom flex-fill text-center py-3 ${
                       activeTab === "reviews"
-                        ? "text-accent border-bottom border-primary border-3"
+                        ? "text-accent border-main"
                         : "profile-joined"
                     }`}
                     onClick={() => setActiveTab("reviews")}
@@ -502,7 +502,7 @@ const {
                   <button
                     className={`btn-link-custom flex-fill text-center py-3 ${
                       activeTab === "analytics"
-                        ? "text-accent border-bottom border-primary border-3"
+                        ? "text-accent border-main"
                         : "profile-joined"
                     }`}
                     onClick={() => setActiveTab("analytics")}
@@ -610,7 +610,7 @@ const {
                               style={{ cursor: "pointer" }}
                               onClick={() => setSelectedModuleId(module.id)}
                             >
-                              <h4 className={`about-subtitle mb-1 ${selectedModuleId === module.id ? "text-primary" : ""}`}>
+                              <h4 className={`about-subtitle mb-1 ${selectedModuleId === module.id ? "" : ""}`}>
                                 {module.title}
                               </h4>
                               <div className="d-flex gap-3 mb-2">
@@ -750,20 +750,20 @@ const {
 
                   {/* Course Summary */}
                   {moduleData && moduleData.length > 0 && (
-                    <div className="card border-primary">
+                    <div className="card ">
                       <div className="card-body">
                         <h5 className="about-subtitle mb-3">Course Summary</h5>
                         <div className="row text-center">
                           <div className="col-md-3">
                             <div className="mb-2">
-                              <i className="bi bi-collection text-primary" style={{fontSize: '1.5rem'}}></i>
+                              <i className="bi bi-collection text-main" style={{fontSize: '1.5rem'}}></i>
                             </div>
                             <small className="profile-joined d-block">Total Modules</small>
                             <strong className="text-accent">{moduleData.length}</strong>
                           </div>
                           <div className="col-md-3">
                             <div className="mb-2">
-                              <i className="bi bi-play-circle text-primary" style={{fontSize: '1.5rem'}}></i>
+                              <i className="bi bi-play-circle text-main" style={{fontSize: '1.5rem'}}></i>
                             </div>
                             <small className="profile-joined d-block">Total Lessons</small>
                             <strong className="text-accent">
@@ -772,7 +772,7 @@ const {
                           </div>
                           <div className="col-md-3">
                             <div className="mb-2">
-                              <Clock size={24} className="text-primary" />
+                              <Clock size={24} className="text-main" />
                             </div>
                             <small className="profile-joined d-block">Total Duration</small>
                             <strong className="text-accent">
@@ -781,7 +781,7 @@ const {
                           </div>
                           <div className="col-md-3">
                             <div className="mb-2">
-                              <DollarSign size={24} className="text-primary" />
+                              <DollarSign size={24} className="text-main" />
                             </div>
                             <small className="profile-joined d-block">Free Modules</small>
                             <strong className="text-success">
@@ -801,11 +801,7 @@ const {
               <div className="card">
                 <div className="card-body">
                   <div className="d-flex justify-content-between align-items-center mb-4">
-                    <h3 className="section-title mb-0">Student Performance</h3>
-                    <button className="btn-edit-profile d-flex align-items-center">
-                      <Download size={16} className="me-2" />
-                      Export Data
-                    </button>
+                    <h3 className="section-title mb-0">Students Performance</h3>
                   </div>
 
                   <div className="row mb-4">
@@ -839,8 +835,8 @@ const {
                     <h4 className="about-subtitle mb-3">
                       Recent Student Activity
                     </h4>
-                    <div className="table-responsive">
-                      <table className="table">
+                    <div className="table-responsive custom-table-container">
+                      <table className="table table-borderless">
                         <thead>
                           <tr>
                             <th>Student</th>
@@ -1094,8 +1090,8 @@ const {
                       <h5 className="about-subtitle mb-3">
                         Lesson Performance
                       </h5>
-                      <div className="table-responsive">
-                        <table className="table">
+                      <div className="table-responsive custom-table-container">
+                        <table className="table table-borderless">
                           <thead>
                             <tr>
                               <th>Lesson</th>

@@ -133,7 +133,7 @@ body {
 }
 
 .text-accent {
-  color: var(--color-primary-light) !important;
+  color: var(--color-primary-dark) !important;
   font-weight: 600;
   letter-spacing: 0.015em;
 }
@@ -361,7 +361,7 @@ body {
   color: var(--color-primary-light) !important;
 }
 
-.text-primary {
+.text-main {
   color: var(--color-primary-dark) !important;
 }
 
@@ -712,6 +712,39 @@ form .form-check-input:checked {
   border-right-color: transparent;
   border-radius: 50%;
   animation: spinner-border 0.75s linear infinite;
+}
+/* Border */
+.border-main {
+  border-color: var(--color-primary) !important;
+  border-width: 3px !important;
+  border-bottom: 3px solid var(--color-primary) !important;
+}
+
+/* Custom Table Container */
+.custom-table-container {
+  border: none !important;
+}
+
+.custom-table-container .table {
+  border: none !important;
+}
+
+.custom-table-container .table th,
+.custom-table-container .table td {
+  border: none !important;
+}
+
+.custom-table-container .table thead th {
+  border: none !important;
+  border-bottom: 1px solid #dee2e6 !important;
+}
+
+.border-success {
+  border-color: var(--color-success) !important;
+}
+
+.border-warning {
+  border-color: var(--color-warning) !important;
 }
 
 /* Progress Bars */
