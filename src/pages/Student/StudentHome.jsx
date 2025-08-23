@@ -75,7 +75,7 @@ function StudentHome() {
             <div className="card shadow-sm h-100">
               <div className="card-body p-4">
                 <div className="d-flex align-items-center mb-4">
-                  <User size={24} className="me-2 text-primary" />
+                  <User size={24} className="me-2 text-main" />
                   <h3 className="section-title mb-0">Meet Your Educator</h3>
                 </div>
 
@@ -114,37 +114,37 @@ function StudentHome() {
                       <div className="col-sm-6 mb-3">
                         <div className="about-bubble p-3">
                           <div className="d-flex align-items-center mb-2">
-                            <BookOpen size={16} className="me-2 text-primary" />
+                            <BookOpen size={16} className="me-2 text-main" />
                             <strong>Specialization</strong>
                           </div>
-                          <small>{educatorData.specialization || "Not specified"}</small>
+                          <small className="text-muted">{educatorData.specialization || "Not specified"}</small>
                         </div>
                       </div>
                       <div className="col-sm-6 mb-3">
                         <div className="about-bubble p-3">
                           <div className="d-flex align-items-center mb-2">
-                            <Clock size={16} className="me-2 text-primary" />
+                            <Clock size={16} className="me-2 text-main" />
                             <strong>Experience</strong>
                           </div>
-                          <small>{educatorData.experiance || "Not specified"}+</small>
+                          <small className="text-muted">{educatorData.experiance || "Not specified"}+</small>
                         </div>
                       </div>
                       <div className="col-sm-6 mb-3">
                         <div className="about-bubble p-3">
                           <div className="d-flex align-items-center mb-2">
-                            <Users size={16} className="me-2 text-primary" />
+                            <Users size={16} className="me-2 text-main" />
                             <strong>Students Taught</strong>
                           </div>
-                          <small>{educatorData.number_of_students || 0}+</small>
+                          <small className="text-muted">{educatorData.number_of_students || 0}+</small>
                         </div>
                       </div>
                       <div className="col-sm-6 mb-3">
                         <div className="about-bubble p-3">
                           <div className="d-flex align-items-center mb-2">
-                            <Award size={16} className="me-2 text-primary" />
+                            <Award size={16} className="me-2 text-main" />
                             <strong>Courses Created</strong>
                           </div>
-                          <small>{educatorData.number_of_courses || 0}</small>
+                          <small className="text-muted">{educatorData.number_of_courses || 0}</small>
                         </div>
                       </div>
                     </div>
@@ -157,7 +157,7 @@ function StudentHome() {
                             <div key={index} className="col-sm-6 mb-2">
                               <div className="d-flex align-items-center">
                                 <Award size={14} className="me-2 text-success" />
-                                <small>{achievement}</small>
+                                <small className="text-muted">{achievement}</small>
                               </div>
                             </div>
                           ))}
@@ -175,7 +175,7 @@ function StudentHome() {
             <div className="card shadow-sm h-100">
               <div className="card-body p-4">
                 <div className="d-flex align-items-center mb-4">
-                  <Phone size={24} className="me-2 text-primary" />
+                  <Phone size={24} className="me-2 text-main" />
                   <h3 className="section-title mb-0">Contact Information</h3>
                 </div>
 
@@ -184,12 +184,12 @@ function StudentHome() {
                   {educatorData.user?.email && (
                     <div className="about-bubble p-3 mb-3">
                       <div className="d-flex align-items-center mb-2">
-                        <Mail size={16} className="me-2 text-primary" />
+                        <Mail size={16} className="me-2 text-main" />
                         <strong className="about-subtitle">Email</strong>
                       </div>
                       <a 
                         href={`mailto:${educatorData.user.email}`}
-                        className="text-decoration-none small"
+                        className="text-decoration-none small text-muted"
                       >
                         {educatorData.user.email}
                       </a>
@@ -200,13 +200,13 @@ function StudentHome() {
                   {educatorData.user?.phone && (
                     <div className="about-bubble p-3 mb-3">
                       <div className="d-flex align-items-center mb-2">
-                        <Phone size={16} className="me-2 text-primary" />
+                        <Phone size={16} className="me-2 text-main" />
                         <strong className="about-subtitle">Phone</strong>
                       </div>
                       <div className="mb-1">
                         <a 
                           href={`tel:${educatorData.user.phone}`}
-                          className="text-decoration-none small"
+                          className="text-decoration-none small text-muted"
                         >
                           {educatorData.user.phone}
                         </a>
@@ -218,11 +218,11 @@ function StudentHome() {
                   {(educatorData.city || educatorData.country) && (
                     <div className="about-bubble p-3 mb-3">
                       <div className="d-flex align-items-center mb-2">
-                        <MapPin size={16} className="me-2 text-primary" />
+                        <MapPin size={16} className="me-2 text-main" />
                         <strong className="about-subtitle">Location</strong>
                       </div>
                       <div className="small">
-                        <div className="mb-1">{educatorData.city && educatorData.country ? `${educatorData.city}, ${educatorData.country}` : educatorData.city || educatorData.country}</div>
+                        <div className="mb-1 text-muted">{educatorData.city && educatorData.country ? `${educatorData.city}, ${educatorData.country}` : educatorData.city || educatorData.country}</div>
                         {educatorData.address && (
                           <div className="text-muted">{educatorData.address}</div>
                         )}
@@ -256,7 +256,7 @@ function StudentHome() {
                   {/* Who We Are */}
                   <div className="col-md-4 mb-4">
                     <div className="text-center about-bubble p-4 h-100">
-                      <Heart size={32} className="text-primary mb-3" />
+                      <Heart size={32} className="text-main mb-3" />
                       <h4 className="about-subtitle mb-3">Who We Are</h4>
                       <p className="profile-joined">
                         We are a passionate team of educators and technology enthusiasts 
@@ -270,7 +270,7 @@ function StudentHome() {
                   {/* What We Do */}
                   <div className="col-md-4 mb-4">
                     <div className="text-center about-bubble p-4 h-100">
-                      <Target size={32} className="text-primary mb-3" />
+                      <Target size={32} className="text-main mb-3" />
                       <h4 className="about-subtitle mb-3">What We Do</h4>
                       <p className="profile-joined">
                         EduPlatform provides a comprehensive learning management system 
@@ -284,7 +284,7 @@ function StudentHome() {
                   {/* Our Mission */}
                   <div className="col-md-4 mb-4">
                     <div className="text-center about-bubble p-4 h-100">
-                      <Shield size={32} className="text-primary mb-3" />
+                      <Shield size={32} className="text-main mb-3" />
                       <h4 className="about-subtitle mb-3">Our Mission</h4>
                       <p className="profile-joined">
                         To democratize quality education by making it accessible, 
@@ -302,19 +302,19 @@ function StudentHome() {
                     <h5 className="about-subtitle">Platform Statistics</h5>
                   </div>
                   <div className="col-md-3 col-6 text-center mb-3">
-                    <div className="fw-bold fs-3 text-primary">10,000+</div>
+                    <div className="fw-bold fs-3 text-main">10,000+</div>
                     <small className="text-muted">Students</small>
                   </div>
                   <div className="col-md-3 col-6 text-center mb-3">
-                    <div className="fw-bold fs-3 text-primary">500+</div>
+                    <div className="fw-bold fs-3 text-main">500+</div>
                     <small className="text-muted">Expert Instructors</small>
                   </div>
                   <div className="col-md-3 col-6 text-center mb-3">
-                    <div className="fw-bold fs-3 text-primary">2,000+</div>
+                    <div className="fw-bold fs-3 text-main">2,000+</div>
                     <small className="text-muted">Courses Available</small>
                   </div>
                   <div className="col-md-3 col-6 text-center mb-3">
-                    <div className="fw-bold fs-3 text-primary">95%</div>
+                    <div className="fw-bold fs-3 text-main">95%</div>
                     <small className="text-muted">Student Satisfaction</small>
                   </div>
                 </div>

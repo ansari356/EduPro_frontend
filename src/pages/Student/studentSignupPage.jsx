@@ -29,7 +29,7 @@ const StudentSignupPage = () => {
 
   const validateForm = () => {
     const newErrors = {};
-    
+
     // First Name validation
     if (!formData.firstName.trim()) {
       newErrors.firstName = 'First name is required';
@@ -38,7 +38,7 @@ const StudentSignupPage = () => {
     } else if (!/^[a-zA-Z\s]+$/.test(formData.firstName.trim())) {
       newErrors.firstName = 'First name can only contain letters and spaces';
     }
-    
+
     // Last Name validation
     if (!formData.lastName.trim()) {
       newErrors.lastName = 'Last name is required';
@@ -56,21 +56,21 @@ const StudentSignupPage = () => {
     } else if (!/^[a-zA-Z0-9_-]+$/.test(formData.username.trim())) {
       newErrors.username = 'Username can only contain letters, numbers, underscores, and hyphens';
     }
-        
+
     // Phone validation
     if (!formData.phone.trim()) {
       newErrors.phone = 'Phone number is required';
     } else if (!/^01[0125][0-9]{8}$/.test(formData.phone.trim())) {
       newErrors.phone = 'Please enter a valid Egyptian phone number (e.g., 01012345678)';
     }
-        
+
     // Email validation
     if (!formData.email.trim()) {
       newErrors.email = 'Email is required';
     } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email.trim())) {
       newErrors.email = 'Please enter a valid email address';
     }
-    
+
     // Password validation
     if (!formData.password) {
       newErrors.password = 'Password is required';
@@ -83,21 +83,21 @@ const StudentSignupPage = () => {
     } else if (!/(?=.*\d)/.test(formData.password)) {
       newErrors.password = 'Password must contain at least one number';
     }
-    
+
     // Confirm Password validation
     if (!formData.confirmPassword) {
       newErrors.confirmPassword = 'Please confirm your password';
     } else if (formData.password !== formData.confirmPassword) {
       newErrors.confirmPassword = 'Passwords do not match';
     }
-    
+
     // Parent Phone validation
     if (!formData.parentPhone.trim()) {
       newErrors.parentPhone = 'Parent phone number is required';
     } else if (!/^01[0125][0-9]{8}$/.test(formData.parentPhone.trim())) {
       newErrors.parentPhone = 'Please enter a valid Egyptian phone number (e.g., 01012345678)';
     }
-    
+
     return newErrors;
   };
 
@@ -107,7 +107,7 @@ const StudentSignupPage = () => {
       ...prev,
       [name]: value
     }));
-    
+
     // Clear error when user starts typing
     if (errors[name]) {
       setErrors(prev => ({
@@ -115,7 +115,7 @@ const StudentSignupPage = () => {
         [name]: ''
       }));
     }
-    
+
     // Check password strength in real-time
     if (name === 'password') {
       const strength = checkPasswordStrength(value);
@@ -125,14 +125,14 @@ const StudentSignupPage = () => {
 
   const checkPasswordStrength = (password) => {
     if (!password) return '';
-    
+
     let score = 0;
     if (password.length >= 8) score++;
     if (/(?=.*[a-z])/.test(password)) score++;
     if (/(?=.*[A-Z])/.test(password)) score++;
     if (/(?=.*\d)/.test(password)) score++;
     if (/(?=.*[!@#$%^&*])/.test(password)) score++;
-    
+
     if (score <= 2) return 'weak';
     if (score <= 3) return 'medium';
     return 'strong';
@@ -143,7 +143,7 @@ const StudentSignupPage = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (!educatorData) return;
-    
+
     const validationErrors = validateForm();
     if (Object.keys(validationErrors).length > 0) {
       setErrors(validationErrors);
@@ -156,7 +156,7 @@ const StudentSignupPage = () => {
       }
       return;
     }
-    
+
     const registrationData = {
       first_name: formData.firstName,
       last_name: formData.lastName,
@@ -172,11 +172,11 @@ const StudentSignupPage = () => {
     try {
       const response = await registerStudent(registrationData, educatorUsername);
       console.log('Student registration successful:', response.data);
-      
+
       // Show success message
       setSuccessMessage(`Registration successful! Welcome to ${educatorData.full_name}'s ${educatorData.specialization} class!`);
       setShowSuccess(true);
-      
+
       // Reset form
       setFormData({
         firstName: '',
@@ -189,21 +189,21 @@ const StudentSignupPage = () => {
         parentPhone: ''
       });
       setErrors({});
-      
+
       // Redirect after 3 seconds
       setTimeout(() => {
         navigate(pagePaths.student.login(educatorUsername));
       }, 3000);
-      
+
     } catch (err) {
       console.error('Student registration failed:', err);
-      
+
       // Handle different types of errors
       if (err.response?.status === 400) {
         // Handle validation errors from API
         const apiErrors = err.response.data;
         const newErrors = {};
-        
+
         // Map API error fields to form fields
         if (apiErrors.username) {
           newErrors.username = Array.isArray(apiErrors.username) ? apiErrors.username[0] : apiErrors.username;
@@ -220,7 +220,7 @@ const StudentSignupPage = () => {
         if (apiErrors.non_field_errors) {
           newErrors.general = Array.isArray(apiErrors.non_field_errors) ? apiErrors.non_field_errors[0] : apiErrors.non_field_errors;
         }
-        
+
         if (Object.keys(newErrors).length > 0) {
           setErrors(newErrors);
         } else {
@@ -268,10 +268,10 @@ const StudentSignupPage = () => {
           <div className="display-1 mb-4">❌</div>
           <h1 className="main-title mb-4">Teacher Not Found</h1>
           <p className="profile-joined mb-4">
-            Sorry, we couldn't find this teacher's page. 
+            Sorry, we couldn't find this teacher's page.
             Please check the link or contact platform administration.
           </p>
-          <button 
+          <button
             className="btn-edit-profile"
             onClick={() => navigate('/')} // Navigate to a default homepage or error page
           >
@@ -290,7 +290,7 @@ const StudentSignupPage = () => {
           <div className="d-flex align-items-center justify-content-between">
             <div className="d-flex align-items-center">
               <div className="header-avatar">
-                <img src={educatorData.profile_picture} alt="Educator Profile" style={{ borderRadius: '10px', width: '50px', height: '50px', objectFit: 'cover' }} />
+                <img src={educatorData.profile_picture || 'https://placehold.co/50x50?text=Profile'} alt="Educator Profile" style={{ borderRadius: '10px', width: '50px', height: '50px', objectFit: 'cover' }} />
               </div>
               <div>
                 <span className="section-title mb-0">
@@ -301,9 +301,9 @@ const StudentSignupPage = () => {
                 </p>
               </div>
             </div>
-            
+
             <div className="d-flex align-items-center gap-2">
-              <button 
+              <button
                 className="btn-edit-profile d-flex align-items-center"
                 onClick={() => navigate(pagePaths.student.login(educatorUsername))}
               >
@@ -318,14 +318,14 @@ const StudentSignupPage = () => {
       {/* Main Content */}
       <div className="container py-5">
         <div className="row align-items-center min-vh-100">
-          
+
           {/* Signup Form */}
           <div className="col-lg-6 col-xl-5 mx-auto">
             <div className="card">
               <div className="card-body">
                 <div className="text-center mb-4">
                   <div className="avatar-rectangle">
-                    <img src={educatorData.profile_picture} alt="Educator Profile" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                    <img src={educatorData.profile_picture || 'https://placehold.co/400x300?text=Profile'} alt="Educator Profile" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
                   </div>
                   <h1 className="section-title mb-2">
                     Join
@@ -334,7 +334,7 @@ const StudentSignupPage = () => {
                     {educatorData.full_name}'s Class
                   </h2>
                   <p className="profile-joined">
-                    {educatorData.experience} years experience • {educatorData.number_of_students} registered students
+                    {educatorData.experiance || 0} years experience • {educatorData.number_of_students || 0} registered students
                   </p>
                 </div>
 
@@ -344,9 +344,9 @@ const StudentSignupPage = () => {
                     <div className="alert alert-success alert-dismissible fade show mb-4" role="alert">
                       <i className="fas fa-check-circle me-2"></i>
                       {successMessage}
-                      <button 
-                        type="button" 
-                        className="btn-close" 
+                      <button
+                        type="button"
+                        className="btn-close"
                         onClick={() => setShowSuccess(false)}
                       ></button>
                     </div>
@@ -357,9 +357,9 @@ const StudentSignupPage = () => {
                     <div className="alert alert-danger alert-dismissible fade show mb-4" role="alert">
                       <i className="fas fa-exclamation-triangle me-2"></i>
                       {errors.general}
-                      <button 
-                        type="button" 
-                        className="btn-close" 
+                      <button
+                        type="button"
+                        className="btn-close"
                         onClick={() => setErrors(prev => ({ ...prev, general: '' }))}
                       ></button>
                     </div>
@@ -563,8 +563,8 @@ const StudentSignupPage = () => {
 
                 <div className="text-center">
                   <p className="profile-joined">
-                    Already have an account? 
-                    <button 
+                    Already have an account?
+                    <button
                       className="btn-link-custom text-accent ms-1"
                       onClick={() => navigate(pagePaths.student.login(educatorUsername))}
                     >
@@ -590,23 +590,23 @@ const StudentSignupPage = () => {
                   {educatorData.bio}
                 </p>
               </div>
-              
+
               <div className="position-relative mx-auto mb-4 illustration-container">
                 <div className="card h-100 d-flex align-items-center justify-content-center">
                   <div className="text-center">
-                    <img src={educatorData.logo} alt="Educator Logo" className="img-fluid" style={{ maxHeight: '150px' }} />
+                    <img src={educatorData.logo || 'https://placehold.co/200x100?text=Logo'} alt="Educator Logo" className="img-fluid" style={{ maxHeight: '150px' }} />
                     <div className="progress-bar-primary"></div>
                     <div className="progress-bar-light"></div>
                     <div className="progress-bar-accent"></div>
                   </div>
                 </div>
-                
+
                 <div className="floating-element">
                   <UserPlus size={24} />
                 </div>
                 <div className="floating-pulse"></div>
               </div>
-              
+
               <div className="card p-4 mb-4">
                 <div className="row text-center">
                   <div className="col-6">
@@ -623,7 +623,7 @@ const StudentSignupPage = () => {
                   </div>
                 </div>
               </div>
-              
+
               <div className="text-center">
                 <p className="profile-role text-white fw-bold">
                   {educatorData.full_name} - {educatorData.specialization}

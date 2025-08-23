@@ -550,21 +550,6 @@ const {
                       </div>
                     </div>
                   </div>
-
-                  <div className="mb-4">
-                    <h4 className="about-subtitle mb-2">Tags</h4>
-                    <div className="d-flex flex-wrap gap-2">
-                     {course?.tags?.length > 0 ? (
-                        course.tags.map((tag, index) => (
-                          <span key={index} className="about-bubble">
-                            {tag}
-                          </span>
-                        ))
-                      ) : (
-                        <span className="profile-joined">No tags available</span>
-                      )}
-                    </div>
-                  </div>
                 </div>
               </div>
             )}
