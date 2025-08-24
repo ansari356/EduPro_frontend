@@ -21,8 +21,11 @@ import useListCourseModules, { useModuleLessons } from "../../apis/hooks/student
 import useEducatorPublicData from "../../apis/hooks/student/useEducatorPublicData";
 import useCourseProgress from "../../apis/hooks/student/useCourseProgress";
 import useListEnrolledCourses from "../../apis/hooks/student/useListEnrolledCourses";
+import useAvailableAssessments from "../../apis/hooks/student/useAvailableAssessments";
+import useStudentReview from "../../apis/hooks/student/useStudentReview";
 import submitCourseRating from "../../apis/actions/student/submitCourseRating";
 import { pagePaths } from "../../pagePaths";
+
 
 
 /* StudentCourseDetails Component */
@@ -39,6 +42,12 @@ function StudentCourseDetails() {
   const { courseModules, isLoading: modulesLoading } = useListCourseModules(courseId);
   const { data: educatorData } = useEducatorPublicData(educatorUsername);
   const { enrolledInCourses, isLoading: enrolledLoading } = useListEnrolledCourses();
+  // Call the hook and get assessments data
+  const { assessments, isLoading: assessmentsLoading } = useAvailableAssessments(educatorUsername, courseId);
+  
+  // Get student's review for this course
+  const { studentReview, hasReview, isLoading: reviewLoading } = useStudentReview(courseId);
+  
   // Fetch lessons for all modules
   const allModuleIds = courseModules && courseModules.length > 0 ? courseModules.map(module => module.id) : [];
 
@@ -234,6 +243,8 @@ function StudentCourseDetails() {
 
   // Check if modules are available
   const hasModules = courseModules && courseModules.length > 0;
+  
+
 
   // Video player states
   const [showVideoModal, setShowVideoModal] = useState(false);
@@ -253,26 +264,27 @@ function StudentCourseDetails() {
 
   // Check if student has already submitted a review
   useEffect(() => {
-    if (course?.studentReview) {
+    if (studentReview) {
+      setReviewRating(studentReview.rating);
+      setReviewComment(studentReview.comment);
       setReviewSubmitted(true);
-    }
-
-    // Also check localStorage for existing review
-    if (courseId) {
-      const existingReview = localStorage.getItem(`courseReview_${courseId}`);
-      if (existingReview) {
-        try {
-          const reviewData = JSON.parse(existingReview);
-          setReviewRating(reviewData.rating);
-          setReviewComment(reviewData.comment);
-          setReviewSubmitted(true);
-
-        } catch (error) {
-          console.error("Failed to parse existing review:", error);
+    } else {
+      // Fallback to localStorage if no backend review found
+      if (courseId) {
+        const existingReview = localStorage.getItem(`courseReview_${courseId}`);
+        if (existingReview) {
+          try {
+            const reviewData = JSON.parse(existingReview);
+            setReviewRating(reviewData.rating);
+            setReviewComment(reviewData.comment);
+            setReviewSubmitted(true);
+          } catch (error) {
+            console.error("Failed to parse existing review:", error);
+          }
         }
       }
     }
-  }, [course, courseId]);
+  }, [studentReview, courseId]);
 
   // Handle keyboard shortcuts for video player
   useEffect(() => {
@@ -434,11 +446,30 @@ function StudentCourseDetails() {
       // Save to localStorage for persistence
       localStorage.setItem(`courseReview_${courseId}`, JSON.stringify(submittedReview));
 
+      // Refresh the review data from the backend
+      if (window.location.reload) {
+        window.location.reload();
+      }
+
       alert("Thank you for your review! Your feedback helps us improve.");
 
     } catch (error) {
       console.error('Failed to submit review:', error);
-      alert(`Failed to submit review: ${error.response?.data?.detail || error.message}`);
+      
+      // Handle specific error cases based on backend logic
+      if (error.response?.status === 403) {
+        if (error.response?.data?.detail?.includes("already rated")) {
+          alert("You have already reviewed this course. You cannot submit another review.");
+          // Refresh the page to show the existing review
+          window.location.reload();
+        } else if (error.response?.data?.detail?.includes("must have full access")) {
+          alert("You must be enrolled in this course to submit a review.");
+        } else {
+          alert("You don't have permission to review this course. Please make sure you are enrolled.");
+        }
+      } else {
+        alert(`Failed to submit review: ${error.response?.data?.detail || error.message}`);
+      }
     }
   };
 
@@ -766,7 +797,11 @@ function StudentCourseDetails() {
             {activeTab === 'assessments' && (
               <div className="card">
                 <div className="card-body">
-                  <h3 className="section-title mb-4">Course Assessments</h3>
+                  <div className="d-flex justify-content-between align-items-center mb-4">
+                    <h3 className="section-title mb-0">Course Assessments</h3>
+                  </div>
+
+
 
                   {/* Enrollment Required Message */}
                   {showEnrollmentMessage && (
@@ -782,111 +817,91 @@ function StudentCourseDetails() {
                     </div>
                   )}
 
-                  {hasModules ? (
-                    courseModules.map((module, index) => (
-                      <div key={module.id} className="mb-4">
-                        <div className="d-flex align-items-center p-3 mb-2 about-bubble bg-light">
+                  {assessmentsLoading ? (
+                    <div className="text-center py-5">
+                      <div className="loading-spinner mb-3" role="status">
+                        <span className="visually-hidden">Loading...</span>
+                      </div>
+                      <p className="profile-joined">Loading assessments...</p>
+                    </div>
+                  ) : assessments && assessments.length > 0 ? (
+                    assessments.map((assessment) => (
+                      <div key={assessment.id} className="mb-4">
+                        <div className="d-flex align-items-center p-3 mb-3 about-bubble bg-light">
                           <div className="me-3">
-                            <BookOpen size={24} className="text-primary" />
-                          </div>
-                          <div className="flex-grow-1">
-                            <h5 className="about-subtitle mb-1">Chapter {index + 1}: {module.title}</h5>
-                            {module.description && (
-                              <small className="text-muted">{module.description}</small>
+                            {assessment.assessment_type === 'quiz' ? (
+                              <BarChart3 size={24} className="text-main" />
+                            ) : assessment.assessment_type === 'assignment' ? (
+                              <Download size={24} className="text-main" />
+                            ) : (
+                              <BookOpen size={24} className="text-main" />
                             )}
                           </div>
-                        </div>
-
-                        {/* Module Assessments */}
-                        <div className="ms-4">
-                          {/* Quiz Assessment */}
-                          <div className="d-flex align-items-center p-3 mb-2 about-bubble position-relative">
-                            <div className="me-3">
-                              <BarChart3 size={20} className="text-warning" />
-                            </div>
-                            <div className="flex-grow-1">
-                              <h6 className="about-subtitle mb-1">Chapter {index + 1} Quiz</h6>
-                              <div className="d-flex align-items-center gap-3">
+                          <div className="flex-grow-1">
+                            <h5 className="about-subtitle mb-1">{assessment.title}</h5>
+                            <div className="d-flex align-items-center gap-3 mb-2">
+                              {assessment.is_timed && assessment.time_limit && (
                                 <small className="profile-joined">
                                   <Clock size={14} className="me-1" />
-                                  15 min
+                                  {assessment.time_limit} min
                                 </small>
-                                <small
-                                  className="border rounded px-2 py-1"
-                                  style={{
-                                    color: "var(--color-primary)",
-                                    borderColor: "var(--color-primary)"
-                                  }}
-                                >
-                                  Quiz
-                                </small>
-                                <small className="badge bg-info">
-                                  10 Questions
-                                </small>
-                              </div>
-                              <small className="text-muted d-block mt-1">
-                                Test your knowledge of Chapter {index + 1} concepts
-                              </small>
-                            </div>
-                            <div className="d-flex align-items-center">
-                              <button
-                                className="btn-edit-profile btn-sm"
-                                onClick={() => {
-                                  if (showEnrollmentMessage) {
-                                    alert("Please enroll in this course to access assessments.");
-                                  } else {
-                                    alert(`Starting Chapter ${index + 1} Quiz...`);
-                                  }
+                              )}
+                              <small
+                                className="border rounded px-2 py-1"
+                                style={{
+                                  color: "var(--color-primary)",
+                                  borderColor: "var(--color-primary)"
                                 }}
                               >
-                                Start Quiz
-                              </button>
+                                {assessment.assessment_type === 'quiz' ? 'Quiz' : 
+                                 assessment.assessment_type === 'assignment' ? 'Assignment' : 
+                                 assessment.assessment_type === 'course_exam' ? 'Final Exam' : 'Assessment'}
+                              </small>
+                              {assessment.total_questions > 0 && (
+                                <small className="badge bg-secondary">
+                                  {assessment.total_questions} Questions
+                                </small>
+                              )}
+                              {assessment.total_marks > 0 && (
+                                <small className="badge bg-secondary">
+                                  {assessment.total_marks} Marks
+                                </small>
+                              )}
                             </div>
+                            <small className="text-muted d-block">
+                              {assessment.related_to || 'Course assessment'}
+                            </small>
+                            {assessment.is_timed && (
+                              <small className="text-warning d-block mt-1">
+                                ⏰ Timed Assessment
+                              </small>
+                            )}
+                            {!assessment.is_available && (
+                              <small className="text-danger d-block mt-1">
+                                ⚠️ Assessment not available
+                              </small>
+                            )}
                           </div>
-
-                          {/* Assignment Assessment */}
-                          <div className="d-flex align-items-center p-3 mb-2 about-bubble position-relative">
-                            <div className="me-3">
-                              <Download size={20} className="text-success" />
-                            </div>
-                            <div className="flex-grow-1">
-                              <h6 className="about-subtitle mb-1">Chapter {index + 1} Assignment</h6>
-                              <div className="d-flex align-items-center gap-3">
-                                <small className="profile-joined">
-                                  <Clock size={14} className="me-1" />
-                                  2 hours
-                                </small>
-                                <small
-                                  className="border rounded px-2 py-1"
-                                  style={{
-                                    color: "var(--color-primary)",
-                                    borderColor: "var(--color-primary)"
-                                  }}
-                                >
-                                  Assignment
-                                </small>
-                                <small className="badge bg-warning">
-                                  Due: 7 days
-                                </small>
-                              </div>
-                              <small className="text-muted d-block mt-1">
-                                Practical assignment to apply Chapter {index + 1} concepts
-                              </small>
-                            </div>
-                            <div className="d-flex align-items-center">
-                              <button
-                                className="btn-edit-profile btn-sm"
-                                onClick={() => {
-                                  if (showEnrollmentMessage) {
-                                    alert("Please enroll in this course to access assessments.");
-                                  } else {
-                                    alert(`Opening Chapter ${index + 1} Assignment...`);
-                                  }
-                                }}
-                              >
-                                View Assignment
-                              </button>
-                            </div>
+                          <div className="d-flex align-items-center">
+                            <button
+                              className={`btn-edit-profile btn-sm ${!assessment.is_available ? 'disabled' : ''}`}
+                              onClick={() => {
+                                if (showEnrollmentMessage) {
+                                  alert("Please enroll in this course to access assessments.");
+                                } else if (!assessment.is_available) {
+                                  alert("This assessment is not available at the moment.");
+                                } else {
+                                  navigate(pagePaths.student.assessmentDetails(educatorUsername, assessment.id), {
+                                    state: { assessment }
+                                  });
+                                }
+                              }}
+                              disabled={!assessment.is_available}
+                            >
+                              {assessment.assessment_type === 'quiz' ? 'View' : 
+                               assessment.assessment_type === 'assignment' ? 'View' : 
+                               'View'}
+                            </button>
                           </div>
                         </div>
                       </div>
@@ -898,54 +913,7 @@ function StudentCourseDetails() {
                     </div>
                   )}
 
-                  {/* Final Assessment */}
-                  {hasModules && (
-                    <div className="mt-4">
-                      <div className="d-flex align-items-center p-3 mb-2 about-bubble bg-primary text-white">
-                        <div className="me-3">
-                          <Award size={24} className="text-white" />
-                        </div>
-                        <div className="flex-grow-1">
-                          <h5 className="about-subtitle mb-1 text-white">Final Course Assessment</h5>
-                          <div className="d-flex align-items-center gap-3">
-                            <small className="text-white-50">
-                              <Clock size={14} className="me-1" />
-                              3 hours
-                            </small>
-                            <small
-                              className="border rounded px-2 py-1 text-white"
-                              style={{
-                                borderColor: "white"
-                              }}
-                            >
-                              Final Exam
-                            </small>
-                            <small className="badge bg-warning">
-                              50 Questions
-                            </small>
-                          </div>
-                          <small className="text-white-50 d-block mt-1">
-                            Comprehensive final exam covering all course material
-                          </small>
-                        </div>
-                        <div className="d-flex align-items-center">
-                          <button
-                            className="btn-edit-profile btn-sm"
-                            style={{ backgroundColor: 'white', color: 'var(--color-primary)' }}
-                            onClick={() => {
-                              if (showEnrollmentMessage) {
-                                alert("Please enroll in this course to access assessments.");
-                              } else {
-                                alert("Starting Final Course Assessment...");
-                              }
-                            }}
-                          >
-                            Start Final Exam
-                          </button>
-                        </div>
-                      </div>
-                    </div>
-                  )}
+
                 </div>
               </div>
             )}
@@ -955,7 +923,16 @@ function StudentCourseDetails() {
                 <div className="card-body">
                   <h3 className="section-title mb-4">Course Review</h3>
 
-                  {reviewSubmitted ? (
+
+
+                  {reviewLoading ? (
+                    <div className="text-center py-5">
+                      <div className="loading-spinner mb-3" role="status">
+                        <span className="visually-hidden">Loading...</span>
+                      </div>
+                      <p className="profile-joined">Loading review data...</p>
+                    </div>
+                  ) : hasReview ? (
                     <div className="alert alert-success">
                       <h5 className="alert-heading d-flex align-items-center">
                         <CheckCircle size={20} className="me-2" />
@@ -970,15 +947,15 @@ function StudentCourseDetails() {
                             <Star
                               key={i}
                               size={16}
-                              className={i < reviewRating ? "text-warning" : "text-muted"}
-                              fill={i < reviewRating ? "currentColor" : "none"}
+                              className={i < studentReview?.rating ? "text-warning" : "text-muted"}
+                              fill={i < studentReview?.rating ? "currentColor" : "none"}
                             />
                           ))}
                         </span>
-                        {reviewComment && (
+                        {studentReview?.comment && (
                           <>
                             <br />
-                            <strong>Your Comment:</strong> {reviewComment}
+                            <strong>Your Comment:</strong> {studentReview.comment}
                           </>
                         )}
                       </p>
@@ -989,7 +966,7 @@ function StudentCourseDetails() {
                         Share your experience with this course to help other students make informed decisions.
                       </p>
 
-                      {!showReviewForm ? (
+                      {!showReviewForm && !hasReview ? (
                         <button
                           className="btn-edit-profile"
                           onClick={() => setShowReviewForm(true)}
@@ -997,7 +974,7 @@ function StudentCourseDetails() {
                           <Star size={16} className="me-2" />
                           Write a Review
                         </button>
-                      ) : (
+                      ) : showReviewForm ? (
                         <form onSubmit={handleReviewSubmit}>
                           <div className="mb-4">
                             <h5 className="about-subtitle mb-3">Rate this course</h5>
@@ -1060,7 +1037,7 @@ function StudentCourseDetails() {
                             </button>
                           </div>
                         </form>
-                      )}
+                      ) : null}
                     </div>
                   )}
                 </div>
