@@ -13,6 +13,8 @@ export const pagePaths = {
       `/${educator_username}/student/courses/${courseId}`,
     lessonDetails: (educator_username, courseId, lessonId) =>
       `/${educator_username}/student/course/${courseId}/lesson/${lessonId}`,
+    assessmentDetails: (educator_username, assessmentId) =>
+      `/${educator_username}/student/assessments/${assessmentId}`,
   },
   educator: {
     login: "/login",

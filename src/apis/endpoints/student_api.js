@@ -22,10 +22,30 @@ export const studentEndpoints = {
 		// Alternative endpoint - uncomment if this matches your backend
 		// courseModules: (courseId) => `/course/${courseId}/modules/`,
 		courseDetails: (courseId) => `/course/course-detail/${courseId}`,
+		courseRatings: (courseId) => `/courses/${courseId}/list-ratings/`,
 		listAll: (educatorUsername) => `course/teacher-list/${educatorUsername}`,
 		enrollmentDelete: (courseId, enrollmentId) =>
 			`/course/course-enrollment-delete/${courseId}/${enrollmentId}`,
 		// New endpoint for fetching lessons within a module
 		moduleLessons: (moduleId) => `/modules/${moduleId}/lessons/`,
 	},
+
+  // Assessment endpoints - Updated to match your EXACT backend structure
+  assessments: {
+    // Get available assessments for a teacher (EXACT ENDPOINT FROM YOUR BACKEND)
+    available: (teacherUsername, courseId = null) => 
+      `/student/assessments/${teacherUsername}/`,
+    
+    // Start an assessment (EXACT ENDPOINT FROM YOUR BACKEND)
+    start: (assessmentId, teacherUsername) => `/student/assessments/${assessmentId}/${teacherUsername}/start/`,
+    
+    // Submit assessment answers (EXACT ENDPOINT FROM YOUR BACKEND)
+    submit: (attemptId) => `/students/attempts/${attemptId}/submit/`,
+    
+    // Get all attempts (EXACT ENDPOINT FROM YOUR BACKEND)
+    attempts: (teacherUsername) => `/student/${teacherUsername}/attempts/`,
+    
+    // Get specific attempt details (EXACT ENDPOINT FROM YOUR BACKEND)
+    attemptDetails: (attemptId) => `/student/attempts/${attemptId}/result/`,
+  },
 };

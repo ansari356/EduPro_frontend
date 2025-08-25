@@ -12,6 +12,7 @@ import EducatorCourseDetailsPage from "./pages/Educator/EducatorCourseDetails";
 import StudentCourseDetailsPage from "./pages/Student/studentCourseDetails";
 import StudentCourses from "./pages/Student/StudentCourses";
 import LessonDetails from "./pages/Student/LessonDetails";
+import AssessmentDetails from "./pages/Student/AssessmentDetails";
 import EditCoursePage from "./pages/Educator/EducatorEditCoursePage";
 import Home from "./pages/home";
 import EducatorProtectedRoutes from "./components/auth/educatorProtectedRoutes";
@@ -82,6 +83,7 @@ function App() {
               <Route path=":id" element={<StudentCourseDetailsPage />} />
             </Route>
             <Route path="course/:courseId/lesson/:lessonId" element={<LessonDetails />} />
+            <Route path="assessments/:assessmentId" element={<AssessmentDetails />} />
           </Route>
         </Route>
       </Route>
