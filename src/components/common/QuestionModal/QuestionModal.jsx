@@ -16,7 +16,11 @@ export default function QuestionModal({
   const handleAddOption = () => {
     setQuestionForm(prev => ({
       ...prev,
-      options: [...prev.options, { option_text: "", is_correct: false }]
+      options: [...prev.options, { 
+        option_text: "", 
+        is_correct: false,
+        order: prev.options.length + 1
+      }]
     }));
   };
 
@@ -47,8 +51,8 @@ export default function QuestionModal({
       explanation: "",
       image: null,
       options: [
-        { option_text: "", is_correct: false },
-        { option_text: "", is_correct: false }
+        { option_text: "", is_correct: true, order: 1 },
+        { option_text: "", is_correct: false, order: 2 }
       ]
     });
   };
@@ -165,7 +169,7 @@ export default function QuestionModal({
                 <div className="mb-3">
                   <label className="form-label">Options</label>
                   {questionForm.options.map((option, index) => (
-                    <div key={index} className="input-group mb-2">
+                    <div key={option.id || `option-${index}`} className="input-group mb-2">
                       <input
                         type="text"
                         className="form-control"

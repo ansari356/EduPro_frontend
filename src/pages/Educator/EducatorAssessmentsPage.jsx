@@ -35,6 +35,7 @@ import gradeAnswer from "../../apis/actions/educator/gradeAnswer";
 import { educatorEndpoints } from "../../apis/endpoints/educatorApi";
 import baseApi from "../../apis/base";
 import QuestionModal from "../../components/common/QuestionModal/QuestionModal";
+import useEducatorQuestionDetail from "../../apis/hooks/educator/useEducatorQuestionDetail";
 
 export default function EducatorAssessmentsPage() {
   const navigate = useNavigate();
@@ -51,6 +52,7 @@ export default function EducatorAssessmentsPage() {
   const [sortOrder, setSortOrder] = useState("desc");
   const [questionLoading, setQuestionLoading] = useState(false);
   const [openDropdownId, setOpenDropdownId] = useState(null);
+  const [editingQuestionId, setEditingQuestionId] = useState(null);
 
   // Toggle dropdown function
   const toggleDropdown = (assessmentId) => {
@@ -77,6 +79,13 @@ export default function EducatorAssessmentsPage() {
   const { data: courses } = useEducatorCoursesData();
   const { data: lessons } = useEducatorAllLessonsData();
   const { data: modules } = useEducatorAllModulesData();
+
+  // Hook to fetch full question details when editing (after editingQuestionId state is declared)
+  const { 
+    data: questionDetail, 
+    isLoading: questionDetailLoading, 
+    error: questionDetailError 
+  } = useEducatorQuestionDetail(editingQuestionId);
 
   // Form states
   const [assessmentForm, setAssessmentForm] = useState({
@@ -110,6 +119,32 @@ export default function EducatorAssessmentsPage() {
     points_awarded: 0,
     teacher_feedback: ""
   });
+
+  // Populate form when question details are loaded
+  useEffect(() => {
+    if (questionDetail && editingQuestionId) {
+      console.log("Populating form with question details:", questionDetail);
+      setQuestionForm({
+        question_text: questionDetail.question_text || "",
+        question_type: questionDetail.question_type || "multiple_choice",
+        points: questionDetail.points || questionDetail.mark || 1,
+        order: questionDetail.order || 1,
+        explanation: questionDetail.explanation || "",
+        image: null, // Don't pre-populate file input
+        options: questionDetail.options && questionDetail.options.length > 0 
+          ? questionDetail.options.map(opt => ({
+              id: opt.id,
+              option_text: opt.option_text || "",
+              is_correct: Boolean(opt.is_correct)
+            }))
+          : [
+              { option_text: "", is_correct: false },
+              { option_text: "", is_correct: false }
+            ]
+      });
+      setShowCreateQuestion(true);
+    }
+  }, [questionDetail, editingQuestionId]);
 
   // Filtered and sorted assessments
   const filteredAssessments = assessments?.filter(assessment => {
@@ -611,6 +646,7 @@ export default function EducatorAssessmentsPage() {
       
       setShowCreateQuestion(false);
       setSelectedQuestion(null);
+      setEditingQuestionId(null);
       
       if (mutateAssessments) {
         await mutateAssessments();
@@ -721,20 +757,10 @@ export default function EducatorAssessmentsPage() {
   };
 
   const handleEditQuestion = (question) => {
+    console.log("Starting to edit question:", question.id);
     setSelectedQuestion(question);
-    setQuestionForm({
-      question_text: question.question_text || "",
-      question_type: question.question_type || "multiple_choice",
-      points: question.points || question.mark || 1,
-      order: question.order || 1,
-      explanation: question.explanation || "",
-      image: null, // Don't pre-populate file input
-      options: question.options || [
-        { option_text: "", is_correct: false },
-        { option_text: "", is_correct: false }
-      ]
-    });
-    setShowCreateQuestion(true);
+    setEditingQuestionId(question.id);
+    // The form will be populated automatically when questionDetail is loaded via useEffect
   };
 
   const handleGradeAnswerClick = (answer) => {
@@ -912,7 +938,7 @@ export default function EducatorAssessmentsPage() {
                       <div className="card card-hoverable h-100">
                         <div className="card-body">
                           <div className="d-flex justify-content-between align-items-start mb-3">
-                            <div className="badge bg-primary">{assessment.assessment_type}</div>
+                            <div className="text-primary text-uppercase fw-bold">{assessment.assessment_type}</div>
                             <div className="dropdown position-relative">
                               <button
                                 className="btn btn-link-custom dropdown-toggle"
@@ -933,19 +959,7 @@ export default function EducatorAssessmentsPage() {
                                   zIndex: 1000
                                 }}
                               >
-                                <li>
-                                  <button
-                                    className="dropdown-item"
-                                    onClick={(e) => {
-                                      e.stopPropagation();
-                                      handleEditAssessment(assessment);
-                                      setOpenDropdownId(null);
-                                    }}
-                                  >
-                                    <Edit size={16} className="me-2" />
-                                    Edit
-                                  </button>
-                                </li>
+                                
                                 <li>
                                   <button
                                     className="dropdown-item"
@@ -1408,12 +1422,13 @@ export default function EducatorAssessmentsPage() {
         onClose={() => {
           setShowCreateQuestion(false);
           setSelectedQuestion(null);
+          setEditingQuestionId(null);
         }}
         onSubmit={selectedQuestion ? handleUpdateQuestion : handleCreateQuestion}
         questionForm={questionForm}
         setQuestionForm={setQuestionForm}
         selectedQuestion={selectedQuestion}
-        isLoading={questionLoading}
+        isLoading={questionLoading || questionDetailLoading}
       />
 
       {/* Grade Answer Modal */}
