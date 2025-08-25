@@ -20,9 +20,9 @@ export const educatorEndpoints = {
 		update: (courseId) => `/course/update/${courseId}`,
 		delete: (courseId) => `/course/course-delete/${courseId}`,
 		searchFilter: `/course/course-search-filter/`,
-		educatorCourses:`/course/list-by-teacher/`,
+		educatorCourses: `/course/list-by-teacher/`,
 		enrollments: (courseId) => `/get_student-enrollments/${courseId}`,
-		ratings:(courseId) => `/courses/${courseId}/list-ratings/`,
+		ratings: (courseId) => `/courses/${courseId}/list-ratings/`,
 	},
 	students: {
 		profile: (studentId) => `/teacher/get-student-profile/${studentId}`,
@@ -53,6 +53,19 @@ export const educatorEndpoints = {
 		list: (moduleId) => `/modules/${moduleId}/lessons/`,
 		create: (moduleId) => `/modules/${moduleId}/lessons/create/`,
 	},
-
-	
+	assessment: {
+		list: `/teacher/assessments/`,
+		detail: (assessmentId) => `/teacher/assessments/${assessmentId}/`,
+		questions: (assessmentId) =>
+			`/teacher/assessments/${assessmentId}/questions/`,
+		questionDetail: (questionId) =>
+			`/teacher/assessments/questions/${questionId}/`,
+		options: (questionId) =>
+			`/teacher/questions/${questionId}/options/`,
+		optionDetail: (optionId) => `/teacher/questions/options/${optionId}/`,
+		grading: {
+			pending: `/teacher/grading/pending/`,
+			answer: (answerId) => `/teacher/grading/answer/${answerId}/`,
+		},
+	},
 };

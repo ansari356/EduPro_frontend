@@ -27,6 +27,7 @@ export const pagePaths = {
     students: "/students",
     studentDetails: (studentId) => `/students/${studentId}`,
     coupons: "/coupons",
+    assessments: "/assessments",
   },
   notFound: "*",
 };

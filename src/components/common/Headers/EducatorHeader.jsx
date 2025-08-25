@@ -38,6 +38,14 @@ export default function EducatorHeader() {
             </Nav.Link>
             <Nav.Link
               as={NavLink}
+              to={pagePaths.educator.assessments}
+              className="nav-link-custom"
+            >
+              <i className="bi bi-file-text me-2"></i>
+              Assessments
+            </Nav.Link>
+            <Nav.Link
+              as={NavLink}
               to={pagePaths.educator.students}
               className="nav-link-custom"
             >

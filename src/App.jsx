@@ -26,6 +26,8 @@ import EducatorStudentsPage from "./pages/Educator/educatorStudentsPage";
 import EducatorStudentDetails from "./pages/Educator/educatorStudentDetails";
 import MainNavbarLayout from "./components/layout/MainNavbarLayout";
 import EducatorCouponsPage from "./pages/Educator/educatorCouponsPage";
+import EducatorAssessmentsPage from "./pages/Educator/EducatorAssessmentsPage";
+import EducatorAssessmentDetailPage from "./pages/Educator/EducatorAssessmentDetailPage";
 import StudentHome from "./pages/Student/StudentHome";
 import StudentMainNavbarLayout from "./components/layout/StudentMainNavbarLayout";
 
@@ -47,6 +49,8 @@ function App() {
         <Route element={<EducatorNavbarLayout />}>
           <Route path="/educator" element={<EducatorProfile />} />
           <Route path="/coupons" element={<EducatorCouponsPage />} />
+          <Route path="/assessments" element={<EducatorAssessmentsPage />} />
+          <Route path="/assessments/:assessmentId" element={<EducatorAssessmentDetailPage />} />
           <Route path="/students" element={<EducatorStudentsPage />} />
           <Route
             path="/students/:studentId"
