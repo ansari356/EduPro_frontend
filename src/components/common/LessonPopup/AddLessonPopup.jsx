@@ -3,7 +3,7 @@ import PropTypes from "prop-types";
 import "./AddLessonPopup.css";
 import createNewLesson from "../../../apis/actions/educator/createNewLesson";
 import updateLesson from "../../../apis/actions/educator/updateLesson";
-import { X, PlusCircle, FileText, Image, Hash, Video, BookOpen } from "lucide-react";
+import { X, PlusCircle, FileText, Image, Hash, Video, BookOpen, Check } from "lucide-react";
 
 const AddLessonPopup = ({ module, onClose, onLessonAdded, lesson, lessonsCount }) => {
   const isEditMode = !!lesson;
@@ -17,7 +17,8 @@ const AddLessonPopup = ({ module, onClose, onLessonAdded, lesson, lessonsCount }
     document: null,
     thumbnail: null,
   });
-  const [thumbnailPreview, setThumbnailPreview] = useState(null);
+  const [thumbnailPreview, setThumbnailPreview] = useState(lesson?.thumbnail_url || null);
+  
   const [errors, setErrors] = useState({});
   const [isSubmitting, setIsSubmitting] = useState(false);
 
@@ -41,10 +42,17 @@ const AddLessonPopup = ({ module, onClose, onLessonAdded, lesson, lessonsCount }
 
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target;
-    setLessonData({
-      ...lessonData,
-      [name]: type === "checkbox" ? checked : value,
-    });
+    
+    if (type === 'checkbox') {
+      setLessonData((prev) => ({ ...prev, [name]: checked }));
+    } else {
+      setLessonData((prev) => ({ ...prev, [name]: value }));
+    }
+    
+    // Clear error when user starts typing
+    if (errors[name]) {
+      setErrors((prev) => ({ ...prev, [name]: "" }));
+    }
   };
 
   const handleFileChange = (e) => {
@@ -100,7 +108,9 @@ const AddLessonPopup = ({ module, onClose, onLessonAdded, lesson, lessonsCount }
       } else {
         const formData = new FormData();
         Object.keys(lessonData).forEach((key) => {
-            formData.append(key, lessonData[key]);
+            if (lessonData[key] !== null) {
+                formData.append(key, lessonData[key]);
+            }
         });
         await createNewLesson(module.id, formData);
         alert("Lesson created successfully!");
@@ -137,7 +147,11 @@ const AddLessonPopup = ({ module, onClose, onLessonAdded, lesson, lessonsCount }
                   value={lessonData.title}
                   onChange={handleChange}
                   required
+                  disabled={isSubmitting}
                 />
+                {errors.title && (
+                  <div className="invalid-feedback">{errors.title}</div>
+                )}
               </div>
               <div className="col-12">
                 <label className="form-label d-flex align-items-center gap-2">
@@ -151,6 +165,7 @@ const AddLessonPopup = ({ module, onClose, onLessonAdded, lesson, lessonsCount }
                   value={lessonData.description}
                   onChange={handleChange}
                   rows={3}
+                  disabled={isSubmitting}
                 />
               </div>
               <div className="col-12">
@@ -167,30 +182,67 @@ const AddLessonPopup = ({ module, onClose, onLessonAdded, lesson, lessonsCount }
                   onChange={handleChange}
                   required
                   min="1"
+                  disabled={isSubmitting}
                 />
+                {errors.order && (
+                  <div className="invalid-feedback">{errors.order}</div>
+                )}
               </div>
+
+              {/* Is Free */}
               <div className="col-12">
-                <div className="form-group-checkbox">
-                  <label>
-                    <input
-                      type="checkbox"
-                      name="is_published"
-                      checked={lessonData.is_published}
-                      onChange={handleChange}
-                    />
-                    Published
-                  </label>
-                  <label>
-                    <input
-                      type="checkbox"
-                      name="is_free"
-                      checked={lessonData.is_free}
-                      onChange={handleChange}
-                    />
-                    Free
+                <div className="form-check">
+                  <input
+                    id="is_free"
+                    type="checkbox"
+                    className={`form-check-input ${
+                      errors.is_free ? "is-invalid" : ""
+                    }`}
+                    name="is_free"
+                    checked={lessonData.is_free}
+                    onChange={handleChange}
+                    disabled={isSubmitting}
+                  />
+                  <label
+                    className="form-check-label d-flex align-items-center gap-2"
+                    htmlFor="is_free"
+                  >
+                    <Check size={16} />
+                    Is Free
                   </label>
                 </div>
+                {errors.is_free && (
+                  <div className="invalid-feedback">{errors.is_free}</div>
+                )}
               </div>
+
+              {/* Is Published */}
+              <div className="col-12">
+                <div className="form-check">
+                  <input
+                    id="is_published"
+                    type="checkbox"
+                    className={`form-check-input ${
+                      errors.is_published ? "is-invalid" : ""
+                    }`}
+                    name="is_published"
+                    checked={lessonData.is_published}
+                    onChange={handleChange}
+                    disabled={isSubmitting}
+                  />
+                  <label
+                    className="form-check-label d-flex align-items-center gap-2"
+                    htmlFor="is_published"
+                  >
+                    <Check size={16} />
+                    Is Published
+                  </label>
+                </div>
+                {errors.is_published && (
+                  <div className="invalid-feedback">{errors.is_published}</div>
+                )}
+              </div>
+
               <div className="col-12">
                 <label className="form-label d-flex align-items-center gap-2">
                   <Video size={16} />
@@ -203,6 +255,7 @@ const AddLessonPopup = ({ module, onClose, onLessonAdded, lesson, lessonsCount }
                   className="form-control"
                   onChange={handleFileChange}
                   accept="video/*"
+                  disabled={isSubmitting}
                 />
               </div>
               <div className="col-12">
@@ -217,7 +270,16 @@ const AddLessonPopup = ({ module, onClose, onLessonAdded, lesson, lessonsCount }
                   className="form-control"
                   onChange={handleFileChange}
                   accept=".pdf,.doc,.docx"
+                  disabled={isSubmitting}
                 />
+                {lesson?.document_url && (
+                  <div className="mt-1">
+                    <a href={lesson.document_url} target="_blank" rel="noopener noreferrer">
+                      <FileText size={16} />
+                      View Document
+                    </a>
+                  </div>
+                )}
               </div>
               <div className="col-12">
                 <label className="form-label d-flex align-items-center gap-2">
@@ -231,6 +293,7 @@ const AddLessonPopup = ({ module, onClose, onLessonAdded, lesson, lessonsCount }
                   className="form-control"
                   onChange={handleFileChange}
                   accept="image/*"
+                  disabled={isSubmitting}
                 />
                 {thumbnailPreview && (
                   <div className="mt-3">
