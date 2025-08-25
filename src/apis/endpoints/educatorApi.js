@@ -21,6 +21,7 @@ export const educatorEndpoints = {
 		searchFilter: `/course/course-search-filter/`,
 		educatorCourses:`/course/list-by-teacher/`,
 		enrollments: (courseId) => `/get_student-enrollments/${courseId}`,
+		ratings:(courseId) => `/courses/${courseId}/list-ratings/`,
 	},
 	students: {
 		profile: (studentId) => `/teacher/get-student-profile/${studentId}`,
@@ -50,4 +51,6 @@ export const educatorEndpoints = {
 		list: (moduleId) => `/modules/${moduleId}/lessons/`,
 		create: (moduleId) => `/modules/${moduleId}/lessons/create/`,
 	},
+
+	
 };

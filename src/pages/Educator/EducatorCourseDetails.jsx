@@ -4,6 +4,7 @@ import { useParams, useNavigate } from "react-router-dom";
 import getCoursesDetails from "../../apis/hooks/educator/getCoursesDetails";
 import getModules from "../../apis/hooks/educator/getModules";
 import getLessonList from "../../apis/hooks/educator/getLessonList";
+import getRatesandReviews from "../../apis/hooks/educator/getRatesandReviews";
 import {
   LibraryBig,
   Users,
@@ -198,6 +199,12 @@ export default function EducatorCourseDetailsPage() {
   const [selectedModuleId, setSelectedModuleId] = useState(null);
 
 
+const {
+  data: ratesandReviewsData,
+  error: ratesandReviewsError,
+  isLoading: ratesandReviewsLoading,
+} = getRatesandReviews(id);
+
     // Fetch course details from API
   const {
     data: courseData,
@@ -226,7 +233,6 @@ const {
   }, [moduleData, selectedModuleId]);
 
   
-
    if (courseLoading) {
     return (
       <div className="profile-root">
@@ -912,10 +918,16 @@ const {
                 <div className="card-body">
                   <h3 className="section-title mb-4">Student Reviews</h3>
 
+                  {/* Ratings Summary */}
                   <div className="row mb-4">
                     <div className="col-md-4 text-center">
                       <h2 className="section-title text-accent">
-                        {fixedcourses[0]?.rating}
+                        {ratesandReviewsData && ratesandReviewsData.length > 0
+                          ? (
+                              ratesandReviewsData.reduce((sum, r) => sum + r.rating, 0) /
+                              ratesandReviewsData.length
+                            ).toFixed(1)
+                          : "0.0"}
                       </h2>
                       <div className="mb-2">
                         {[...Array(5)].map((_, i) => (
@@ -923,7 +935,12 @@ const {
                             key={i}
                             size={20}
                             className={
-                              i < Math.floor(fixedcourses[0]?.rating)
+                              i < Math.round(
+                                ratesandReviewsData && ratesandReviewsData.length > 0
+                                  ? ratesandReviewsData.reduce((sum, r) => sum + r.rating, 0) /
+                                    ratesandReviewsData.length
+                                  : 0
+                              )
                                 ? "text-warning"
                                 : "text-muted"
                             }
@@ -931,84 +948,70 @@ const {
                         ))}
                       </div>
                       <p className="profile-joined">
-                        Based on {fixedcourses[0]?.reviews} reviews
+                        Based on {ratesandReviewsData ? ratesandReviewsData.length : 0} reviews
                       </p>
                     </div>
                     <div className="col-md-8">
-                      {[5, 4, 3, 2, 1].map((rating) => (
-                        <div
-                          key={rating}
-                          className="d-flex align-items-center mb-2"
-                        >
-                          <span className="me-2">{rating} star</span>
-                          <div className="progress flex-grow-1 me-2">
-                            <div
-                              className="progress-bar-filled"
-                              style={{
-                                width: `${
-                                  rating === 5
-                                    ? 70
-                                    : rating === 4
-                                    ? 20
-                                    : rating === 3
-                                    ? 7
-                                    : rating === 2
-                                    ? 2
-                                    : 1
-                                }%`,
-                              }}
-                            ></div>
+                      {[5, 4, 3, 2, 1].map((rating) => {
+                        const count =
+                          ratesandReviewsData?.filter((r) => r.rating === rating).length || 0;
+                        const percent =
+                          ratesandReviewsData && ratesandReviewsData.length > 0
+                            ? (count / ratesandReviewsData.length) * 100
+                            : 0;
+                        return (
+                          <div key={rating} className="d-flex align-items-center mb-2">
+                            <span className="me-2">{rating} star</span>
+                            <div className="progress flex-grow-1 me-2">
+                              <div
+                                className="progress-bar-filled"
+                                style={{ width: `${percent}%` }}
+                              ></div>
+                            </div>
+                            <small className="profile-joined">{count}</small>
                           </div>
-                          <small className="profile-joined">
-                            {rating === 5
-                              ? 164
-                              : rating === 4
-                              ? 47
-                              : rating === 3
-                              ? 16
-                              : rating === 2
-                              ? 5
-                              : 2}
-                          </small>
-                        </div>
-                      ))}
+                        );
+                      })}
                     </div>
                   </div>
 
+                  {/* Recent Reviews */}
                   <div>
                     <h4 className="about-subtitle mb-3">Recent Reviews</h4>
-                    {fixedcourses[0]?.recentReviews?.map((review) => (
-                      <div key={review.id} className="card mb-3">
-                        <div className="card-body">
-                          <div className="d-flex justify-content-between align-items-start mb-2">
-                            <div>
-                              <h6 className="about-subtitle mb-1">
-                                {review.student}
-                              </h6>
-                              <div className="mb-2">
-                                {[...Array(5)].map((_, i) => (
-                                  <Star
-                                    key={i}
-                                    size={16}
-                                    className={
-                                      i < review.rating
-                                        ? "text-warning"
-                                        : "text-muted"
-                                    }
-                                  />
-                                ))}
+                    {ratesandReviewsData && ratesandReviewsData.length > 0 ? (
+                      ratesandReviewsData.map((review) => (
+                        <div key={review.id} className="card mb-3">
+                          <div className="card-body">
+                            <div className="d-flex justify-content-between align-items-start mb-2">
+                              <div>
+                                <h6 className="about-subtitle mb-1">
+                                  {review.student?.full_name || "Unknown"}
+                                </h6>
+                                <div className="mb-2">
+                                  {[...Array(5)].map((_, i) => (
+                                    <Star
+                                      key={i}
+                                      size={16}
+                                      className={i < review.rating ? "text-warning" : "text-muted"}
+                                    />
+                                  ))}
+                                </div>
                               </div>
+                              <small className="profile-joined">
+                                {review.created_at
+                                  ? new Date(review.created_at).toLocaleDateString()
+                                  : ""}
+                              </small>
                             </div>
-                            <small className="profile-joined">
-                              {review.date}
-                            </small>
+                            <p className="profile-joined mb-0">{review.comment}</p>
                           </div>
-                          <p className="profile-joined mb-0">
-                            {review.comment}
-                          </p>
                         </div>
+                      ))
+                    ) : (
+                      <div className="text-center text-muted py-3">
+                        No reviews available.
                       </div>
-                    ))}
+                    )}
                   </div>
                 </div>
               </div>
