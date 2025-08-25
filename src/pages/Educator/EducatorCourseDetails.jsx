@@ -567,10 +567,10 @@ const {
                 <div className="card-body">
                   <div className="d-flex justify-content-between align-items-center mb-4">
                     <h3 className="section-title mb-0">Course Curriculum</h3>
-                    <button className="btn-edit-profile d-flex align-items-center">
+                    {/* <button className="btn-edit-profile d-flex align-items-center">
                       <i className="bi bi-plus me-2"></i>
                       Add Module
-                    </button>
+                    </button> */}
                   </div>
 
                   {moduleLoading ? (
@@ -626,14 +626,14 @@ const {
                               </div>
                             </div>
                             <div className="d-flex gap-2">
-                              <button className="btn-edit-profile d-flex align-items-center">
+                              {/* <button className="btn-edit-profile d-flex align-items-center">
                                 <Edit size={14} className="me-1" />
                                 Edit
-                              </button>
-                              <button className="btn-edit-profile d-flex align-items-center">
+                              </button> */}
+                              {/* <button className="btn-edit-profile d-flex align-items-center">
                                 <i className="bi bi-plus me-1"></i>
                                 Add Lesson
-                              </button>
+                              </button> */}
                             </div>
                           </div>
 
