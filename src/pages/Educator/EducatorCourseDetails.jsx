@@ -6,6 +6,7 @@ import getModules from "../../apis/hooks/educator/getModules";
 import getLessonList from "../../apis/hooks/educator/getLessonList";
 import getRatesandReviews from "../../apis/hooks/educator/getRatesandReviews";
 import useCourseEnrollments from "../../apis/hooks/educator/useCourseEnrollments";
+import useCourseAssessments from "../../apis/hooks/educator/useCourseAssessments";
 import {
   LibraryBig,
   Users,
@@ -21,6 +22,9 @@ import {
   TriangleAlert,
   DollarSign,
   ArrowBigLeft,
+  FileText,
+  CheckCircle,
+  AlertCircle,
 } from "lucide-react";
 
 // fixed_data
@@ -224,6 +228,12 @@ const {
   error: enrollmentsError,
   isLoading: enrollmentsLoading,
 } = useCourseEnrollments(id);
+
+const {
+  assessments,
+  error: assessmentsError,
+  isLoading: assessmentsLoading,
+} = useCourseAssessments(id);
 
 
 
@@ -505,6 +515,16 @@ const {
                     onClick={() => setActiveTab("reviews")}
                   >
                     Reviews
+                  </button>
+                  <button
+                    className={`btn-link-custom flex-fill text-center py-3 ${
+                      activeTab === "assessments"
+                        ? "text-accent border-main"
+                        : "profile-joined"
+                    }`}
+                    onClick={() => setActiveTab("assessments")}
+                  >
+                    Assessments
                   </button>
 
                 </div>
@@ -963,6 +983,183 @@ const {
                       </div>
                     )}
                   </div>
+                </div>
+              </div>
+            )}
+
+            {activeTab === "assessments" && (
+              <div className="card">
+                <div className="card-body">
+                  <div className="d-flex justify-content-between align-items-center mb-4">
+                    <h3 className="section-title mb-0">Course Assessments</h3>
+                    <button 
+                      className="btn-edit-profile d-flex align-items-center"
+                      onClick={() => navigate(`/assessments`)}
+                    >
+                      <i className="bi bi-plus me-2"></i>
+                      Create Assessment
+                    </button>
+                  </div>
+
+                  {assessmentsLoading ? (
+                    <div className="text-center py-4">
+                      <div className="spinner-border text-main" role="status">
+                        <span className="visually-hidden">Loading assessments...</span>
+                      </div>
+                    </div>
+                  ) : assessmentsError ? (
+                    <div className="card mb-3">
+                      <div className="card-body text-center">
+                        <TriangleAlert size={40} className="text-muted mb-3" />
+                        <h5 className="section-title">Error Loading Assessments</h5>
+                        <p className="profile-joined">Failed to load assessment data. Please try again.</p>
+                      </div>
+                    </div>
+                  ) : !assessments || Object.keys(assessments).length === 0 ? (
+                    <div className="card mb-3">
+                      <div className="card-body text-center">
+                        <FileText size={40} className="text-muted mb-3" />
+                        <h5 className="section-title">No Assessments Found</h5>
+                        <p className="profile-joined">This course doesn't have any assessments yet.</p>
+                        <button 
+                          className="btn-edit-profile"
+                          onClick={() => navigate(`/assessments`)}
+                        >
+                          <i className="bi bi-plus me-2"></i>
+                          Create First Assessment
+                        </button>
+                      </div>
+                    </div>
+                  ) : (
+                    <div className="d-flex flex-column gap-3">
+                      {Object.values(assessments)
+                        .sort((a, b) => {
+                          // Sort by creation date - newest first
+                          return new Date(b.created_at) - new Date(a.created_at);
+                        })
+                        .map((assessment) => (
+                        <div key={assessment.id} className="card">
+                          <div className="card-body p-3">
+                            <div className="d-flex justify-content-between align-items-start mb-2">
+                              <div className="flex-grow-1">
+                                <div className="d-flex align-items-center gap-2 mb-2">
+                                  <h6 className="about-subtitle mb-0">{assessment.title}</h6>
+                                  <span className={`badge badge-sm ${
+                                    assessment.assessment_type === 'quiz' ? 'bg-info' :
+                                    assessment.assessment_type === 'exam' ? 'bg-warning' :
+                                    assessment.assessment_type === 'assignment' ? 'bg-primary' :
+                                    'bg-secondary'
+                                  }`}>
+                                    {assessment.assessment_type?.charAt(0).toUpperCase() + assessment.assessment_type?.slice(1)}
+                                  </span>
+                                  <span className={`badge badge-sm ${assessment.is_published ? 'bg-success' : 'bg-secondary'}`}>
+                                    {assessment.is_published ? 'Published' : 'Draft'}
+                                  </span>
+                                </div>
+                                
+                                {/* Related To */}
+                                <div className="mb-2">
+                                  <small className="profile-joined">
+                                    <i className="bi bi-link-45deg me-1"></i>
+                                    {assessment.related_to || 'Course Assessment'}
+                                  </small>
+                                </div>
+
+                                {/* Assessment Info */}
+                                <div className="d-flex flex-wrap gap-3 mb-2">
+                                  <small className="profile-joined">
+                                    <i className="bi bi-list-ol me-1"></i>
+                                    {assessment.total_questions} questions
+                                  </small>
+                                  <small className="profile-joined">
+                                    <i className="bi bi-award me-1"></i>
+                                    {assessment.total_marks} marks
+                                  </small>
+                                  {assessment.is_timed && assessment.time_limit && (
+                                    <small className="profile-joined">
+                                      <i className="bi bi-clock me-1"></i>
+                                      {assessment.time_limit} min
+                                    </small>
+                                  )}
+                                  <small className="profile-joined">
+                                    <i className="bi bi-arrow-repeat me-1"></i>
+                                    {assessment.max_attempts} attempt{assessment.max_attempts !== 1 ? 's' : ''}
+                                  </small>
+                                </div>
+
+                                {/* Availability */}
+                                <div className="d-flex align-items-center gap-2">
+                                  <span className={`badge badge-sm ${assessment.is_available ? 'bg-success' : 'bg-warning'}`}>
+                                    {assessment.is_available ? 'Available' : 'Not Available'}
+                                  </span>
+                                  <small className="profile-joined">
+                                    Created: {assessment.created_at ? new Date(assessment.created_at).toLocaleDateString() : 'N/A'}
+                                  </small>
+                                </div>
+                              </div>
+
+                              {/* Action Icons */}
+                              <div className="d-flex gap-1">
+                                <button 
+                                  className="btn btn-sm p-1 border-0 bg-transparent text-primary"
+                                  title="View Assessment Details"
+                                  onClick={() => navigate(`/assessments/${assessment.id}`)}
+                                >
+                                  <Eye size={16} />
+                                </button>
+            
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+
+                  {/* Assessment Summary */}
+                  {assessments && Object.keys(assessments).length > 0 && (
+                    <div className="card mt-4">
+                      <div className="card-body">
+                        <h5 className="about-subtitle mb-3">Assessment Summary</h5>
+                        <div className="row text-center">
+                          <div className="col-6 col-md-3">
+                            <div className="mb-2">
+                              <FileText size={24} className="text-main" />
+                            </div>
+                            <small className="profile-joined d-block">Total</small>
+                            <strong className="text-accent">{Object.keys(assessments).length}</strong>
+                          </div>
+                          <div className="col-6 col-md-3">
+                            <div className="mb-2">
+                              <CheckCircle size={24} className="text-success" />
+                            </div>
+                            <small className="profile-joined d-block">Published</small>
+                            <strong className="text-success">
+                              {Object.values(assessments).filter(a => a.is_published).length}
+                            </strong>
+                          </div>
+                          <div className="col-6 col-md-3">
+                            <div className="mb-2">
+                              <AlertCircle size={24} className="text-warning" />
+                            </div>
+                            <small className="profile-joined d-block">Available</small>
+                            <strong className="text-success">
+                              {Object.values(assessments).filter(a => a.is_available).length}
+                            </strong>
+                          </div>
+                          <div className="col-6 col-md-3">
+                            <div className="mb-2">
+                              <i className="bi bi-clock text-main" style={{fontSize: '24px'}}></i>
+                            </div>
+                            <small className="profile-joined d-block">Timed</small>
+                            <strong className="text-accent">
+                              {Object.values(assessments).filter(a => a.is_timed).length}
+                            </strong>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  )}
                 </div>
               </div>
             )}

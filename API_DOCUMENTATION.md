@@ -390,21 +390,161 @@ Most endpoints require JWT authentication. Include the token in the http only co
 
 **Authentication:** Required (Teacher)
 
+**Description:** This endpoint allows authenticated teachers to retrieve a paginated list of all students associated with their account. The endpoint provides comprehensive student information including profile details, enrollment status, and academic progress.
+
+**Request Headers:**
+```
+Authorization: Bearer <jwt_access_token>
+Content-Type: application/json
+```
+
+**Query Parameters:**
+- `page` (optional): Page number for pagination (default: 1)
+- `is_active` (optional): Filter students by active status (true/false)
+- `search` (optional): Search students by username, email, or full name
+- `ordering` (optional): Sort results by specific fields
+
+**Available Ordering Options:**
+- `enrollment_date` - Sort by enrollment date (ascending)
+- `-enrollment_date` - Sort by enrollment date (descending)
+- `student__full_name` - Sort by student full name (ascending)
+- `-student__full_name` - Sort by student full name (descending)
+
 **Response (200):**
 ```json
-[
-    {
-        "id": "uuid",
-        "username": "string",
-        "first_name": "string",
-        "last_name": "string",
-        "email": "string",
-        "phone": "string",
-        "avatar": "url or null",
-        "is_blocked": "boolean"
-    }
-]
+{
+    "count": 15,
+    "next": "http://localhost:8000/api/teacher/get_students/?page=2",
+    "previous": null,
+    "results": [
+        {
+            "id": "uuid",
+            "student": {
+                "id": "uuid",
+                "user": {
+                    "id": "uuid",
+                    "first_name": "string",
+                    "last_name": "string",
+                    "email": "string",
+                    "username": "string",
+                    "phone": "string",
+                    "avatar": "url or null",
+                    "user_type": "student",
+                    "is_active": true,
+                    "created_at": "datetime",
+                    "last_login": "datetime"
+                },
+                "full_name": "string",
+                "bio": "string or null",
+                "profile_picture": "url or null",
+                "date_of_birth": "date or null",
+                "address": "string or null",
+                "country": "string or null",
+                "city": "string or null",
+                "gender": "string or null"
+            },
+            "enrollment_date": "date",
+            "notes": "string or null",
+            "is_active": true,
+            "completed_lessons": 0,
+            "last_activity": "datetime",
+            "number_of_completed_courses": 0
+        }
+    ]
+}
 ```
+
+**Response Fields Explanation:**
+- `count`: Total number of students associated with the teacher
+- `next`: URL for the next page (null if no next page)
+- `previous`: URL for the previous page (null if no previous page)
+- `results`: Array of student objects
+
+**Student Object Fields:**
+- `id`: Unique identifier for the teacher-student relationship
+- `student`: Complete student profile information
+  - `user`: Basic user account details
+  - `full_name`: Student's full name
+  - `bio`: Student's biography (optional)
+  - `profile_picture`: Student's profile picture URL (optional)
+  - `date_of_birth`: Student's date of birth (optional)
+  - `address`, `country`, `city`: Location information (optional)
+  - `gender`: Student's gender (optional)
+- `enrollment_date`: Date when student joined the teacher
+- `notes`: Teacher's notes about the student (optional)
+- `is_active`: Whether the student is currently active/blocked
+- `completed_lessons`: Number of lessons completed by the student
+- `last_activity`: Timestamp of student's last activity
+- `number_of_completed_courses`: Number of courses completed by the student
+
+**Usage Examples:**
+
+1. **Get all students (first page):**
+   ```
+   GET /api/teacher/get_students/
+   ```
+
+2. **Get page 2 of students:**
+   ```
+   GET /api/teacher/get_students/?page=2
+   ```
+
+3. **Get only active students:**
+   ```
+   GET /api/teacher/get_students/?is_active=true
+   ```
+
+4. **Search for students with "john" in their name, email, or username:**
+   ```
+   GET /api/teacher/get_students/?search=john
+   ```
+
+5. **Order students by enrollment date (ascending):**
+   ```
+   GET /api/teacher/get_students/?ordering=enrollment_date
+   ```
+
+6. **Order students by full name (descending):**
+   ```
+   GET /api/teacher/get_students/?ordering=-student__full_name
+   ```
+
+7. **Combined example (active students, page 1, ordered by name):**
+   ```
+   GET /api/teacher/get_students/?is_active=true&page=1&ordering=student__full_name
+   ```
+
+**Error Responses:**
+
+**401 Unauthorized:**
+```json
+{
+    "detail": "Authentication credentials were not provided."
+}
+```
+
+**403 Forbidden:**
+```json
+{
+    "detail": "You do not have permission to perform this action."
+}
+```
+
+**500 Internal Server Error:**
+```json
+{
+    "error": "Internal server error",
+    "detail": "An unexpected error occurred while retrieving students."
+}
+```
+
+**Notes:**
+- The endpoint uses pagination with a default page size of 5 students per page
+- Students are ordered by full name by default
+- The `is_active` field indicates whether a student is blocked or active
+- Search functionality works across username, email, and full name fields
+- All datetime fields are returned in ISO 8601 format
+- File fields (avatar, profile_picture) return full URLs when available
 
 ### 1.19 Get Student Profile by ID
 **GET** `/teacher/get-student-profile/<student_id>/`

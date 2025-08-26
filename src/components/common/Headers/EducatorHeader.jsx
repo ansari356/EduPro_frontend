@@ -3,9 +3,11 @@ import { NavLink, Link } from "react-router-dom";
 import { pagePaths } from "../../../pagePaths";
 import logoutUser from "../../../apis/actions/logoutUser";
 import useRefreshToken from "../../../apis/hooks/useRefreshToken";
+import useEducatorProfileData from "../../../apis/hooks/educator/useEducatorProfileData";
 
 export default function EducatorHeader() {
   const { mutate } = useRefreshToken();
+  const { data: user } = useEducatorProfileData();
   return (
     <Navbar bg="white" expand="lg" className="custom-navbar shadow-sm">
       <Container fluid className="px-4">
@@ -80,43 +82,11 @@ export default function EducatorHeader() {
                 <Dropdown.Header className="dropdown-header">
                   <div className="user-info">
                     <i className="bi bi-person-circle me-2"></i>
-                    <span>Dr. Amelia Carter</span>
+                    <span>{user?.user?.username}</span>
                   </div>
                 </Dropdown.Header>
                 <Dropdown.Divider />
-                <Dropdown.Item
-                  as={Link}
-                  to={pagePaths.educator.profile}
-                  className="dropdown-item-custom"
-                >
-                  <i className="bi bi-person me-2"></i>
-                  Profile
-                </Dropdown.Item>
-                <Dropdown.Item
-                  as={Link}
-                  to={pagePaths.educator.settings || "#settings"}
-                  className="dropdown-item-custom"
-                >
-                  <i className="bi bi-gear me-2"></i>
-                  Settings
-                </Dropdown.Item>
-                <Dropdown.Item
-                  as={Link}
-                  to={pagePaths.educator.courseSettings || "#course-settings"}
-                  className="dropdown-item-custom"
-                >
-                  <i className="bi bi-sliders me-2"></i>
-                  Course Settings
-                </Dropdown.Item>
-                <Dropdown.Item
-                  as={Link}
-                  to={pagePaths.educator.notifications || "#notifications"}
-                  className="dropdown-item-custom"
-                >
-                  <i className="bi bi-bell me-2"></i>
-                  Notifications
-                </Dropdown.Item>
-                <Dropdown.Divider />
+                
                 <Dropdown.Item
                   onClick={() => logoutUser()
                     .then(() => {

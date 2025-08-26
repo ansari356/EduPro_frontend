@@ -55,7 +55,10 @@ export const educatorEndpoints = {
 	},
 	assessment: {
 		list: `/teacher/assessments/`,
+		courseAssessments: (courseId) => `/teacher/courses/${courseId}/assessments/`,
 		detail: (assessmentId) => `/teacher/assessments/${assessmentId}/`,
+		attempts: (assessmentId) => `/teacher/assessments/${assessmentId}/attempts/`,
+		studentAttempts: (assessmentId, studentUsername) => `/teacher/assessments/${assessmentId}/attempts/${studentUsername}/`,
 		questions: (assessmentId) =>
 			`/teacher/assessments/${assessmentId}/questions/`,
 		questionDetail: (questionId) =>
@@ -64,7 +67,17 @@ export const educatorEndpoints = {
 			`/teacher/questions/${questionId}/options/`,
 		optionDetail: (optionId) => `/teacher/questions/options/${optionId}/`,
 		grading: {
+			// All pending grading across all assessments
 			pending: `/teacher/grading/pending/`,
+			// Course-specific pending grading
+			courseGrading: (courseId) => `/teacher/courses/${courseId}/grading/pending/`,
+			// Assessment-specific pending grading
+			assessmentGrading: (assessmentId) => `/teacher/assessments/${assessmentId}/grading/pending/`,
+			// Assessment type grading (quiz, assignment, exam)
+			typeGrading: (assessmentType) => `/teacher/assessments/${assessmentType}/grading/pending/`,
+			// Question type grading (multiple_choice, essay, etc.)
+			questionTypeGrading: (questionType) => `/teacher/assessments/questions/${questionType}/grading/pending/`,
+			// Grade specific answer
 			answer: (answerId) => `/teacher/grading/answer/${answerId}/`,
 		},
 	},

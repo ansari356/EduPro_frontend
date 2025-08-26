@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { DollarSign, Plus, Copy } from "lucide-react";
+import { DollarSign, Plus, Copy, Eye, EyeOff } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import useEducatorCouponsListData from "../../apis/hooks/educator/useEducatorCouponsListData";
 import useEducatorUsedCouponsListData from "../../apis/hooks/educator/useEducatorUsedCouponsListData";
@@ -10,9 +10,17 @@ const COUPONS_PER_PAGE = 5;
 export default function ManageCouponsPage() {
   const navigate = useNavigate();
   const [pageNumber, setPageNumber] = useState(1);
+  const [viewMode, setViewMode] = useState('active'); // 'active' or 'used'
   const { totalRevenue } = useEducatorTotalRevenue();
-  const { data: coupons, isLoading, error, couponsCount, mutate } = useEducatorCouponsListData(pageNumber);
-  const { usedCouponsCount } = useEducatorUsedCouponsListData(pageNumber);
+  const { data: activeCoupons, isLoading: activeLoading, error: activeError, couponsCount: activeCouponsCount, mutate: mutateActive } = useEducatorCouponsListData(pageNumber);
+  const { data: usedCoupons, isLoading: usedLoading, error: usedError, usedCouponsCount, mutate: mutateUsed } = useEducatorUsedCouponsListData(pageNumber);
+  
+  // Determine current data based on view mode
+  const currentCoupons = viewMode === 'active' ? activeCoupons : usedCoupons;
+  const currentLoading = viewMode === 'active' ? activeLoading : usedLoading;
+  const currentError = viewMode === 'active' ? activeError : usedError;
+  const currentCount = viewMode === 'active' ? activeCouponsCount : usedCouponsCount;
+  const currentMutate = viewMode === 'active' ? mutateActive : mutateUsed;
 
   const [showAddForm, setShowAddForm] = useState(false);
   const [formData, setFormData] = useState({
@@ -28,6 +36,11 @@ export default function ManageCouponsPage() {
     setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
+  const handleViewModeChange = (mode) => {
+    setViewMode(mode);
+    setPageNumber(1); // Reset to first page when switching views
+  };
+
   const handleAddCouponSubmit = async (e) => {
     e.preventDefault();
     const { price, numberOfCoupons } = formData;
@@ -41,7 +54,7 @@ export default function ManageCouponsPage() {
     }
     try {
       await createCoupon({ n: Number(numberOfCoupons), price: Number(price) });
-      mutate(); // Revalidate SWR cache
+      mutateActive(); // Revalidate active coupons cache
       alert("Coupon created successfully!");
       setFormData({ price: "", numberOfCoupons: "" });
       setShowAddForm(false);
@@ -50,7 +63,7 @@ export default function ManageCouponsPage() {
     }
   };
 
-  if (isLoading) {
+  if (currentLoading) {
     return (
       <div className="min-vh-100 profile-root p-4 d-flex justify-content-center align-items-center">
         <p>Loading coupons data...</p>
@@ -58,10 +71,10 @@ export default function ManageCouponsPage() {
     );
   }
 
-  if (error) {
+  if (currentError) {
     return (
       <div className="min-vh-100 profile-root p-4 d-flex justify-content-center align-items-center">
-        <p>Error loading coupons: {error.message}</p>
+        <p>Error loading coupons: {currentError.message}</p>
       </div>
     );
   }
@@ -122,6 +135,7 @@ export default function ManageCouponsPage() {
 										id="price"
 										name="price"
 										min="0"
+										step="1"
 										className="form-control"
 										value={formData.price}
 										onChange={handleInputChange}
@@ -168,8 +182,8 @@ export default function ManageCouponsPage() {
 								<div className="avatar-circle mx-auto">
 									<DollarSign size={24} />
 								</div>
-								<h4 className="profile-role mt-2">{couponsCount}</h4>
-								<p className="profile-role">Total Coupons</p>
+								<h4 className="profile-role mt-2">{activeCouponsCount || 0}</h4>
+								<p className="profile-role">Active Coupons</p>
 							</div>
 						</div>
 					</div>
@@ -180,7 +194,7 @@ export default function ManageCouponsPage() {
 								<div className="avatar-circle mx-auto">
 									<Plus size={24} />
 								</div>
-								<h4 className="profile-role mt-2">{usedCouponsCount}</h4>
+								<h4 className="profile-role mt-2">{usedCouponsCount || 0}</h4>
 								<p className="profile-role">Used Coupons</p>
 							</div>
 						</div>
@@ -199,37 +213,68 @@ export default function ManageCouponsPage() {
 					</div>
 				</div>
 
+				{/* View Toggle */}
+				<div className="card border-0 shadow-sm mb-4">
+					<div className="card-body">
+						<div className="d-flex justify-content-center">
+							<div className="btn-group" role="group" aria-label="Coupon view toggle">
+								<button
+									type="button"
+									className={`btn ${viewMode === 'active' ? 'btn-edit-profile' : 'btn-outline-secondary'}`}
+									onClick={() => handleViewModeChange('active')}
+								>
+									<Eye size={16} className="me-2" />
+									Active Coupons ({activeCouponsCount || 0})
+								</button>
+								<button
+									type="button"
+									className={`btn ${viewMode === 'used' ? 'btn-edit-profile' : 'btn-outline-secondary'}`}
+									onClick={() => handleViewModeChange('used')}
+								>
+									<EyeOff size={16} className="me-2" />
+									Used Coupons ({usedCouponsCount || 0})
+								</button>
+							</div>
+						</div>
+					</div>
+				</div>
+
 				{/* Coupons Grid */}
 				<section>
 					<div className="row g-4">
-						{coupons.length === 0 ? (
+						{!currentCoupons || currentCoupons.length === 0 ? (
 							<div className="alert alert-primary">
-								No active coupons available.
+								No {viewMode} coupons available.
 							</div>
 						) : (
-							coupons.map((coupon) => (
+							currentCoupons.map((coupon) => (
 								<div key={coupon.id} className="col-md-6 col-xl-4">
 									<div className="card h-100 shadow-sm">
 										<div className="card-body d-flex flex-column">
 											<div className="d-flex justify-content-between align-items-start mb-2">
-												<h5 className="section-title mb-0">{coupon.code}</h5>
+												<h5 className="section-title mb-0">
+													{viewMode === 'used' ? coupon.coupon?.code : coupon.code}
+												</h5>
 												<div className="d-flex align-items-center gap-2">
 													<span
 														className={`badge ${
-															coupon.is_active
+															viewMode === 'used' 
+																? "badge-warning-custom" 
+																: coupon.is_active
 																? "badge-success-custom"
 																: "badge-warning-custom"
 														}`}
 													>
-														{coupon.is_active ? "Active" : "Inactive"}
+														{viewMode === 'used' ? "Used" : (coupon.is_active ? "Active" : "Inactive")}
 													</span>
 													<button
-														className="btn btn-edit-profile p-1"
+														className=" btn-edit-profile p-0"
 														onClick={() => {
-															navigator.clipboard.writeText(coupon.code);
+															const code = viewMode === 'used' ? coupon.coupon?.code : coupon.code;
+															navigator.clipboard.writeText(code);
 															alert("Coupon code copied!");
 														}}
-														aria-label={`Copy coupon code ${coupon.code}`}
+														aria-label={`Copy coupon code ${viewMode === 'used' ? coupon.coupon?.code : coupon.code}`}
 													>
 														<Copy size={16} />
 													</button>
@@ -237,23 +282,38 @@ export default function ManageCouponsPage() {
 											</div>
 
 											<p className="profile-role mb-1">
-												Value: {coupon.price.toFixed(2)}
+												Value: ${viewMode === 'used' ? (coupon.coupon?.price ? coupon.coupon.price.toFixed(2) : '0.00') : (coupon.price ? coupon.price.toFixed(2) : '0.00')}
 											</p>
-											<p className="profile-joined mb-1">
-												Status: {coupon.used_count ? "Used" : "Available"}
-											</p>
+											{viewMode === 'used' && coupon.student && (
+												<p className="profile-joined mb-1">
+													Used by: {coupon.student}
+												</p>
+											)}
+											{viewMode === 'used' && coupon.course && (
+												<p className="profile-joined mb-1">
+													Course: {coupon.course}
+												</p>
+											)}
+											{viewMode === 'used' && coupon.used_at && (
+												<p className="profile-joined mb-1">
+													Used on: {new Date(coupon.used_at).toLocaleDateString()}
+												</p>
+											)}
 
 											<div className="d-flex justify-content-between align-items-center mb-3">
 												<p className="profile-joined mb-0">
-													Created: {new Date(coupon.date).toLocaleDateString()}
+													Created: {new Date(viewMode === 'used' ? coupon.coupon?.date : coupon.date).toLocaleDateString()}
 												</p>
 												<p className="profile-joined mb-0">
 													Expires:{" "}
-													{coupon.expiration_date
-														? new Date(
-																coupon.expiration_date
-														  ).toLocaleDateString()
-														: "N/A"}
+													{viewMode === 'used' 
+														? (coupon.coupon?.expiration_date
+															? new Date(coupon.coupon.expiration_date).toLocaleDateString()
+															: "N/A")
+														: (coupon.expiration_date
+															? new Date(coupon.expiration_date).toLocaleDateString()
+															: "N/A")
+													}
 												</p>
 											</div>
 
@@ -273,7 +333,7 @@ export default function ManageCouponsPage() {
 					</div>
 
 					{/* Pagination */}
-					{couponsCount > COUPONS_PER_PAGE && (
+					{currentCount > COUPONS_PER_PAGE && (
 						<nav aria-label="Page navigation">
 							<ul className="pagination justify-content-center mt-4">
 								<li
@@ -289,7 +349,7 @@ export default function ManageCouponsPage() {
 									</button>
 								</li>
 								{Array.from(
-									{ length: Math.ceil(couponsCount / COUPONS_PER_PAGE) },
+									{ length: Math.ceil(currentCount / COUPONS_PER_PAGE) },
 									(_, i) => (
 										<li
 											key={i + 1}
@@ -308,7 +368,7 @@ export default function ManageCouponsPage() {
 								)}
 								<li
 									className={`page-item ${
-										pageNumber === Math.ceil(couponsCount / COUPONS_PER_PAGE)
+										pageNumber === Math.ceil(currentCount / COUPONS_PER_PAGE)
 											? "disabled"
 											: ""
 									}`}
@@ -318,7 +378,7 @@ export default function ManageCouponsPage() {
 										onClick={() =>
 											setPageNumber((prev) =>
 												Math.min(
-													Math.ceil(couponsCount / COUPONS_PER_PAGE),
+													Math.ceil(currentCount / COUPONS_PER_PAGE),
 													prev + 1
 												)
 											)
