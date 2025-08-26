@@ -9,8 +9,8 @@ export default function 	useRefreshToken() {
 		swrPostFetcher(),
 		{
 			refreshInterval: 50 * 1000,
-			// errorRetryInterval: 10 * 60 * 1000,
-			// revalidateOnFocus: false,
+			errorRetryInterval: 10 * 60 * 1000,
+			revalidateOnFocus: false,
 		}
 	);
 
