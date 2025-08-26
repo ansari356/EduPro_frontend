@@ -978,17 +978,6 @@ export default function EducatorAssessmentDetailPage() {
 									Student Attempts ({assessment.total_attempts || 0})
 								</button>
 							</li>
-							<li className="nav-item" role="presentation">
-								<button
-									className={`nav-link ${
-										activeTab === "analytics" ? "active" : ""
-									}`}
-									onClick={() => setActiveTab("analytics")}
-								>
-									<BarChart3 size={16} className="me-2" />
-									Analytics
-								</button>
-							</li>
 						</ul>
 					</div>
 				</div>

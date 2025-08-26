@@ -5,6 +5,7 @@ import getCoursesDetails from "../../apis/hooks/educator/getCoursesDetails";
 import getModules from "../../apis/hooks/educator/getModules";
 import getLessonList from "../../apis/hooks/educator/getLessonList";
 import getRatesandReviews from "../../apis/hooks/educator/getRatesandReviews";
+import useCourseEnrollments from "../../apis/hooks/educator/useCourseEnrollments";
 import {
   LibraryBig,
   Users,
@@ -181,13 +182,7 @@ const fixedcourses = [
         date: "1 week ago",
       },
     ],
-    analytics: {
-      totalViews: 45623,
-      completionRate: "71.5%",
-      avgTimeSpent: "8.5 hours",
-      dropoffPoint: "Chapter 3 - Data Cleaning",
-      peakEngagement: "Chapter 1 - Introduction",
-    },
+
   },
 ];
 
@@ -224,6 +219,12 @@ const {
   isLoading: lessonLoading,
 } = getLessonList(selectedModuleId);
 
+const {
+  enrollments,
+  error: enrollmentsError,
+  isLoading: enrollmentsLoading,
+} = useCourseEnrollments(id);
+
 
 
   React.useEffect(() => {
@@ -237,7 +238,7 @@ const {
     return (
       <div className="profile-root">
         <div className="container py-5 text-center">
-          <div className="spinner-border text-primary" role="status">
+          <div className="spinner-border text-main" role="status">
             <span className="visually-hidden">Loading...</span>
           </div>
         </div>
@@ -505,16 +506,7 @@ const {
                   >
                     Reviews
                   </button>
-                  <button
-                    className={`btn-link-custom flex-fill text-center py-3 ${
-                      activeTab === "analytics"
-                        ? "text-accent border-main"
-                        : "profile-joined"
-                    }`}
-                    onClick={() => setActiveTab("analytics")}
-                  >
-                    Analytics
-                  </button>
+
                 </div>
               </div>
             </div>
@@ -575,7 +567,7 @@ const {
 
                   {moduleLoading ? (
                     <div className="text-center py-4">
-                      <div className="spinner-border text-primary" role="status">
+                      <div className="spinner-border text-main" role="status">
                         <span className="visually-hidden">Loading modules...</span>
                       </div>
                     </div>
@@ -792,102 +784,80 @@ const {
               <div className="card">
                 <div className="card-body">
                   <div className="d-flex justify-content-between align-items-center mb-4">
-                    <h3 className="section-title mb-0">Students Performance</h3>
+                    <h3 className="section-title mb-0">Course Students</h3>
                   </div>
-
-                  <div className="row mb-4">
-                    <div className="col-md-4">
-                      <div className="text-center">
-                        <h4 className="section-title text-accent">
-                              {fixedcourses[0]?.completionRate}
-                        </h4>
-                        <p className="profile-joined">Completion Rate</p>
-                      </div>
-                    </div>
-                    <div className="col-md-4">
-                      <div className="text-center">
-                        <h4 className="section-title text-accent">
-                          {fixedcourses[0]?.averageProgress}
-                        </h4>
-                        <p className="profile-joined">Average Progress</p>
-                      </div>
-                    </div>
-                    <div className="col-md-4">
-                      <div className="text-center">
-                        <h4 className="section-title text-accent">
-                            {fixedcourses[0]?.analytics?.totalViews}
-                        </h4>
-                        <p className="profile-joined">Avg. Time Spent</p>
-                      </div>
-                    </div>
-                  </div>
-
                   <div className="mb-4">
-                    <h4 className="about-subtitle mb-3">
-                      Recent Student Activity
-                    </h4>
-                    <div className="table-responsive custom-table-container">
-                      <table className="table table-borderless">
-                        <thead>
-                          <tr>
-                            <th>Student</th>
-                            <th>Progress</th>
-                            <th>Last Activity</th>
-                            <th>Status</th>
-                          </tr>
-                        </thead>
-                        <tbody>
-                          <tr>
-                            <td>John Smith</td>
-                            <td>
-                              <div className="progress">
-                                <div
-                                  className="progress-bar-filled"
-                                  style={{ width: "85%" }}
-                                ></div>
-                              </div>
-                              <small className="profile-joined">85%</small>
-                            </td>
-                            <td>2 hours ago</td>
-                            <td>
-                              <span className="text-accent">Active</span>
-                            </td>
-                          </tr>
-                          <tr>
-                            <td>Sarah Johnson</td>
-                            <td>
-                              <div className="progress">
-                                <div
-                                  className="progress-bar-filled"
-                                  style={{ width: "92%" }}
-                                ></div>
-                              </div>
-                              <small className="profile-joined">92%</small>
-                            </td>
-                            <td>1 day ago</td>
-                            <td>
-                              <span className="text-accent">Active</span>
-                            </td>
-                          </tr>
-                          <tr>
-                            <td>Mike Chen</td>
-                            <td>
-                              <div className="progress">
-                                <div
-                                  className="progress-bar-filled"
-                                  style={{ width: "100%" }}
-                                ></div>
-                              </div>
-                              <small className="profile-joined">100%</small>
-                            </td>
-                            <td>3 days ago</td>
-                            <td>
-                              <span className="text-success">Completed</span>
-                            </td>
-                          </tr>
-                        </tbody>
-                      </table>
-                    </div>
+                    {enrollmentsLoading ? (
+                      <div className="text-center py-4">
+                        <div className="spinner-border text-main" role="status">
+                          <span className="visually-hidden">Loading students...</span>
+                        </div>
+                      </div>
+                    ) : enrollmentsError ? (
+                      <div className="card mb-3">
+                        <div className="card-body text-center">
+                          <TriangleAlert size={40} className="text-muted mb-3" />
+                          <h5 className="section-title">Error Loading Students</h5>
+                          <p className="profile-joined">Failed to load student data. Please try again.</p>
+                        </div>
+                      </div>
+                    ) : enrollments.length === 0 ? (
+                      <div className="card mb-3">
+                        <div className="card-body text-center">
+                          <Users size={40} className="text-muted mb-3" />
+                          <h5 className="section-title">No Students Enrolled</h5>
+                          <p className="profile-joined">This course doesn't have any enrolled students yet.</p>
+                        </div>
+                      </div>
+                    ) : (
+                      <div className="table-responsive custom-table-container">
+                        <table className="table table-borderless">
+                          <thead>
+                            <tr>
+                              <th>Student</th>
+                              <th>Email</th>
+                              <th>Username</th>
+                              <th>Phone</th>
+                              <th>Status</th>
+                            </tr>
+                          </thead>
+                          <tbody>
+                            {enrollments.map((enrollment) => (
+                              <tr key={enrollment.id}>
+                                <td>
+                                  <div className="d-flex align-items-center">
+                                    <img
+                                      src={enrollment.profile_picture || "https://placehold.co/40x40?text=U"}
+                                      alt={enrollment.full_name}
+                                      className="rounded-circle me-2"
+                                      style={{ width: "40px", height: "40px", objectFit: "cover" }}
+                                    />
+                                    <div>
+                                      <div className="fw-bold">{enrollment.full_name}</div>
+                                      <small className="text-muted">{enrollment.user?.username}</small>
+                                    </div>
+                                  </div>
+                                </td>
+                                <td>
+                                  <small className="profile-joined">{enrollment.user?.email}</small>
+                                </td>
+                                <td>
+                                  <span className="badge bg-light text-dark">{enrollment.user?.username}</span>
+                                </td>
+                                <td>
+                                  <small className="profile-joined">{enrollment.user?.phone || "N/A"}</small>
+                                </td>
+                                <td>
+                                  <span className={`badge ${enrollment.user?.is_active ? "bg-success" : "bg-secondary"}`}>
+                                    {enrollment.user?.is_active ? "Active" : "Inactive"}
+                                  </span>
+                                </td>
+                              </tr>
+                            ))}
+                          </tbody>
+                        </table>
+                      </div>
+                    )}
                   </div>
                 </div>
               </div>
@@ -997,135 +967,7 @@ const {
               </div>
             )}
 
-            {activeTab === "analytics" && (
-              <div className="card">
-                <div className="card-body">
-                  <h3 className="section-title mb-4">Course Analytics</h3>
 
-                  <div className="row mb-4">
-                    <div className="col-md-6">
-                      <div className="card">
-                        <div className="card-body">
-                          <h5 className="about-subtitle mb-3">
-                            Engagement Metrics
-                          </h5>
-                          <div className="mb-2">
-                            <div className="d-flex justify-content-between">
-                              <span className="profile-joined">
-                                Total Views
-                              </span>
-                              <span className="text-accent fw-bold">
-                                {fixedcourses[0]?.analytics?.totalViews?.toLocaleString()}
-                              </span>
-                            </div>
-                          </div>
-                          <div className="mb-2">
-                            <div className="d-flex justify-content-between">
-                              <span className="profile-joined">
-                                Completion Rate
-                              </span>
-                              <span className="text-accent fw-bold">
-                                {fixedcourses[0]?.analytics?.completionRate}
-                              </span>
-                            </div>
-                          </div>
-                          <div className="mb-2">
-                            <div className="d-flex justify-content-between">
-                              <span className="profile-joined">
-                                Avg. Time Spent
-                              </span>
-                              <span className="text-accent fw-bold">
-                                {fixedcourses[0]?.analytics?.avgTimeSpent}
-                              </span>
-                            </div>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                    <div className="col-md-6">
-                      <div className="card">
-                        <div className="card-body">
-                          <h5 className="about-subtitle mb-3">
-                            Learning Insights
-                          </h5>
-                          <div className="mb-2">
-                            <div className="d-flex justify-content-between">
-                              <span className="profile-joined">
-                                Peak Engagement
-                              </span>
-                              <span className="text-accent fw-bold">
-                                {fixedcourses[0]?.analytics?.peakEngagement}
-                              </span>
-                            </div>
-                          </div>
-                          <div className="mb-2">
-                            <div className="d-flex justify-content-between">
-                              <span className="profile-joined">
-                                Drop-off Point
-                              </span>
-                              <span className="text-warning fw-bold">
-                                {fixedcourses[0]?.analytics?.dropoffPoint}
-                              </span>
-                            </div>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-
-                  <div className="card">
-                    <div className="card-body">
-                      <h5 className="about-subtitle mb-3">
-                        Lesson Performance
-                      </h5>
-                      <div className="table-responsive custom-table-container">
-                        <table className="table table-borderless">
-                          <thead>
-                            <tr>
-                              <th>Lesson</th>
-                              <th>Views</th>
-                              <th>Avg. Rating</th>
-                              <th>Completion Rate</th>
-                            </tr>
-                          </thead>
-                          <tbody>
-                            {(fixedcourses[0]?.lessons || []).map((lesson) => (
-                              <tr key={lesson.id}>
-                                <td>{lesson.title}</td>
-                                <td>{lesson.views.toLocaleString()}</td>
-                                <td>
-                                  <div className="d-flex align-items-center">
-                                    <Star
-                                      size={16}
-                                      className="text-warning me-1"
-                                    />
-                                    {lesson.avgRating}
-                                  </div>
-                                </td>
-                                <td>
-                                  <div className="progress">
-                                    <div
-                                      className="progress-bar-filled"
-                                      style={{
-                                        width: `${
-                                          (lesson.views /
-                                            fixedcourses[0]?.enrolledStudents) *
-                                          100
-                                        }%`,
-                                      }}
-                                    ></div>
-                                  </div>
-                                </td>
-                              </tr>
-                            ))}
-                          </tbody>
-                        </table>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            )}
           </div>
 
           {/* Sidebar */}
@@ -1139,18 +981,6 @@ const {
                   <button onClick={() => navigate(`/courses/edit/${course.id}`)} className="btn-edit-profile d-flex align-items-center justify-content-center">
                     <Edit size={16} className="me-2" />
                     Edit Course Content
-                  </button>
-                  <button className="btn-edit-profile d-flex align-items-center justify-content-center">
-                    <MessageCircle size={16} className="me-2" />
-                    Message Students
-                  </button>
-                  <button className="btn-edit-profile d-flex align-items-center justify-content-center">
-                    <Download size={16} className="me-2" />
-                    Export Analytics
-                  </button>
-                  <button className="btn-edit-profile d-flex align-items-center justify-content-center">
-                    <Eye size={16} className="me-2" />
-                    Preview as Student
                   </button>
                 </div>
               </div>

@@ -1,12 +1,12 @@
 import React, { useState, useEffect } from "react";
-import { 
-  FileText, 
-  Plus, 
-  Edit, 
-  Trash2, 
-  Eye, 
-  CheckCircle, 
-  Clock, 
+import {
+  FileText,
+  Plus,
+  Edit,
+  Trash2,
+  Eye,
+  CheckCircle,
+  Clock,
   AlertCircle,
   Users,
   BarChart3,
@@ -20,6 +20,7 @@ import { useNavigate } from "react-router-dom";
 import useEducatorAssessmentsData from "../../apis/hooks/educator/useEducatorAssessmentsData";
 import useEducatorPendingGradingData from "../../apis/hooks/educator/useEducatorPendingGradingData";
 import useEducatorCoursesData from "../../apis/hooks/educator/useEducatorCoursesData";
+import useEducatorStudentProfileData from "../../apis/hooks/educator/useEducatorStudentProfileData";
 import useEducatorAllLessonsData from "../../apis/hooks/educator/useEducatorAllLessonsData";
 import useEducatorAllModulesData from "../../apis/hooks/educator/useEducatorAllModulesData";
 import createAssessment from "../../apis/actions/educator/createAssessment";
@@ -36,6 +37,35 @@ import { educatorEndpoints } from "../../apis/endpoints/educatorApi";
 import baseApi from "../../apis/base";
 import QuestionModal from "../../components/common/QuestionModal/QuestionModal";
 import useEducatorQuestionDetail from "../../apis/hooks/educator/useEducatorQuestionDetail";
+
+// Student Avatar Component that fetches student profile data
+function StudentAvatar({ studentName, attemptId }) {
+  // Extract student ID from attempt ID or use a different approach
+  // For now, we'll use the student name to create a nice avatar
+  const firstLetter = studentName?.[0]?.toUpperCase() || "S";
+
+  return (
+    <div className="d-flex align-items-center">
+      <div
+        className="avatar-circle me-3 d-flex align-items-center justify-content-center"
+        style={{
+          width: "40px",
+          height: "40px",
+          backgroundColor: "var(--color-secondary)",
+          color: "var(--color-primary-dark)",
+          fontSize: "16px",
+          fontWeight: "600"
+        }}
+      >
+        {firstLetter}
+      </div>
+      <div>
+        <div className="fw-bold">{studentName || "Unknown Student"}</div>
+        <small className="text-muted">Attempt: {attemptId?.slice(-8) || "N/A"}</small>
+      </div>
+    </div>
+  );
+}
 
 export default function EducatorAssessmentsPage() {
   const navigate = useNavigate();
@@ -81,10 +111,10 @@ export default function EducatorAssessmentsPage() {
   const { data: modules } = useEducatorAllModulesData();
 
   // Hook to fetch full question details when editing (after editingQuestionId state is declared)
-  const { 
-    data: questionDetail, 
-    isLoading: questionDetailLoading, 
-    error: questionDetailError 
+  const {
+    data: questionDetail,
+    isLoading: questionDetailLoading,
+    error: questionDetailError
   } = useEducatorQuestionDetail(editingQuestionId);
 
   // Form states
@@ -98,8 +128,12 @@ export default function EducatorAssessmentsPage() {
     passing_score: 70,
     is_published: false,
     is_timed: false,
-    time_limit: 30,
-    max_attempts: 3
+  });
+
+  const [gradingForm, setGradingForm] = useState({
+    marks_awarded: "",
+    teacher_feedback: "",
+    is_correct: false,
   });
 
   const [questionForm, setQuestionForm] = useState({
@@ -115,10 +149,7 @@ export default function EducatorAssessmentsPage() {
     ]
   });
 
-  const [gradeForm, setGradeForm] = useState({
-    points_awarded: 0,
-    teacher_feedback: ""
-  });
+
 
   // Populate form when question details are loaded
   useEffect(() => {
@@ -131,16 +162,16 @@ export default function EducatorAssessmentsPage() {
         order: questionDetail.order || 1,
         explanation: questionDetail.explanation || "",
         image: null, // Don't pre-populate file input
-        options: questionDetail.options && questionDetail.options.length > 0 
+        options: questionDetail.options && questionDetail.options.length > 0
           ? questionDetail.options.map(opt => ({
-              id: opt.id,
-              option_text: opt.option_text || "",
-              is_correct: Boolean(opt.is_correct)
-            }))
+            id: opt.id,
+            option_text: opt.option_text || "",
+            is_correct: Boolean(opt.is_correct)
+          }))
           : [
-              { option_text: "", is_correct: false },
-              { option_text: "", is_correct: false }
-            ]
+            { option_text: "", is_correct: false },
+            { option_text: "", is_correct: false }
+          ]
       });
       setShowCreateQuestion(true);
     }
@@ -149,15 +180,15 @@ export default function EducatorAssessmentsPage() {
   // Filtered and sorted assessments
   const filteredAssessments = assessments?.filter(assessment => {
     try {
-      const matchesSearch = searchTerm === "" || 
+      const matchesSearch = searchTerm === "" ||
         (assessment.title && assessment.title.toLowerCase().includes(searchTerm.toLowerCase())) ||
         (assessment.description && assessment.description.toLowerCase().includes(searchTerm.toLowerCase()));
-      
+
       // Fix: Use is_published instead of status since API returns is_published boolean
-      const matchesStatus = filterStatus === "all" || 
+      const matchesStatus = filterStatus === "all" ||
         (filterStatus === "published" && assessment.is_published) ||
         (filterStatus === "draft" && !assessment.is_published);
-      
+
       return matchesSearch && matchesStatus;
     } catch (error) {
       console.error("Error filtering assessment:", error, assessment);
@@ -169,23 +200,23 @@ export default function EducatorAssessmentsPage() {
     try {
       let aValue = a[sortBy];
       let bValue = b[sortBy];
-      
+
       // Handle undefined/null values
       if (aValue === undefined || aValue === null) aValue = "";
       if (bValue === undefined || bValue === null) bValue = "";
-      
+
       // Handle date sorting
       if (sortBy === "created_at") {
         aValue = new Date(aValue).getTime() || 0;
         bValue = new Date(bValue).getTime() || 0;
       }
-      
+
       // Handle string comparison
       if (typeof aValue === "string" && typeof bValue === "string") {
         aValue = aValue.toLowerCase();
         bValue = bValue.toLowerCase();
       }
-      
+
       if (sortOrder === "asc") {
         return aValue > bValue ? 1 : aValue < bValue ? -1 : 0;
       } else {
@@ -200,35 +231,35 @@ export default function EducatorAssessmentsPage() {
   // Assessment management functions
   const handleCreateAssessment = async (e) => {
     e.preventDefault();
-    
+
     try {
       // Validate form data
       if (!assessmentForm.title?.trim()) {
         alert("Assessment title is required");
         return;
       }
-      
+
       if (!assessmentForm.assessment_type) {
         alert("Assessment type is required");
         return;
       }
-      
+
       // Validate relationship field based on assessment type
       if (assessmentForm.assessment_type === "quiz" && !assessmentForm.lesson) {
         alert("Please select a lesson for the quiz");
         return;
       }
-      
+
       if (assessmentForm.assessment_type === "assignment" && !assessmentForm.module) {
         alert("Please select a module for the assignment");
         return;
       }
-      
+
       if (assessmentForm.assessment_type === "course_exam" && !assessmentForm.course) {
         alert("Please select a course for the exam");
         return;
       }
-    
+
       // Prepare the data for API
       const assessmentData = {
         title: assessmentForm.title.trim(),
@@ -240,7 +271,7 @@ export default function EducatorAssessmentsPage() {
         max_attempts: parseInt(assessmentForm.max_attempts) || 3,
         passing_score: assessmentForm.passing_score ? parseFloat(assessmentForm.passing_score) : undefined
       };
-      
+
       // Add the appropriate relationship based on assessment type
       if (assessmentForm.assessment_type === "quiz" && assessmentForm.lesson) {
         assessmentData.lesson = assessmentForm.lesson;
@@ -249,11 +280,11 @@ export default function EducatorAssessmentsPage() {
       } else if (assessmentForm.assessment_type === "course_exam" && assessmentForm.course) {
         assessmentData.course = assessmentForm.course;
       }
-      
+
       console.log("Creating assessment with data:", assessmentData);
       const response = await createAssessment(assessmentData);
       console.log("Assessment created successfully:", response);
-      
+
       // Reset form and close modal
       const resetForm = {
         title: "",
@@ -268,21 +299,21 @@ export default function EducatorAssessmentsPage() {
         time_limit: 30,
         max_attempts: 3
       };
-      
+
       setShowCreateAssessment(false);
       setAssessmentForm(resetForm);
-      
+
       // Refresh data
       if (mutateAssessments) {
         await mutateAssessments();
       }
-      
+
     } catch (error) {
       console.error("Error creating assessment:", error);
-      
+
       // Enhanced error handling
       let errorMessage = "Failed to create assessment. Please try again.";
-      
+
       if (error.response?.data) {
         const errorData = error.response.data;
         if (typeof errorData === 'object' && errorData !== null) {
@@ -304,19 +335,19 @@ export default function EducatorAssessmentsPage() {
       } else if (error.message) {
         errorMessage = error.message;
       }
-      
+
       alert(`Error creating assessment:\n${errorMessage}`);
     }
   };
 
   const handleUpdateAssessment = async (e) => {
     e.preventDefault();
-    
+
     if (!selectedAssessment?.id) {
       alert("No assessment selected for update");
       return;
     }
-    
+
     try {
       const updateData = {
         ...assessmentForm,
@@ -328,11 +359,11 @@ export default function EducatorAssessmentsPage() {
         max_attempts: parseInt(assessmentForm.max_attempts) || 3,
         passing_score: assessmentForm.passing_score ? parseFloat(assessmentForm.passing_score) : undefined
       };
-      
+
       await updateAssessment(selectedAssessment.id, updateData);
       setShowCreateAssessment(false);
       setSelectedAssessment(null);
-      
+
       if (mutateAssessments) {
         await mutateAssessments();
       }
@@ -347,7 +378,7 @@ export default function EducatorAssessmentsPage() {
       alert("Invalid assessment ID");
       return;
     }
-    
+
     if (window.confirm("Are you sure you want to delete this assessment? This action cannot be undone.")) {
       try {
         await deleteAssessment(assessmentId);
@@ -364,32 +395,32 @@ export default function EducatorAssessmentsPage() {
   // Question management functions
   const handleCreateQuestion = async (e) => {
     e.preventDefault();
-    
+
     if (!selectedAssessment?.id) {
       alert("No assessment selected");
       return;
     }
-    
+
     if (!questionForm.question_text?.trim()) {
       alert("Question text is required");
       return;
     }
-    
+
     // Validate options for multiple choice questions
     const validOptions = questionForm.options?.filter(opt => opt.option_text?.trim() !== "") || [];
     if ((questionForm.question_type === "multiple_choice" || questionForm.question_type === "true_false") && validOptions.length < 2) {
       alert("Please provide at least 2 options for this question type");
       return;
     }
-    
+
     // Ensure at least one correct answer for multiple choice
     if ((questionForm.question_type === "multiple_choice" || questionForm.question_type === "true_false") && !validOptions.some(opt => opt.is_correct)) {
       alert("Please mark at least one option as correct");
       return;
     }
-    
+
     setQuestionLoading(true);
-    
+
     try {
       // Step 1: Create the question
       const questionData = {
@@ -400,38 +431,38 @@ export default function EducatorAssessmentsPage() {
         explanation: questionForm.explanation?.trim() || undefined,
         image: questionForm.image || undefined
       };
-      
+
       console.log("Creating question with data:", questionData);
       const questionResponse = await createQuestion(selectedAssessment.id, questionData);
       console.log("Question created successfully:", questionResponse);
       console.log("Full response structure:", JSON.stringify(questionResponse, null, 2));
-      
+
       // Step 2: Create options if this is a multiple choice or true/false question
       if ((questionForm.question_type === "multiple_choice" || questionForm.question_type === "true_false") && validOptions.length > 0) {
         // Try different possible response structures
-        let questionId = questionResponse.data?.id || 
-                        questionResponse.id || 
-                        questionResponse.data?.question?.id ||
-                        questionResponse.question?.id;
-        
+        let questionId = questionResponse.data?.id ||
+          questionResponse.id ||
+          questionResponse.data?.question?.id ||
+          questionResponse.question?.id;
+
         console.log("Extracted question ID:", questionId);
         console.log("Response data:", questionResponse.data);
-        
+
         if (!questionId) {
           console.error("Could not extract question ID from response:", questionResponse);
           console.log("Attempting to fetch questions to find the newly created question...");
-          
+
           // Fallback: Try to fetch the questions and find the one we just created
           try {
             const questionsResponse = await baseApi.get(educatorEndpoints.assessment.questions(selectedAssessment.id));
             const questionsData = questionsResponse.data;
             console.log("Fetched questions:", questionsData);
-            
+
             // Find the question with matching text (most recently created)
-            const newQuestion = questionsData.find(q => 
+            const newQuestion = questionsData.find(q =>
               q.question_text === questionForm.question_text.trim()
             );
-            
+
             if (newQuestion && newQuestion.id) {
               questionId = newQuestion.id;
               console.log("Found question ID from questions list:", questionId);
@@ -439,14 +470,14 @@ export default function EducatorAssessmentsPage() {
           } catch (fetchError) {
             console.error("Error fetching questions for fallback:", fetchError);
           }
-          
+
           if (!questionId) {
             console.warn("Could not extract question ID - options will not be created automatically");
             console.warn("You may need to edit the question to add options manually");
-            
+
             // Don't throw error, just skip options creation
             alert("Question created successfully, but options could not be added automatically. Please edit the question to add options.");
-            
+
             // Reset form and close modal
             const resetQuestionForm = {
               question_text: "",
@@ -460,20 +491,20 @@ export default function EducatorAssessmentsPage() {
                 { option_text: "", is_correct: false }
               ]
             };
-            
+
             setShowCreateQuestion(false);
             setQuestionForm(resetQuestionForm);
-            
+
             if (mutateAssessments) {
               await mutateAssessments();
             }
-            
+
             return; // Exit early, skip options creation
           }
         }
-        
+
         console.log("Creating options for question:", questionId);
-        
+
         // Create each option
         for (let i = 0; i < validOptions.length; i++) {
           const option = validOptions[i];
@@ -483,14 +514,14 @@ export default function EducatorAssessmentsPage() {
             is_correct: Boolean(option.is_correct),
             order: i + 1
           };
-          
+
           console.log(`Creating option ${i + 1}:`, optionData);
           await createOption(questionId, optionData);
         }
-        
+
         console.log("All options created successfully");
       }
-      
+
       // Reset form and close modal
       const resetQuestionForm = {
         question_text: "",
@@ -504,22 +535,22 @@ export default function EducatorAssessmentsPage() {
           { option_text: "", is_correct: false }
         ]
       };
-      
+
       setShowCreateQuestion(false);
       setQuestionForm(resetQuestionForm);
-      
+
       if (mutateAssessments) {
         await mutateAssessments();
       }
-      
+
       alert("Question created successfully!");
-      
+
     } catch (error) {
       console.error("Error creating question:", error);
       console.error("Error response:", error.response?.data);
-      
+
       let errorMessage = "Failed to create question. Please try again.";
-      
+
       if (error.response?.data) {
         const errorData = error.response.data;
         if (typeof errorData === 'object' && errorData !== null) {
@@ -540,7 +571,7 @@ export default function EducatorAssessmentsPage() {
       } else if (error.message) {
         errorMessage = error.message;
       }
-      
+
       alert(`Error creating question:\n${errorMessage}`);
     } finally {
       setQuestionLoading(false);
@@ -549,32 +580,32 @@ export default function EducatorAssessmentsPage() {
 
   const handleUpdateQuestion = async (e) => {
     e.preventDefault();
-    
+
     if (!selectedQuestion?.id) {
       alert("No question selected for update");
       return;
     }
-    
+
     if (!questionForm.question_text?.trim()) {
       alert("Question text is required");
       return;
     }
-    
+
     // Validate options for multiple choice questions
     const validOptions = questionForm.options?.filter(opt => opt.option_text?.trim() !== "") || [];
     if ((questionForm.question_type === "multiple_choice" || questionForm.question_type === "true_false") && validOptions.length < 2) {
       alert("Please provide at least 2 options for this question type");
       return;
     }
-    
+
     // Ensure at least one correct answer for multiple choice
     if ((questionForm.question_type === "multiple_choice" || questionForm.question_type === "true_false") && !validOptions.some(opt => opt.is_correct)) {
       alert("Please mark at least one option as correct");
       return;
     }
-    
+
     setQuestionLoading(true);
-    
+
     try {
       // Step 1: Update the question
       const questionData = {
@@ -585,24 +616,24 @@ export default function EducatorAssessmentsPage() {
         explanation: questionForm.explanation?.trim() || undefined,
         image: questionForm.image || undefined
       };
-      
+
       console.log("Updating question with data:", questionData);
       await updateQuestion(selectedQuestion.id, questionData);
-      
+
       // Step 2: Handle options for multiple choice and true/false questions
       if (questionForm.question_type === "multiple_choice" || questionForm.question_type === "true_false") {
         const existingOptions = selectedQuestion.options || [];
-        
+
         console.log("Existing options:", existingOptions);
         console.log("New options:", validOptions);
-        
+
         // Delete options that are no longer present
         for (const existingOption of existingOptions) {
-          const stillExists = validOptions.some(newOpt => 
-            newOpt.id === existingOption.id || 
+          const stillExists = validOptions.some(newOpt =>
+            newOpt.id === existingOption.id ||
             (newOpt.option_text.trim() === existingOption.option_text && newOpt.is_correct === existingOption.is_correct)
           );
-          
+
           if (!stillExists && existingOption.id) {
             console.log("Deleting option:", existingOption.id);
             try {
@@ -612,7 +643,7 @@ export default function EducatorAssessmentsPage() {
             }
           }
         }
-        
+
         // Update or create options
         for (let i = 0; i < validOptions.length; i++) {
           const option = validOptions[i];
@@ -622,7 +653,7 @@ export default function EducatorAssessmentsPage() {
             is_correct: Boolean(option.is_correct),
             order: i + 1
           };
-          
+
           // Check if this is an existing option (has an ID) or a new one
           if (option.id) {
             // Update existing option
@@ -640,26 +671,26 @@ export default function EducatorAssessmentsPage() {
             await createOption(selectedQuestion.id, optionData);
           }
         }
-        
+
         console.log("All options updated successfully");
       }
-      
+
       setShowCreateQuestion(false);
       setSelectedQuestion(null);
       setEditingQuestionId(null);
-      
+
       if (mutateAssessments) {
         await mutateAssessments();
       }
-      
+
       alert("Question updated successfully!");
-      
+
     } catch (error) {
       console.error("Error updating question:", error);
       console.error("Error response:", error.response?.data);
-      
+
       let errorMessage = "Failed to update question. Please try again.";
-      
+
       if (error.response?.data) {
         const errorData = error.response.data;
         if (typeof errorData === 'object' && errorData !== null) {
@@ -680,7 +711,7 @@ export default function EducatorAssessmentsPage() {
       } else if (error.message) {
         errorMessage = error.message;
       }
-      
+
       alert(`Error updating question:\n${errorMessage}`);
     } finally {
       setQuestionLoading(false);
@@ -703,31 +734,31 @@ export default function EducatorAssessmentsPage() {
   // Grading functions
   const handleGradeAnswer = async (e) => {
     e.preventDefault();
-    
+
     if (!selectedAnswer?.id) {
       alert("No answer selected for grading");
       return;
     }
-    
+
     const pointsAwarded = parseInt(gradeForm.points_awarded) || 0;
     const maxPoints = selectedAnswer.question?.points || 0;
-    
+
     if (pointsAwarded < 0 || pointsAwarded > maxPoints) {
       alert(`Points awarded must be between 0 and ${maxPoints}`);
       return;
     }
-    
+
     try {
       await gradeAnswer(selectedAnswer.id, {
         points_awarded: pointsAwarded,
         teacher_feedback: gradeForm.teacher_feedback?.trim() || undefined,
         is_correct: pointsAwarded > 0
       });
-      
+
       setShowGradeAnswer(false);
       setSelectedAnswer(null);
       setGradeForm({ points_awarded: 0, teacher_feedback: "" });
-      
+
       if (mutateGrading) {
         await mutateGrading();
       }
@@ -765,11 +796,39 @@ export default function EducatorAssessmentsPage() {
 
   const handleGradeAnswerClick = (answer) => {
     setSelectedAnswer(answer);
-    setGradeForm({ 
-      points_awarded: answer.points_awarded || 0,
-      teacher_feedback: answer.teacher_feedback || ""
+    setGradingForm({
+      marks_awarded: answer.marks_awarded || "0.00",
+      teacher_feedback: answer.teacher_feedback || "",
+      is_correct: answer.is_correct || false,
     });
     setShowGradeAnswer(true);
+  };
+
+  const handleGradeSubmit = async (e) => {
+    e.preventDefault();
+
+    try {
+      const response = await baseApi.put(
+        educatorEndpoints.assessment.grading.answer(selectedAnswer.id),
+        gradingForm
+      );
+
+      if (response.status === 200) {
+        // Refresh the pending grading data
+        mutateGrading();
+        setShowGradeAnswer(false);
+        setSelectedAnswer(null);
+        setGradingForm({
+          marks_awarded: "",
+          teacher_feedback: "",
+          is_correct: false,
+        });
+        alert("Answer graded successfully!");
+      }
+    } catch (error) {
+      console.error("Error grading answer:", error);
+      alert("Failed to grade answer. Please try again.");
+    }
   };
 
   if (assessmentsLoading) {
@@ -790,13 +849,13 @@ export default function EducatorAssessmentsPage() {
           <div className="alert alert-danger">
             <h5 className="alert-heading">Error Loading Assessments</h5>
             <p className="mb-0">
-              {assessmentsError.response?.data?.message || 
-               assessmentsError.message || 
-               "Failed to load assessments. Please try refreshing the page."}
+              {assessmentsError.response?.data?.message ||
+                assessmentsError.message ||
+                "Failed to load assessments. Please try refreshing the page."}
             </p>
             <hr />
-            <button 
-              className="btn btn-outline-danger btn-sm" 
+            <button
+              className="btn btn-outline-danger btn-sm"
               onClick={() => window.location.reload()}
             >
               Refresh Page
@@ -938,7 +997,7 @@ export default function EducatorAssessmentsPage() {
                       <div className="card card-hoverable h-100">
                         <div className="card-body">
                           <div className="d-flex justify-content-between align-items-start mb-3">
-                            <div className="text-primary text-uppercase fw-bold">{assessment.assessment_type}</div>
+                            <div className="text-main text-uppercase fw-bold">{assessment.assessment_type}</div>
                             <div className="dropdown position-relative">
                               <button
                                 className="btn btn-link-custom dropdown-toggle"
@@ -950,16 +1009,16 @@ export default function EducatorAssessmentsPage() {
                               >
                                 <Settings size={16} />
                               </button>
-                              <ul 
+                              <ul
                                 className={`dropdown-menu ${openDropdownId === assessment.id ? 'show' : ''}`}
-                                style={{ 
+                                style={{
                                   position: 'absolute',
                                   top: '100%',
                                   right: '0',
                                   zIndex: 1000
                                 }}
                               >
-                                
+
                                 <li>
                                   <button
                                     className="dropdown-item"
@@ -990,12 +1049,12 @@ export default function EducatorAssessmentsPage() {
                               </ul>
                             </div>
                           </div>
-                          
+
                           <h5 className="card-title line-clamp-2">{assessment.title}</h5>
                           <p className="card-text text-muted line-clamp-3">
                             {assessment.description || "No description provided"}
                           </p>
-                          
+
                           <div className="d-flex justify-content-between align-items-center mb-3">
                             <span className="text-muted">
                               <Clock size={14} className="me-1" />
@@ -1005,7 +1064,7 @@ export default function EducatorAssessmentsPage() {
                               Passing: {assessment.passing_score || assessment.passing_grade || 70}%
                             </span>
                           </div>
-                          
+
                           <div className="d-flex gap-2">
                             <button
                               className="btn-edit-profile btn-sm flex-fill"
@@ -1042,14 +1101,14 @@ export default function EducatorAssessmentsPage() {
           <div className="card border-0 shadow-sm">
             <div className="card-body">
               <h4 className="section-title mb-4">Pending Grading</h4>
-              
+
               {gradingError ? (
                 <div className="alert alert-warning">
                   <h6 className="alert-heading">Error Loading Pending Grading</h6>
                   <p className="mb-0">
-                    {gradingError.response?.data?.message || 
-                     gradingError.message || 
-                     "Failed to load pending grading items."}
+                    {gradingError.response?.data?.message ||
+                      gradingError.message ||
+                      "Failed to load pending grading items."}
                   </p>
                 </div>
               ) : gradingLoading ? (
@@ -1058,7 +1117,7 @@ export default function EducatorAssessmentsPage() {
                   <p className="mt-3 text-muted">Loading pending grading...</p>
                 </div>
               ) : pendingGrading && pendingGrading.length > 0 ? (
-                <div className="table-responsive">
+                <div className="table-responsive custom-table-container">
                   <table className="table">
                     <thead>
                       <tr>
@@ -1067,6 +1126,7 @@ export default function EducatorAssessmentsPage() {
                         <th>Question</th>
                         <th>Answer</th>
                         <th>Max Points</th>
+                        <th>Current Marks</th>
                         <th>Action</th>
                       </tr>
                     </thead>
@@ -1074,27 +1134,31 @@ export default function EducatorAssessmentsPage() {
                       {pendingGrading.map((item) => (
                         <tr key={item.id}>
                           <td>
-                            <div className="d-flex align-items-center">
-                              <div className="avatar-circle me-2" style={{ width: "32px", height: "32px" }}>
-                                {item.student?.user?.first_name?.[0] || "S"}
-                              </div>
-                              <div>
-                                <div className="fw-bold">{item.student?.full_name || "Unknown Student"}</div>
-                                <small className="text-muted">{item.student?.user?.email}</small>
-                              </div>
-                            </div>
+                            <StudentAvatar
+                              studentName={item.student_name}
+                              attemptId={item.attempt_id}
+                            />
                           </td>
-                          <td>{item.assessment?.title || "Unknown Assessment"}</td>
-                          <td>{item.question?.question_text || "Unknown Question"}</td>
+                          <td>{item.assessment_title || "Unknown Assessment"}</td>
                           <td>
                             <div className="text-truncate" style={{ maxWidth: "200px" }}>
-                              {item.answer_text || "No answer provided"}
+                              {item.question_text || "Unknown Question"}
                             </div>
                           </td>
-                          <td>{item.question?.points || 0}</td>
+                          <td>
+                            <div className="text-truncate" style={{ maxWidth: "200px" }}>
+                              {item.text_answer || "No answer provided"}
+                            </div>
+                          </td>
+                          <td>{item.question_mark || 0}</td>
+                          <td>
+                            <span className={`badge ${item.is_correct ? 'bg-success' : 'bg-warning'}`}>
+                              {item.marks_awarded || "0.00"}
+                            </span>
+                          </td>
                           <td>
                             <button
-                              className="btn btn-primary btn-sm"
+                              className="btn-edit-profile btn-sm"
                               onClick={() => handleGradeAnswerClick(item)}
                             >
                               Grade
@@ -1121,7 +1185,7 @@ export default function EducatorAssessmentsPage() {
           <div className="card border-0 shadow-sm">
             <div className="card-body">
               <h4 className="section-title mb-4">Assessment Analytics</h4>
-              
+
               <div className="row">
                 <div className="col-md-3 mb-4">
                   <div className="card bg-primary text-white">
@@ -1132,7 +1196,7 @@ export default function EducatorAssessmentsPage() {
                     </div>
                   </div>
                 </div>
-                
+
                 <div className="col-md-3 mb-4">
                   <div className="card bg-success text-white">
                     <div className="card-body text-center">
@@ -1142,7 +1206,7 @@ export default function EducatorAssessmentsPage() {
                     </div>
                   </div>
                 </div>
-                
+
                 <div className="col-md-3 mb-4">
                   <div className="card bg-info text-white">
                     <div className="card-body text-center">
@@ -1152,7 +1216,7 @@ export default function EducatorAssessmentsPage() {
                     </div>
                   </div>
                 </div>
-                
+
                 <div className="col-md-3 mb-4">
                   <div className="card bg-warning text-white">
                     <div className="card-body text-center">
@@ -1163,7 +1227,7 @@ export default function EducatorAssessmentsPage() {
                   </div>
                 </div>
               </div>
-              
+
               <div className="text-center py-5">
                 <BarChart3 size={48} className="text-muted mb-3" />
                 <h5 className="text-muted">Analytics Coming Soon</h5>
@@ -1223,19 +1287,19 @@ export default function EducatorAssessmentsPage() {
                     <div className="col-md-4">
                       <div className="mb-3">
                         <label className="form-label">Type</label>
-                                                 <select
-                           className="form-select"
-                           value={assessmentForm.assessment_type}
-                           onChange={(e) => setAssessmentForm(prev => ({ ...prev, assessment_type: e.target.value }))}
-                         >
-                           <option value="quiz">Quiz (Lesson)</option>
-                           <option value="assignment">Assignment (Module)</option>
-                           <option value="course_exam">Course Exam</option>
-                         </select>
+                        <select
+                          className="form-select"
+                          value={assessmentForm.assessment_type}
+                          onChange={(e) => setAssessmentForm(prev => ({ ...prev, assessment_type: e.target.value }))}
+                        >
+                          <option value="quiz">Quiz (Lesson)</option>
+                          <option value="assignment">Assignment (Module)</option>
+                          <option value="course_exam">Course Exam</option>
+                        </select>
                       </div>
                     </div>
                   </div>
-                  
+
                   <div className="mb-3">
                     <label className="form-label">Description</label>
                     <textarea
@@ -1245,7 +1309,7 @@ export default function EducatorAssessmentsPage() {
                       onChange={(e) => setAssessmentForm(prev => ({ ...prev, description: e.target.value }))}
                     ></textarea>
                   </div>
-                  
+
                   {/* Dynamic relationship field based on assessment type */}
                   <div className="row">
                     <div className="col-md-6">
@@ -1268,7 +1332,7 @@ export default function EducatorAssessmentsPage() {
                             </select>
                           </>
                         )}
-                        
+
                         {assessmentForm.assessment_type === "assignment" && (
                           <>
                             <label className="form-label">Module *</label>
@@ -1287,7 +1351,7 @@ export default function EducatorAssessmentsPage() {
                             </select>
                           </>
                         )}
-                        
+
                         {assessmentForm.assessment_type === "course_exam" && (
                           <>
                             <label className="form-label">Course *</label>
@@ -1320,7 +1384,7 @@ export default function EducatorAssessmentsPage() {
                       </div>
                     </div>
                   </div>
-                  
+
                   {/* Additional settings */}
                   <div className="row">
                     <div className="col-md-4">
@@ -1366,7 +1430,7 @@ export default function EducatorAssessmentsPage() {
                       )}
                     </div>
                   </div>
-                  
+
                   <div className="mb-3">
                     <div className="form-check">
                       <input
@@ -1389,19 +1453,19 @@ export default function EducatorAssessmentsPage() {
                     onClick={() => {
                       setShowCreateAssessment(false);
                       setSelectedAssessment(null);
-                                           setAssessmentForm({
-                       title: "",
-                       description: "",
-                       assessment_type: "quiz",
-                       lesson: "",
-                       module: "",
-                       course: "",
-                       passing_score: 70,
-                       is_published: false,
-                       is_timed: false,
-                       time_limit: 30,
-                       max_attempts: 3
-                     });
+                      setAssessmentForm({
+                        title: "",
+                        description: "",
+                        assessment_type: "quiz",
+                        lesson: "",
+                        module: "",
+                        course: "",
+                        passing_score: 70,
+                        is_published: false,
+                        is_timed: false,
+                        time_limit: 30,
+                        max_attempts: 3
+                      });
                     }}
                   >
                     Cancel
@@ -1444,41 +1508,65 @@ export default function EducatorAssessmentsPage() {
                   onClick={() => {
                     setShowGradeAnswer(false);
                     setSelectedAnswer(null);
-                    setGradeForm({ points_awarded: 0, teacher_feedback: "" });
+                    setGradingForm({ marks_awarded: "", teacher_feedback: "", is_correct: false });
                   }}
                 ></button>
               </div>
-              <form onSubmit={handleGradeAnswer}>
+              <form onSubmit={handleGradeSubmit}>
                 <div className="modal-body">
                   <div className="mb-3">
                     <label className="form-label">Student Answer</label>
                     <div className="form-control-plaintext bg-light p-3">
-                      {selectedAnswer?.answer_text || "No answer provided"}
+                      {selectedAnswer?.text_answer || "No answer provided"}
                     </div>
                   </div>
-                  
+
                   <div className="mb-3">
-                    <label className="form-label">Points Awarded</label>
+                    <label className="form-label">Question</label>
+                    <div className="form-control-plaintext bg-light p-3">
+                      {selectedAnswer?.question_text || "No question text"}
+                    </div>
+                  </div>
+
+                  <div className="mb-3">
+                    <label className="form-label">Marks Awarded</label>
                     <input
                       type="number"
+                      step="0.01"
                       className="form-control"
                       min="0"
-                      max={selectedAnswer?.question?.points || 0}
-                      value={gradeForm.points_awarded}
-                      onChange={(e) => setGradeForm(prev => ({ ...prev, points_awarded: parseInt(e.target.value) }))}
+                      max={selectedAnswer?.question_mark || 0}
+                      value={gradingForm.marks_awarded}
+                      onChange={(e) => setGradingForm(prev => ({ ...prev, marks_awarded: e.target.value }))}
                     />
                     <small className="text-muted">
-                      Maximum points: {selectedAnswer?.question?.points || 0}
+                      Maximum marks: {selectedAnswer?.question_mark || 0}
                     </small>
                   </div>
-                  
+
+                  <div className="mb-3">
+                    <label className="form-label">Is Correct</label>
+                    <div className="form-check">
+                      <input
+                        type="checkbox"
+                        className="form-check-input"
+                        id="isCorrect"
+                        checked={gradingForm.is_correct}
+                        onChange={(e) => setGradingForm(prev => ({ ...prev, is_correct: e.target.checked }))}
+                      />
+                      <label className="form-check-label" htmlFor="isCorrect">
+                        Mark this answer as correct
+                      </label>
+                    </div>
+                  </div>
+
                   <div className="mb-3">
                     <label className="form-label">Teacher Feedback (Optional)</label>
                     <textarea
                       className="form-control"
                       rows="3"
-                      value={gradeForm.teacher_feedback}
-                      onChange={(e) => setGradeForm(prev => ({ ...prev, teacher_feedback: e.target.value }))}
+                      value={gradingForm.teacher_feedback}
+                      onChange={(e) => setGradingForm(prev => ({ ...prev, teacher_feedback: e.target.value }))}
                       placeholder="Provide feedback to the student..."
                     ></textarea>
                   </div>
@@ -1490,7 +1578,7 @@ export default function EducatorAssessmentsPage() {
                     onClick={() => {
                       setShowGradeAnswer(false);
                       setSelectedAnswer(null);
-                      setGradeForm({ points_awarded: 0, teacher_feedback: "" });
+                      setGradingForm({ marks_awarded: "", teacher_feedback: "", is_correct: false });
                     }}
                   >
                     Cancel
@@ -1507,3 +1595,4 @@ export default function EducatorAssessmentsPage() {
     </div>
   );
 }
+

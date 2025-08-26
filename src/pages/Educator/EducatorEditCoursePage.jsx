@@ -1,15 +1,15 @@
 
 import {
-  LibraryBig,
-  FileText,
-  Clock,
-  Layers,
-  Tag,
-  Edit3,
-  Edit,
-  Trash2,
-  Eye,
-  TriangleAlert,
+	LibraryBig,
+	FileText,
+	Clock,
+	Layers,
+	Tag,
+	Edit3,
+	Edit,
+	Trash2,
+	Eye,
+	TriangleAlert,
 } from "lucide-react";
 import { useNavigate, useParams } from "react-router-dom";
 import { useState, useEffect } from "react";
@@ -21,249 +21,249 @@ import updateCourseDetailsRequest from "../../apis/actions/educator/updateCourse
 import ModuleItem from "../../components/common/ModuleItem";
 
 export default function EditCourse() {
-  const { courseId } = useParams();
-  const navigate = useNavigate();
-  const [errors, setErrors] = useState({});
-  const [selectedModuleId, setSelectedModuleId] = useState(null);
-  const [isPopupOpen, setIsPopupOpen] = useState(false);
-  const [editingModule, setEditingModule] = useState(null);
-  const [thumbnailPreview, setThumbnailPreview] = useState(null);
-  
-  // Use the SWR hook to get course details
-  const {
-    data: courseData,
-    error: courseError,
-    isLoading: courseLoading,
-    mutate
-  } = getCoursesDetails(courseId);
+	const { courseId } = useParams();
+	const navigate = useNavigate();
+	const [errors, setErrors] = useState({});
+	const [selectedModuleId, setSelectedModuleId] = useState(null);
+	const [isPopupOpen, setIsPopupOpen] = useState(false);
+	const [editingModule, setEditingModule] = useState(null);
+	const [thumbnailPreview, setThumbnailPreview] = useState(null);
 
-  // Use the update hook
-  const { updateCourse, error: updateError, isMutating } = useUpdateCourseDetails(courseId);
+	// Use the SWR hook to get course details
+	const {
+		data: courseData,
+		error: courseError,
+		isLoading: courseLoading,
+		mutate
+	} = getCoursesDetails(courseId);
 
-  // Use hooks for modules and lessons
-  const {
-    isLoading: moduleLoading,
-    error: moduleError,
-    data: moduleData,
-    mutate: moduleMutate
-  } = getModules(courseId);
+	// Use the update hook
+	const { updateCourse, error: updateError, isMutating } = useUpdateCourseDetails(courseId);
 
-  const [formData, setFormData] = useState({
-    title: '',
-    description: '',
-    trailer_video: '',
-    price: null,
-    is_published: false,
-    is_free: false,
-    thumbnail: null
-  });
+	// Use hooks for modules and lessons
+	const {
+		isLoading: moduleLoading,
+		error: moduleError,
+		data: moduleData,
+		mutate: moduleMutate
+	} = getModules(courseId);
 
-  // Load course data when it's available
-  useEffect(() => {
-    if (courseData) {
-      setFormData({
-        title: courseData.title || '',
-        description: courseData.description || '',
-        trailer_video: courseData.trailer_video || '',
-        price: courseData.price || null,
-        is_published: courseData.is_published || false,
-        is_free: courseData.is_free || false,
-        thumbnail: null // Don't set existing thumbnail for file input
-      });
-    }
-  }, [courseData]);
+	const [formData, setFormData] = useState({
+		title: '',
+		description: '',
+		trailer_video: '',
+		price: null,
+		is_published: false,
+		is_free: false,
+		thumbnail: null
+	});
 
-  // Auto-select first module when modules load
-  useEffect(() => {
-    if (moduleData && moduleData.length > 0 && !selectedModuleId) {
-      setSelectedModuleId(moduleData[0].id);
-    }
-  }, [moduleData, selectedModuleId]);
+	// Load course data when it's available
+	useEffect(() => {
+		if (courseData) {
+			setFormData({
+				title: courseData.title || '',
+				description: courseData.description || '',
+				trailer_video: courseData.trailer_video || '',
+				price: courseData.price || null,
+				is_published: courseData.is_published || false,
+				is_free: courseData.is_free || false,
+				thumbnail: null // Don't set existing thumbnail for file input
+			});
+		}
+	}, [courseData]);
 
-  const handleChange = (e) => {
-    const { name, value, type, checked, files } = e.target;
-    let newValue;
+	// Auto-select first module when modules load
+	useEffect(() => {
+		if (moduleData && moduleData.length > 0 && !selectedModuleId) {
+			setSelectedModuleId(moduleData[0].id);
+		}
+	}, [moduleData, selectedModuleId]);
 
-    if (type === 'checkbox') {
-      newValue = checked;
-    } else if (type === 'file') {
-      const file = files[0];
-      newValue = file || null;
-      if (file) {
-        setThumbnailPreview(URL.createObjectURL(file));
-      } else {
-        setThumbnailPreview(null);
-      }
-    } else if (name === 'price' && value === '') {
-      newValue = null;
-    } else {
-      newValue = value;
-    }
+	const handleChange = (e) => {
+		const { name, value, type, checked, files } = e.target;
+		let newValue;
 
-    setFormData((prev) => ({ ...prev, [name]: newValue }));
-    
-    // Clear error when user starts typing
-    if (errors[name]) {
-      setErrors(prev => ({
-        ...prev,
-        [name]: ''
-      }));
-    }
-  };
+		if (type === 'checkbox') {
+			newValue = checked;
+		} else if (type === 'file') {
+			const file = files[0];
+			newValue = file || null;
+			if (file) {
+				setThumbnailPreview(URL.createObjectURL(file));
+			} else {
+				setThumbnailPreview(null);
+			}
+		} else if (name === 'price' && value === '') {
+			newValue = null;
+		} else {
+			newValue = value;
+		}
 
-  const validateForm = () => {
-    const newErrors = {};
-    
-    if (!formData.title.trim()) {
-      newErrors.title = 'Course title is required';
-    }
-    
-    if (!formData.description.trim()) {
-      newErrors.description = 'Description is required';
-    }
-    
-    return newErrors;
-  };
+		setFormData((prev) => ({ ...prev, [name]: newValue }));
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    
-    const validationErrors = validateForm();
-    if (Object.keys(validationErrors).length > 0) {
-      setErrors(validationErrors);
-      return;
-    }
-    
-    try {
-      // Prepare data for API - use JSON format instead of FormData since the hook uses application/json
-      const dataToSubmit = {
-        title: formData.title,
-        description: formData.description,
-        trailer_video: formData.trailer_video || '',
-        is_published: formData.is_published,
-        is_free: formData.is_free,
-      };
-      
-      if (formData.price !== null && formData.price !== '') {
-        dataToSubmit.price = parseFloat(formData.price);
-      }
-      
-      if (formData.thumbnail) {
-        dataToSubmit.thumbnail = formData.thumbnail;
-      }
-      
-      // Update course using the hook
-      await updateCourseDetailsRequest(courseId, dataToSubmit);
-      
-      // Refresh the data
-      mutate();
-      
-      alert('Course updated successfully!');
-      navigate(`/courses/${courseId}`);
-      
-    } catch (error) {
-      console.error("Error updating course:", error);
-      alert('Failed to update course. Please try again.');
-    }
-  };
+		// Clear error when user starts typing
+		if (errors[name]) {
+			setErrors(prev => ({
+				...prev,
+				[name]: ''
+			}));
+		}
+	};
 
-  const handleEditClick = (module) => {
-    setEditingModule(module);
-    setIsPopupOpen(true);
-  };
+	const validateForm = () => {
+		const newErrors = {};
 
-  const handleAddClick = () => {
-    setEditingModule(null);
-    setIsPopupOpen(true);
-  };
+		if (!formData.title.trim()) {
+			newErrors.title = 'Course title is required';
+		}
 
-  const handleClosePopup = () => {
-    setEditingModule(null);
-    setIsPopupOpen(false);
-  };
+		if (!formData.description.trim()) {
+			newErrors.description = 'Description is required';
+		}
 
-  // Loading state
-  if (courseLoading) {
-    return (
-      <div className="profile-root">
-        <div className="card border-0 shadow-sm">
-          <div className="container py-3">
-            <div className="d-flex align-items-center">
-              <div className="header-avatar me-2">
-                <Edit3 size={20} />
-              </div>
-              <div>
-                <span className="section-title mb-0">Edit Course</span>
-                <p className="profile-role mb-0">Loading course data...</p>
-              </div>
-            </div>
-          </div>
-        </div>
+		return newErrors;
+	};
 
-        <div className="container py-5">
-          <div className="row justify-content-center">
-            <div className="col-lg-6">
-              <div className="card">
-                <div className="card-body text-center">
-                  <div className="loading-spinner mb-3 mx-auto w-fit" role="status">
-                    <span className="visually-hidden">Loading...</span>
-                  </div>
-                  <p className="profile-joined">Loading course information...</p>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-    );
-  }
+	const handleSubmit = async (e) => {
+		e.preventDefault();
 
-  // Error state
-  if (courseError) {
-    return (
-      <div className="profile-root">
-        <div className="card border-0 shadow-sm">
-          <div className="container py-3">
-            <div className="d-flex align-items-center">
-              <div className="header-avatar me-2">
-                <i className="bi bi-exclamation-triangle"></i>
-              </div>
-              <div>
-                <span className="section-title mb-0">Error</span>
-                <p className="profile-role mb-0">Failed to load course data</p>
-              </div>
-            </div>
-          </div>
-        </div>
+		const validationErrors = validateForm();
+		if (Object.keys(validationErrors).length > 0) {
+			setErrors(validationErrors);
+			return;
+		}
 
-        <div className="container py-5">
-          <div className="row justify-content-center">
-            <div className="col-lg-6">
-              <div className="card">
-                <div className="card-body text-center">
-                  <div className="avatar-circle mb-4">
-                    <i className="bi bi-exclamation-triangle"></i>
-                  </div>
-                  <h2 className="main-title mb-3">Course Not Found</h2>
-                  <p className="profile-joined mb-4">
-                    Sorry, we couldn't find the course you're trying to edit.
-                  </p>
-                  <button
-                    onClick={() => navigate('/educator')}
-                    className="btn-edit-profile"
-                  >
-                    Back to Profile
-                  </button>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-    );
-  }
+		try {
+			// Prepare data for API - use JSON format instead of FormData since the hook uses application/json
+			const dataToSubmit = {
+				title: formData.title,
+				description: formData.description,
+				trailer_video: formData.trailer_video || '',
+				is_published: formData.is_published,
+				is_free: formData.is_free,
+			};
 
-  return (
+			if (formData.price !== null && formData.price !== '') {
+				dataToSubmit.price = parseFloat(formData.price);
+			}
+
+			if (formData.thumbnail) {
+				dataToSubmit.thumbnail = formData.thumbnail;
+			}
+
+			// Update course using the hook
+			await updateCourseDetailsRequest(courseId, dataToSubmit);
+
+			// Refresh the data
+			mutate();
+
+			alert('Course updated successfully!');
+			navigate(`/courses/${courseId}`);
+
+		} catch (error) {
+			console.error("Error updating course:", error);
+			alert('Failed to update course. Please try again.');
+		}
+	};
+
+	const handleEditClick = (module) => {
+		setEditingModule(module);
+		setIsPopupOpen(true);
+	};
+
+	const handleAddClick = () => {
+		setEditingModule(null);
+		setIsPopupOpen(true);
+	};
+
+	const handleClosePopup = () => {
+		setEditingModule(null);
+		setIsPopupOpen(false);
+	};
+
+	// Loading state
+	if (courseLoading) {
+		return (
+			<div className="profile-root">
+				<div className="card border-0 shadow-sm">
+					<div className="container py-3">
+						<div className="d-flex align-items-center">
+							<div className="header-avatar me-2">
+								<Edit3 size={20} />
+							</div>
+							<div>
+								<span className="section-title mb-0">Edit Course</span>
+								<p className="profile-role mb-0">Loading course data...</p>
+							</div>
+						</div>
+					</div>
+				</div>
+
+				<div className="container py-5">
+					<div className="row justify-content-center">
+						<div className="col-lg-6">
+							<div className="card">
+								<div className="card-body text-center">
+									<div className="loading-spinner mb-3 mx-auto w-fit" role="status">
+										<span className="visually-hidden">Loading...</span>
+									</div>
+									<p className="profile-joined">Loading course information...</p>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		);
+	}
+
+	// Error state
+	if (courseError) {
+		return (
+			<div className="profile-root">
+				<div className="card border-0 shadow-sm">
+					<div className="container py-3">
+						<div className="d-flex align-items-center">
+							<div className="header-avatar me-2">
+								<i className="bi bi-exclamation-triangle"></i>
+							</div>
+							<div>
+								<span className="section-title mb-0">Error</span>
+								<p className="profile-role mb-0">Failed to load course data</p>
+							</div>
+						</div>
+					</div>
+				</div>
+
+				<div className="container py-5">
+					<div className="row justify-content-center">
+						<div className="col-lg-6">
+							<div className="card">
+								<div className="card-body text-center">
+									<div className="avatar-circle mb-4">
+										<i className="bi bi-exclamation-triangle"></i>
+									</div>
+									<h2 className="main-title mb-3">Course Not Found</h2>
+									<p className="profile-joined mb-4">
+										Sorry, we couldn't find the course you're trying to edit.
+									</p>
+									<button
+										onClick={() => navigate('/educator')}
+										className="btn-edit-profile"
+									>
+										Back to Profile
+									</button>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		);
+	}
+
+	return (
 		<div className="profile-root">
 			{/* Header */}
 
@@ -323,9 +323,8 @@ export default function EditCourse() {
 											</label>
 											<input
 												type="text"
-												className={`form-control ${
-													errors.title ? "is-invalid" : ""
-												}`}
+												className={`form-control ${errors.title ? "is-invalid" : ""
+													}`}
 												name="title"
 												value={formData.title}
 												onChange={handleChange}
@@ -363,9 +362,8 @@ export default function EditCourse() {
 												Description *
 											</label>
 											<textarea
-												className={`form-control ${
-													errors.description ? "is-invalid" : ""
-												}`}
+												className={`form-control ${errors.description ? "is-invalid" : ""
+													}`}
 												name="description"
 												value={formData.description}
 												onChange={handleChange}
@@ -522,7 +520,7 @@ export default function EditCourse() {
 										className="text-center"
 										style={{ padding: "var(--spacing-xl) 0" }}
 									>
-										<div className="spinner-border text-primary" role="status">
+										<div className="spinner-border text-main" role="status">
 											<span className="visually-hidden">
 												Loading modules...
 											</span>
@@ -590,11 +588,11 @@ export default function EditCourse() {
 								<div className="col-md-3 mb-3">
 									<div className="d-flex flex-column align-items-center">
 										<i
-											className="bi bi-collection text-primary mb-2"
+											className="bi bi-collection text-main mb-2"
 											style={{ fontSize: "1.5rem" }}
 										></i>
 										<small className="profile-joined">Total Modules</small>
-										<strong className="text-primary">
+										<strong className="text-main">
 											{moduleData.length}
 										</strong>
 									</div>
@@ -606,7 +604,7 @@ export default function EditCourse() {
 											style={{ fontSize: "1.5rem" }}
 										></i>
 										<small className="profile-joined">Total Lessons</small>
-										<strong className="text-primary">
+										<strong className="text-main">
 											{moduleData.reduce(
 												(total, module) => total + module.total_lessons,
 												0
@@ -616,9 +614,9 @@ export default function EditCourse() {
 								</div>
 								<div className="col-md-3 mb-3">
 									<div className="d-flex flex-column align-items-center">
-										<Clock size={24} className="text-info mb-2" />
+										<Clock size={24} className="text-main mb-2" />
 										<small className="profile-joined">Total Duration</small>
-										<strong className="text-primary">
+										<strong className="text-main">
 											{(() => {
 												const totalSeconds = moduleData?.reduce(
 													(total, lesson) => total + lesson.duration,
@@ -634,11 +632,11 @@ export default function EditCourse() {
 								<div className="col-md-3 mb-3">
 									<div className="d-flex flex-column align-items-center">
 										<i
-											className="bi bi-unlock text-warning mb-2"
+											className="bi bi-unlock text-main mb-2"
 											style={{ fontSize: "1.5rem" }}
 										></i>
 										<small className="profile-joined">Free Modules</small>
-										<strong className="text-primary">
+										<strong className="text-main">
 											{moduleData.filter((module) => module.is_free).length} /{" "}
 											{moduleData.length}
 										</strong>

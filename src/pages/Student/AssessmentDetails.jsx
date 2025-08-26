@@ -51,6 +51,7 @@ function AssessmentDetails() {
   const [error, setError] = useState(null);
   const [showConfirmSubmit, setShowConfirmSubmit] = useState(false);
   const [results, setResults] = useState(null);
+  const [isTimedOut, setIsTimedOut] = useState(false);
   
   const intervalRef = useRef(null);
 
@@ -66,6 +67,7 @@ function AssessmentDetails() {
     setError(null);
     setShowConfirmSubmit(false);
     setResults(null);
+    setIsTimedOut(false);
     
     // Clear any existing timer
     if (intervalRef.current) {
@@ -242,7 +244,8 @@ function AssessmentDetails() {
       intervalRef.current = setInterval(() => {
         setTimeRemaining(prev => {
           if (prev <= 1) {
-            handleSubmitAssessment();
+            // Auto-submit when time runs out
+            handleTimeoutSubmission();
             return 0;
           }
           return prev - 1;
@@ -290,6 +293,65 @@ function AssessmentDetails() {
         )
       }
     }));
+  };
+
+  const handleTimeoutSubmission = async () => {
+    if (!attemptId) return;
+    
+    console.log('🔍 Time expired - auto-submitting assessment with attemptId:', attemptId);
+    console.log('🔍 Current answers:', answers);
+    
+    setIsLoading(true);
+    setError(null);
+    
+    try {
+      const answersArray = Object.values(answers);
+      console.log('🔍 Auto-submitting answers array:', answersArray);
+      
+      await submitAssessment(attemptId, answersArray);
+      console.log('🔍 Assessment auto-submitted successfully due to timeout');
+      
+      // Set timeout state
+      setIsTimedOut(true);
+      setIsSubmitted(true);
+      
+      // Store completion flag in localStorage to prevent retaking
+      const completedKey = `assessment_completed_${assessment.id}`;
+      localStorage.setItem(completedKey, 'true');
+      
+      // Clear timer
+      if (intervalRef.current) {
+        clearInterval(intervalRef.current);
+        intervalRef.current = null;
+      }
+      
+    } catch (err) {
+      console.error('🔍 Error during timeout submission:', err);
+      console.error('🔍 Error details:', {
+        status: err.response?.status,
+        message: err.response?.data?.detail || err.message,
+        data: err.response?.data
+      });
+      
+      // Even if submission fails, we still want to show the timeout page
+      // The assessment has timed out regardless of submission success
+      setIsTimedOut(true);
+      setIsSubmitted(true);
+      
+      // Store completion flag in localStorage to prevent retaking
+      const completedKey = `assessment_completed_${assessment.id}`;
+      localStorage.setItem(completedKey, 'true');
+      
+      // Clear timer
+      if (intervalRef.current) {
+        clearInterval(intervalRef.current);
+        intervalRef.current = null;
+      }
+      
+      console.error('Failed to auto-submit assessment, but showing timeout page:', err);
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   const handleSubmitAssessment = async () => {
@@ -484,6 +546,93 @@ function AssessmentDetails() {
     );
   }
 
+  // Show timeout page if assessment timed out (this takes priority over errors)
+  if (isTimedOut) {
+    return (
+      <div className="profile-root min-vh-100 d-flex align-items-center justify-content-center">
+        <div className="container">
+          <div className="row justify-content-center">
+            <div className="col-lg-8">
+              <div className="card shadow-sm">
+                <div className="card-body p-5 text-center">
+                  <Clock size={64} className="text-warning mb-3" />
+                  <h1 className="main-title mb-3">Time's Up!</h1>
+                  <p className="profile-joined mb-4">
+                    Your assessment time has expired. Your answers have been automatically submitted.
+                  </p>
+                  
+                  <div className="row mb-4">
+                    <div className="col-md-6 mb-3">
+                      <div className="card bg-light">
+                        <div className="card-body text-center">
+                          <BookOpen size={32} className="text-main mb-2" />
+                          <h5 className="main-title mb-1">{assessment?.title || 'Assessment'}</h5>
+                          <small className="text-muted">Assessment Name</small>
+                        </div>
+                      </div>
+                    </div>
+                    <div className="col-md-6 mb-3">
+                      <div className="card bg-light">
+                        <div className="card-body text-center">
+                          <CheckCircle size={32} className="text-success mb-2" />
+                          <h5 className="main-title mb-1">Auto-Submitted</h5>
+                          <small className="text-muted">Status</small>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="alert alert-info">
+                    <h6 className="alert-heading">What happens next?</h6>
+                    <ul className="mb-0 text-start">
+                      <li>Your answers have been saved and submitted</li>
+                      <li>Your instructor will review and grade your assessment</li>
+                      <li>You'll be able to view your results once grading is complete</li>
+                    </ul>
+                  </div>
+
+                  <div className="d-flex gap-3 justify-content-center">
+                    <button
+                      className="btn-edit-profile"
+                      onClick={() => navigate(-1)}
+                    >
+                      <ArrowLeft size={16} className="me-2" />
+                      Go Back
+                    </button>
+                    <button
+                      className="btn-secondary-action"
+                      onClick={() => {
+                        // Try to fetch results if available
+                        if (attemptId) {
+                          getAttemptDetails(attemptId)
+                            .then(results => {
+                              if (results && !results.message?.includes('Please wait')) {
+                                setResults(results);
+                                setIsTimedOut(false);
+                              } else {
+                                alert('Results are not yet available. Please check back later.');
+                              }
+                            })
+                            .catch(err => {
+                              console.error('Error fetching results:', err);
+                              alert('Unable to fetch results at this time. Please try again later.');
+                            });
+                        }
+                      }}
+                    >
+                      <Trophy size={16} className="me-2" />
+                      Check Results
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
   if (error) {
     return (
       <div className="profile-root min-vh-100 d-flex align-items-center justify-content-center">
@@ -498,6 +647,93 @@ function AssessmentDetails() {
             <ArrowLeft size={16} className="me-2" />
             Go Back
           </button>
+        </div>
+      </div>
+    );
+  }
+
+  // Show timeout page if assessment timed out (this takes priority over errors)
+  if (isTimedOut) {
+    return (
+      <div className="profile-root min-vh-100 d-flex align-items-center justify-content-center">
+        <div className="container">
+          <div className="row justify-content-center">
+            <div className="col-lg-8">
+              <div className="card shadow-sm">
+                <div className="card-body p-5 text-center">
+                  <Clock size={64} className="text-warning mb-3" />
+                  <h1 className="main-title mb-3">Time's Up!</h1>
+                  <p className="profile-joined mb-4">
+                    Your assessment time has expired. Your answers have been automatically submitted.
+                  </p>
+                  
+                  <div className="row mb-4">
+                    <div className="col-md-6 mb-3">
+                      <div className="card bg-light">
+                        <div className="card-body text-center">
+                          <BookOpen size={32} className="text-main mb-2" />
+                          <h5 className="main-title mb-1">{assessment?.title || 'Assessment'}</h5>
+                          <small className="text-muted">Assessment Name</small>
+                        </div>
+                      </div>
+                    </div>
+                    <div className="col-md-6 mb-3">
+                      <div className="card bg-light">
+                        <div className="card-body text-center">
+                          <CheckCircle size={32} className="text-success mb-2" />
+                          <h5 className="main-title mb-1">Auto-Submitted</h5>
+                          <small className="text-muted">Status</small>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="alert alert-info">
+                    <h6 className="alert-heading">What happens next?</h6>
+                    <ul className="mb-0 text-start">
+                      <li>Your answers have been saved and submitted</li>
+                      <li>Your instructor will review and grade your assessment</li>
+                      <li>You'll be able to view your results once grading is complete</li>
+                    </ul>
+                  </div>
+
+                  <div className="d-flex gap-3 justify-content-center">
+                    <button
+                      className="btn-edit-profile"
+                      onClick={() => navigate(-1)}
+                    >
+                      <ArrowLeft size={16} className="me-2" />
+                      Go Back
+                    </button>
+                    <button
+                      className="btn-secondary-action"
+                      onClick={() => {
+                        // Try to fetch results if available
+                        if (attemptId) {
+                          getAttemptDetails(attemptId)
+                            .then(results => {
+                              if (results && !results.message?.includes('Please wait')) {
+                                setResults(results);
+                                setIsTimedOut(false);
+                              } else {
+                                alert('Results are not yet available. Please check back later.');
+                              }
+                            })
+                            .catch(err => {
+                              console.error('Error fetching results:', err);
+                              alert('Unable to fetch results at this time. Please try again later.');
+                            });
+                        }
+                      }}
+                    >
+                      <Trophy size={16} className="me-2" />
+                      Check Results
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
     );
@@ -937,16 +1173,22 @@ function AssessmentDetails() {
             
             <div className="d-flex align-items-center gap-3">
               <div className="text-center">
-                <div className="h5 mb-0 text-warning">
+                <div className={`h5 mb-0 ${timeRemaining <= 300 ? 'text-danger' : timeRemaining <= 600 ? 'text-warning' : 'text-main'}`}>
                   <Clock size={20} className="me-2" />
                   {formatTime(timeRemaining)}
                 </div>
                 <small className="text-muted">Time Remaining</small>
+                {timeRemaining <= 300 && (
+                  <div className="text-danger small mt-1">
+                    <AlertCircle size={14} className="me-1" />
+                    Time is running out!
+                  </div>
+                )}
               </div>
               
               <div className="progress" style={{ width: '200px', height: '8px' }}>
                 <div 
-                  className="progress-bar" 
+                  className={`progress-bar ${timeRemaining <= 300 ? 'bg-danger' : timeRemaining <= 600 ? 'bg-warning' : ''}`}
                   style={{ width: `${progress}%` }}
                 />
               </div>
@@ -959,6 +1201,17 @@ function AssessmentDetails() {
       <div className="container py-5">
         <div className="row justify-content-center">
           <div className="col-lg-8">
+            {/* Time Warning Banner */}
+            {timeRemaining <= 300 && timeRemaining > 0 && (
+              <div className="alert alert-danger d-flex align-items-center mb-4" role="alert">
+                <AlertCircle size={20} className="me-2" />
+                <div>
+                  <strong>Warning:</strong> You have less than 5 minutes remaining! 
+                  Please submit your assessment soon to avoid automatic submission.
+                </div>
+              </div>
+            )}
+            
             {currentQuestion && (
               <div className="card shadow-sm">
                 <div className="card-body p-4">
@@ -969,7 +1222,7 @@ function AssessmentDetails() {
                       <span className="badge bg-secondary me-2">
                         {getQuestionTypeLabel(currentQuestion.question_type)}
                       </span>
-                      <span className="badge bg-info">
+                      <span className="badge bg-secondary">
                         {currentQuestion.mark} marks
                       </span>
                     </div>
@@ -1014,6 +1267,8 @@ function AssessmentDetails() {
                           Submit Assessment
                         </button>
                       )}
+                      
+
                     </div>
                   </div>
                 </div>

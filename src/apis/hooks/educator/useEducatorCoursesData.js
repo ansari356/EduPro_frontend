@@ -5,30 +5,38 @@ import { swrFetcher } from "../../base";
 export default function useEducatorCoursesData() {
 	
   const { isLoading, error, data, mutate } = useSWR(
-			educatorEndpoints.course.educatorCourses,
+			educatorEndpoints.course.list,
 		swrFetcher()
 	);
-   /* 
+   	 /* 
+   New API Response Structure:
    {
-        "id": "6a186759-fdc7-4fac-b6fa-9e9fe2994694",
-        "title": "Course 4 by teacher1",
-        "description": "This is a demo course number 4.",
-        "trailer_video": null,
-        "price": "4.61",
-        "is_published": true,
-        "is_free": false,
-        "category": {
-            "id": "5d13c05a-0e6f-4018-b8a4-d6e299dfaec0",
-            "name": "Science",
-            "icon": null
-        },
-        "thumbnail": null,
-        "created_at": "2025-08-15T13:18:43.642890Z",
-        "total_enrollments": 1,
-        "total_lessons": 9,
-        "total_reviews": 0,
-        "average_rating": "0.00",
-        "total_durations": 0
+        "count": 1,
+        "next": null,
+        "previous": null,
+        "results": [
+            {
+                "id": "b259b8be-b0a6-43b1-b5a0-026210797c87",
+                "title": "Introduction to Astrophysics",
+                "description": "Introduction to Astrophysics is the study of the physical nature of celestial objects...",
+                "trailer_video": null,
+                "price": "100.00",
+                "is_published": true,
+                "is_free": false,
+                "category": {
+                    "id": "2c746147-7e28-4f90-8e50-b3af0e662f65",
+                    "name": "Physics",
+                    "icon": null
+                },
+                "thumbnail": "http://127.0.0.1:8000/media/course_thumbnails/maxresdefault.jpg",
+                "created_at": "2025-08-23T13:58:31.197484Z",
+                "total_enrollments": 5,
+                "total_lessons": 3,
+                "total_reviews": 1,
+                "average_rating": "5.00",
+                "total_durations": 0
+            }
+        ]
     }
     */
   return { isLoading, error, data, mutate };

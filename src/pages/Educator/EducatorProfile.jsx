@@ -25,7 +25,7 @@ function EducatorProfile() {
     data: coursesData,
     error: coursesError,
     isLoading: coursesLoading,
-  } = useEducatorCoursesData(educatorData?.user?.username);
+  } = useEducatorCoursesData();
 
   const [formData, setFormData] = useState({
     full_name: educatorData?.full_name || "",
@@ -146,11 +146,19 @@ function EducatorProfile() {
   };
 
   const courses = 
-    coursesData?.map((course) => ({
+    coursesData?.results?.map((course) => ({
       id: course.id,
       name: course.title, 
+      description: course.description,
+      thumbnail: course.thumbnail,
       students: course.total_enrollments, 
       status: course.is_published ? "Active" : "Inactive",
+      total_lessons: course.total_lessons,
+      average_rating: course.average_rating,
+      total_reviews: course.total_reviews,
+      price: course.price,
+      is_free: course.is_free,
+      category: course.category?.name,
     })) || [];
   
   const handleRowClick = (courseId) => {
@@ -727,95 +735,143 @@ function EducatorProfile() {
             </div>
           </div>
 
-          {/* Courses Table Card */}
+          {/* Courses Taught Section */}
           <div className="row mt-4">
             <div className="col-12">
-              <div className="card shadow-sm">
-                <div className="card-body p-4">
-                  <h5 className="fw-bold mb-4 section-title">Courses Taught</h5>
-                  {courses.length === 0 ? (
-                    <div className="alert alert-primary">
-                      No courses available.
-                    </div>
-                  ) : (
-                    <div className="table-responsive">
-                      <table className="table table-borderless">
-                        <thead>
-                          <tr className="border-bottom">
-                            <th scope="col" className="fw-bold">
-                              Course Name
-                            </th>
-                            <th scope="col" className="fw-bold">
-                              Students
-                            </th>
-                            <th scope="col" className="fw-bold">
-                              Status
-                            </th>
-                            <th scope="col" className="fw-bold">
-                              Actions
-                            </th>
-                          </tr>
-                        </thead>
-                        <tbody>
-                          {courses.map((course, idx) => (
-                            <tr
-                              key={idx}
-                              className="border-bottom"
-                              style={{ cursor: "pointer" }}
-                              onClick={() => handleRowClick(course.id)}
-                            >
-                              <td className="fw-medium text-primary">
-                                {course.name}
-                              </td>
-                              <td className="fw-medium">{course.students}</td>
-                              <td>
-                                <span
-                                  className={`badge ${
-                                    course.status === "Active"
-                                      ? "bg-primary"
-                                      : "bg-secondary"
-                                  }`}
-                                >
-                                  {course.status}
-                                </span>
-                              </td>
-                              <td>
-                                <div className="d-flex gap-2">
-                                  <button
-                                    className="btn btn-sm"
-                                    style={{
-                                      backgroundColor: "var(--color-surface)",
-                                      color: "var(--color-primary-light)",
-                                      border:
-                                        "1px solid var(--color-border-light)",
-                                      borderRadius: "0.5rem",
-                                    }}
-                                    onClick={(e) => handleViewCourse(e, course.id)}
-                                  >
-                                    <i className="bi bi-eye"></i>
-                                  </button>
-                                  <button
-                                    className="btn btn-sm"
-                                    style={{
-                                      backgroundColor: "var(--color-surface)",
-                                      color: "var(--color-primary-light)",
-                                      border:
-                                        "1px solid var(--color-border-light)",
-                                      borderRadius: "0.5rem",
-                                    }}
-                                    onClick={(e) => handleEditCourse(e, course.id)}
-                                  >
-                                    <i className="bi bi-pencil"></i>
-                                  </button>
+              <h5 className="fw-bold section-title mb-3">Courses Taught</h5>
+              <div className="row g-4">
+                {courses.length === 0 ? (
+                  <div className="alert alert-info">
+                    No courses available yet!
+                  </div>
+                ) : (
+                  courses.map((course, idx) => (
+                    <div className="col-md-6 col-lg-4" key={idx}>
+                      <div className="card h-100 shadow-sm d-flex flex-column">
+                        {/* Course Image */}
+                        {course.thumbnail && (
+                          <img
+                            src={course.thumbnail}
+                            alt={course.name}
+                            className="card-img-top"
+                            style={{ height: '200px', objectFit: 'cover' }}
+                          />
+                        )}
+                        {!course.thumbnail && (
+                          <div 
+                            className="card-img-top d-flex align-items-center justify-content-center"
+                            style={{ 
+                              height: '200px', 
+                              backgroundColor: '#f8f9fa',
+                              color: '#6c757d'
+                            }}
+                          >
+                            <i className="bi bi-book" style={{ fontSize: '48px' }}></i>
+                          </div>
+                        )}
+                        
+                        <div className="card-body d-flex flex-column">
+                          <h5 className="section-title mb-2">
+                            {course.name}
+                          </h5>
+                          
+                          {/* Course Description */}
+                          {course.description && (
+                            <p className="text-muted mb-3 flex-grow-1" style={{ fontSize: '0.9rem', lineHeight: '1.4' }}>
+                              {course.description.length > 100 
+                                ? `${course.description.substring(0, 100)}...` 
+                                : course.description
+                              }
+                            </p>
+                          )}
+                          
+                          {/* Course Stats */}
+                          <div className="mb-3">
+                            <div className="row g-2 mb-2">
+                              <div className="col-6">
+                                <div className="d-flex align-items-center">
+                                  <i className="bi bi-people me-2 text-main"></i>
+                                  <span className="text-muted small">
+                                    <strong>{course.students || 0}</strong> Students
+                                  </span>
                                 </div>
-                              </td>
-                            </tr>
-                          ))}
-                        </tbody>
-                      </table>
+                              </div>
+                              <div className="col-6">
+                                <div className="d-flex align-items-center">
+                                  <i className="bi bi-book me-2 text-info"></i>
+                                  <span className="text-muted small">
+                                    <strong>{course.total_lessons || 0}</strong> Lessons
+                                  </span>
+                                </div>
+                              </div>
+                            </div>
+                            
+                            {/* Rating and Category */}
+                            <div className="row g-2 mb-2">
+                              {course.average_rating && course.average_rating !== "0.00" && (
+                                <div className="col-6">
+                                  <div className="d-flex align-items-center">
+                                    <i className="bi bi-star-fill me-2 text-warning"></i>
+                                    <span className="text-muted small">
+                                      {course.average_rating}
+                                    </span>
+                                  </div>
+                                </div>
+                              )}
+                              {course.category && (
+                                <div className="col-6">
+                                  <div className="d-flex align-items-center">
+                                    <i className="bi bi-tag me-2 text-secondary"></i>
+                                    <span className="text-muted small">
+                                      {course.category}
+                                    </span>
+                                  </div>
+                                </div>
+                              )}
+                            </div>
+                            
+                            {/* Status and Price */}
+                            <div className="d-flex justify-content-between align-items-center mb-2">
+                              <span
+                                className={`badge ${
+                                  course.status === "Active"
+                                    ? "bg-success"
+                                    : "bg-secondary"
+                                }`}
+                                style={{ fontSize: '0.8rem' }}
+                              >
+                                {course.status}
+                              </span>
+                              {course.is_free ? (
+                                <span className="badge bg-success">Free</span>
+                              ) : (
+                                <span className="text-main fw-bold">${course.price}</span>
+                              )}
+                            </div>
+                          </div>
+                          
+                          {/* Action Buttons */}
+                          <div className="d-flex gap-2 mt-auto">
+                            <button
+                              className="btn-edit-profile flex-fill"
+                              onClick={(e) => handleViewCourse(e, course.id)}
+                            >
+                              <i className="bi bi-eye me-2"></i>
+                              View Course
+                            </button>
+                            <button
+                              className="btn-secondary-action flex-fill"
+                              onClick={(e) => handleEditCourse(e, course.id)}
+                            >
+                              <i className="bi bi-pencil me-2"></i>
+                              Edit
+                            </button>
+                          </div>
+                        </div>
+                      </div>
                     </div>
-                  )}
-                </div>
+                  ))
+                )}
               </div>
             </div>
           </div>

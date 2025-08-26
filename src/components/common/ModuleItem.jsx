@@ -54,7 +54,7 @@ export default function ModuleItem({ module, selectedModuleId, setSelectedModule
             style={{ cursor: 'pointer' }}
             onClick={() => setSelectedModuleId(module.id)}
           >
-            <h4 className={`about-subtitle mb-1 ${selectedModuleId === module.id ? 'text-primary' : ''}`}>
+                            <h4 className={`about-subtitle mb-1 ${selectedModuleId === module.id ? 'text-main' : ''}`}>
               {module.title}
             </h4>
             <div className="d-flex gap-3 mb-2">
@@ -75,7 +75,7 @@ export default function ModuleItem({ module, selectedModuleId, setSelectedModule
                                 return totalSeconds ? `${hours}h ${minutes}m` : '0h 0m';
                               })()}
               </small>
-              <small className={`${module.is_free ? 'text-success' : 'text-primary'}`}>
+                              <small className={`${module.is_free ? 'text-success' : 'text-main'}`}>
                 <i className={`bi ${module.is_free ? 'bi-unlock' : 'bi-lock'} me-1`} style={{ fontSize: '12px' }}></i>
                 {module.is_free ? 'Free' : `$${module.price}`}
               </small>
@@ -213,11 +213,11 @@ export default function ModuleItem({ module, selectedModuleId, setSelectedModule
           <div className="row text-center">
             <div className="col-md-3">
               <small className="profile-joined d-block">Lessons</small>
-              <strong className="text-primary">{lessonData?.length||module.total_lessons}</strong>
+                              <strong className="text-main">{lessonData?.length||module.total_lessons}</strong>
             </div>
             <div className="col-md-3">
               <small className="profile-joined d-block">Duration</small>
-              <strong className="text-primary">
+              <strong className="text-main">
 				{(() => {
                                 const totalSeconds = lessonData?.reduce((total, lesson) => total + lesson.duration, 0);
                                 const hours = Math.floor(totalSeconds / 3600);
@@ -228,13 +228,13 @@ export default function ModuleItem({ module, selectedModuleId, setSelectedModule
             </div>
             <div className="col-md-3">
               <small className="profile-joined d-block">Price</small>
-              <strong className="text-primary">
+              <strong className="text-main">
                 {module.is_free ? 'Free' : `$${module.price}`}
               </strong>
             </div>
             <div className="col-md-3">
               <small className="profile-joined d-block">Order</small>
-              <strong className="text-primary">{module.order}</strong>
+              <strong className="text-main">{module.order}</strong>
             </div>
           </div>
         </div>

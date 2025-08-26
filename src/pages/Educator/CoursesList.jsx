@@ -11,7 +11,7 @@ export default function EducatorCoursesList() {
   const {studentsCount} = useEducatorStudentsListData()
   const {totalRevenue}= useEducatorTotalRevenue()
   const totalStudents = studentsCount;
-  const publishedCourses = courses?.filter(
+  const publishedCourses = courses?.results?.filter(
 		(course) => course?.is_published === true
 	);
   const averageRating = educator?.rating
@@ -99,7 +99,7 @@ export default function EducatorCoursesList() {
 				{/* Courses Grid */}
 				<section>
 					<div className="row g-4">
-						{courses?.map((course) => (
+						{courses?.results?.map((course) => (
 								<EducatorCourseCard course={course} key={course?.id} />
 						))}
 					</div>
@@ -113,27 +113,37 @@ function EducatorCourseCard({ course }) {
   const navigate = useNavigate();
   const imgPlaceholder = () => `https://placehold.co/300x200?text${course?.title}`
 	/* 
-   course = {
-        "id": "6a186759-fdc7-4fac-b6fa-9e9fe2994694",
-        "title": "Course 4 by teacher1",
-        "description": "This is a demo course number 4.",
-        "trailer_video": null,
-        "price": "4.61",
-        "is_published": true,
-        "is_free": false,
-        "category": {
-            "id": "5d13c05a-0e6f-4018-b8a4-d6e299dfaec0",
-            "name": "Science",
-            "icon": null
-        },
-        "thumbnail": null,
-        "created_at": "2025-08-15T13:18:43.642890Z",
-        "total_enrollments": 1,
-        "total_lessons": 9,
-        "total_reviews": 0,
-        "average_rating": "0.00",
-        "total_durations": 0
+   New API Response Structure:
+   courses = {
+        "count": 1,
+        "next": null,
+        "previous": null,
+        "results": [
+            {
+                "id": "b259b8be-b0a6-43b1-b5a0-026210797c87",
+                "title": "Introduction to Astrophysics",
+                "description": "Introduction to Astrophysics is the study of the physical nature of celestial objects...",
+                "trailer_video": null,
+                "price": "100.00",
+                "is_published": true,
+                "is_free": false,
+                "category": {
+                    "id": "2c746147-7e28-4f90-8e50-b3af0e662f65",
+                    "name": "Physics",
+                    "icon": null
+                },
+                "thumbnail": "http://127.0.0.1:8000/media/course_thumbnails/maxresdefault.jpg",
+                "created_at": "2025-08-23T13:58:31.197484Z",
+                "total_enrollments": 5,
+                "total_lessons": 3,
+                "total_reviews": 1,
+                "average_rating": "5.00",
+                "total_durations": 0
+            }
+        ]
     }
+    
+    Individual course object structure remains the same
     */
 	const getStatusColor = (status) => {
 		switch (status) {
@@ -178,12 +188,6 @@ function EducatorCourseCard({ course }) {
 						<h5 className="section-title mb-1">{course?.title}</h5>
 						<p className="profile-role mb-0">{course?.category?.name}</p>
 					</div>
-
-					{/* Description */}
-					<p className="profile-joined mb-3 flex-grow-1">
-						{course?.description}
-					</p>
-
 					{/* Course Performance Stats */}
 					<div className="row g-2 mb-3">
 						<div className="col-6">
@@ -251,7 +255,7 @@ function EducatorCourseCard({ course }) {
 								View
 							</button>
 							<button
-								className="btn-edit-profile flex-fill d-flex align-items-center justify-content-center"
+								className="btn-secondary-action flex-fill d-flex align-items-center justify-content-center"
 								onClick={() => navigate(pagePaths.educator.editCourse(course?.id))}
 							>
 								<Edit size={16} className="me-1" />

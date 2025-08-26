@@ -14,7 +14,7 @@ import {
 } from "lucide-react";
 import { pagePaths } from "../../pagePaths";
 import useGetCourseDetails from "../../apis/hooks/student/useGetCourseDetails";
-import useListCourseModules from "../../apis/hooks/student/useListCourseModules";
+import useListCourseModules, { useModuleLessons } from "../../apis/hooks/student/useListCourseModules";
 import useEducatorPublicData from "../../apis/hooks/student/useEducatorPublicData";
 import useListEnrolledCourses from "../../apis/hooks/student/useListEnrolledCourses";
 import useGetLessonDetails from "../../apis/hooks/student/useGetLessonDetails";
@@ -25,6 +25,23 @@ function LessonDetails() {
   const { educatorUsername, courseId, lessonId } = params;
   const navigate = useNavigate();
   const location = useLocation();
+
+  // Helper function to format duration from seconds to human-readable format
+  const formatDuration = (seconds) => {
+    if (!seconds || seconds <= 0) return "Duration not available";
+    
+    const hours = Math.floor(seconds / 3600);
+    const minutes = Math.floor((seconds % 3600) / 60);
+    const remainingSeconds = seconds % 60;
+    
+    if (hours > 0) {
+      return `${hours}h ${minutes}m ${remainingSeconds}s`;
+    } else if (minutes > 0) {
+      return `${minutes}m ${remainingSeconds}s`;
+    } else {
+      return `${remainingSeconds}s`;
+    }
+  };
 
 
 
@@ -39,10 +56,45 @@ function LessonDetails() {
   const { lessonData: apiLessonData, isLoading: lessonLoading, error: lessonError } = useGetLessonDetails(lessonId);
   const { lessonStatus, isLoading: statusLoading, markLessonComplete, isCompleted, error: statusError } = useLessonStatus(lessonId);
 
+  // Fetch lessons for each module
+  const moduleIds = courseModules ? courseModules.map(module => module.id) : [];
+  const { lessons: firstModuleLessons } = useModuleLessons(moduleIds[0]);
+  const { lessons: secondModuleLessons } = useModuleLessons(moduleIds[1]);
+  const { lessons: thirdModuleLessons } = useModuleLessons(moduleIds[2]);
+  const { lessons: fourthModuleLessons } = useModuleLessons(moduleIds[3]);
+  const { lessons: fifthModuleLessons } = useModuleLessons(moduleIds[4]);
+  const { lessons: sixthModuleLessons } = useModuleLessons(moduleIds[5]);
+
+  // Create a map of module lessons for easy access
+  const moduleLessonsMap = React.useMemo(() => {
+    const map = {};
+    if (firstModuleLessons) map[moduleIds[0]] = firstModuleLessons;
+    if (secondModuleLessons) map[moduleIds[1]] = secondModuleLessons;
+    if (thirdModuleLessons) map[moduleIds[2]] = thirdModuleLessons;
+    if (fourthModuleLessons) map[moduleIds[3]] = fourthModuleLessons;
+    if (fifthModuleLessons) map[moduleIds[4]] = fifthModuleLessons;
+    if (sixthModuleLessons) map[moduleIds[5]] = sixthModuleLessons;
+    return map;
+  }, [moduleIds, firstModuleLessons, secondModuleLessons, thirdModuleLessons, fourthModuleLessons, fifthModuleLessons, sixthModuleLessons]);
+
   const currentLesson = React.useMemo(() => {
     if (!courseModules || !lessonId) {
       return null;
     }
+
+    // Helper function to find which module contains a specific lesson
+    const findModuleForLesson = (targetLessonId) => {
+      for (const module of courseModules) {
+        // Check if this module contains the lesson
+        if (moduleLessonsMap[module.id]) {
+          const hasLesson = moduleLessonsMap[module.id].some(lesson => lesson.id === targetLessonId);
+          if (hasLesson) {
+            return module;
+          }
+        }
+      }
+      return courseModules[0]; // fallback
+    };
 
     // Method 0: Use API lesson data first (most reliable and complete)
     if (apiLessonData) {
@@ -50,11 +102,11 @@ function LessonDetails() {
         id: apiLessonData.id,
         title: apiLessonData.title || "Lesson Content",
         description: apiLessonData.description || "This is a detailed description of the lesson content.",
-        duration: apiLessonData.duration ? `${apiLessonData.duration} min` : "25 min",
+        duration: apiLessonData.duration ? formatDuration(apiLessonData.duration) : "Duration not available",
         videoUrl: apiLessonData.playback_info || "",
 
         completed: isCompleted, // From lesson status API
-        module: courseModules.find(m => m.id === apiLessonData.module) || courseModules[0],
+        module: findModuleForLesson(apiLessonData.id),
         order: apiLessonData.order,
         is_published: apiLessonData.is_published,
         is_free: apiLessonData.is_free,
@@ -71,11 +123,11 @@ function LessonDetails() {
         id: foundLesson.id,
         title: foundLesson.title || foundLesson.name || foundLesson.lesson_title || "Lesson Content",
         description: foundLesson.description || foundLesson.lesson_description || "This is a detailed description of the lesson content.",
-        duration: foundLesson.duration || "25 min",
+        duration: foundLesson.duration ? formatDuration(foundLesson.duration) : "Duration not available",
         videoUrl: foundLesson.playback_info || foundLesson.videoUrl || foundLesson.video_url || "",
 
         completed: foundLesson.completed || foundLesson.is_completed || false,
-        module: courseModules.find(m => m.id === foundLesson.module) || courseModules[0]
+        module: findModuleForLesson(foundLesson.id)
       };
     }
 
@@ -90,7 +142,7 @@ function LessonDetails() {
               id: lesson.id,
               title: lesson.title || "Lesson Content",
               description: lesson.description || "This is a detailed description of the lesson content.",
-              duration: lesson.duration || "25 min",
+              duration: lesson.duration ? formatDuration(lesson.duration) : "Duration not available",
               content: lesson.content || "Lesson content will be displayed here.",
               completed: lesson.completed || lesson.is_completed || false,
               module: courseModules.find(m => m.id === lesson.module) || courseModules[0]
@@ -121,10 +173,10 @@ function LessonDetails() {
       id: lessonId,
       title: "Lesson Content",
       description: "This is a detailed description of the lesson content.",
-      duration: "25 min",
+      duration: "Duration not available",
       videoUrl: "",
       completed: false,
-      module: courseModules[0] || null
+      module: findModuleForLesson(lessonId)
     };
   }, [courseModules, lessonId, courseDetails, location.state, apiLessonData]);
 
@@ -321,9 +373,34 @@ function LessonDetails() {
               </div>
             </div>
 
-            <div className="card">
+            {/* Lesson Description and Actions Card */}
+            <div className="card mb-4">
               <div className="card-body">
-                <div className="d-flex gap-2 mt-4 pt-4 border-top">
+                {/* Lesson Description */}
+                {currentLesson.description && currentLesson.description !== "This is a detailed description of the lesson content." && (
+                  <>
+                    <h5 className="section-title mb-3">
+                      <BookOpen size={20} className="me-2 text-main" />
+                      Lesson Description
+                    </h5>
+                    <div className="lesson-description mb-4" style={{ 
+                      backgroundColor: '#f8f9fa', 
+                      padding: '1rem', 
+                      borderRadius: '8px',
+                      border: '1px solid #e9ecef'
+                    }}>
+                      <p className="mb-0 profile-role" style={{ 
+                        lineHeight: '1.6',
+                        color: '#495057'
+                      }}>
+                        {currentLesson.description}
+                      </p>
+                    </div>
+                  </>
+                )}
+                
+                {/* Action Buttons */}
+                <div className="d-flex gap-2">
                   {!isCompleted ? (
                     <button 
                       className="btn-edit-profile"
@@ -345,15 +422,16 @@ function LessonDetails() {
                       Completed ✓
                     </button>
                   )}
-                  {apiLessonData?.document_url && (
+                  
+                  {currentLesson.document_url && (
                     <a 
-                      href={apiLessonData.document_url}
+                      href={currentLesson.document_url}
                       target="_blank"
                       rel="noopener noreferrer"
                       className="btn-secondary-action text-decoration-none"
                     >
                       <FileText size={16} className="me-2" />
-                      Resources
+                      Download Resources
                     </a>
                   )}
                 </div>
@@ -373,42 +451,147 @@ function LessonDetails() {
             </div>
           </div>
 
-          <div className="col-lg-4">
-            <div className="card mb-4">
-              <div className="card-body">
-                <h4 className="section-title mb-3">Lesson Information</h4>
+        </div>
+      </div>
 
-                <div className="about-bubble p-3 mb-3">
-                  <div className="d-flex align-items-center mb-2">
-                    <Clock size={16} className="me-2 text-primary" />
-                    <span className="about-subtitle">Duration</span>
-                  </div>
-                  <p className="mb-0 profile-joined">{currentLesson.duration}</p>
+      {/* Floating Right Sidebar - Fixed Position */}
+      <div className="floating-sidebar" 
+           style={{
+             position: 'fixed',
+             right: '20px',
+             top: '150px',
+             height: 'calc(100vh - 250px)',
+             zIndex: 1000,
+             transition: 'all 0.3s ease-in-out'
+           }}>
+        
+        {/* Expanded Sidebar (Always Visible) */}
+        <div className="sidebar-expanded card" 
+             style={{
+               width: '320px',
+               height: '100%',
+               overflow: 'hidden',
+               boxShadow: '0 4px 12px rgba(0,0,0,0.15)',
+               borderRadius: '8px 0 0 8px'
+             }}>
+          
+          <div className="card-body p-3" style={{ paddingTop: '0' }}>
+            {/* Course Content */}
+            <div className="sidebar-content">
+              <h5 className="section-title mb-3 text-center">Course Content</h5>
+              
+              {/* Course Navigation */}
+              {courseModules && courseModules.length > 0 ? (
+                <div className="course-navigation" style={{ height: 'calc(100vh - 350px)', overflowY: 'auto' }}>
+                  {courseModules.map((module, moduleIndex) => (
+                    <div key={module.id} className="module-section mb-3">
+                      {/* Chapter Header */}
+                      <div className="chapter-header p-2 rounded mb-2" 
+                           style={{ 
+                             backgroundColor: currentLesson.module?.id === module.id ? '#e3f2fd' : '#f8f9fa',
+                             border: currentLesson.module?.id === module.id ? '2px solid #2196f3' : '1px solid #e9ecef'
+                           }}>
+                        <h6 className="mb-0 fw-bold text-main" style={{ fontSize: '0.9rem' }}>
+                          Ch {moduleIndex + 1}: {module.title}
+                        </h6>
+                        <small className="text-muted">
+                          {(() => {
+                            const lessons = moduleLessonsMap[module.id];
+                            if (lessons && Array.isArray(lessons)) {
+                              return `${lessons.length} lessons`;
+                            }
+                            return "Loading lessons...";
+                          })()}
+                        </small>
+                      </div>
+                      
+                      {/* Lessons List */}
+                      {(() => {
+                        // Get lessons from the moduleLessonsMap
+                        const lessons = moduleLessonsMap[module.id];
+                        
+                        if (lessons && Array.isArray(lessons) && lessons.length > 0) {
+                          return (
+                            <div className="lessons-list ms-2">
+                              {lessons.map((lesson, lessonIndex) => (
+                                <div key={lesson.id} className="lesson-item mb-2">
+                                  <button
+                                    className={`btn btn-sm w-100 text-start d-flex align-items-center justify-content-between ${
+                                      lesson.id === currentLesson.id 
+                                        ? 'btn-primary' 
+                                        : 'btn-outline-secondary'
+                                    }`}
+                                    onClick={() => navigate(pagePaths.student.lessonDetails(educatorUsername, courseId, lesson.id))}
+                                    style={{
+                                      fontSize: '0.8rem',
+                                      padding: '0.5rem 0.75rem',
+                                      borderRadius: '6px',
+                                      border: lesson.id === currentLesson.id ? 'none' : '1px solid #dee2e6',
+                                      backgroundColor: lesson.id === currentLesson.id ? '#0d6efd' : 'transparent',
+                                      color: lesson.id === currentLesson.id ? 'white' : '#495057',
+                                      transition: 'all 0.2s ease-in-out',
+                                      cursor: 'pointer'
+                                    }}
+                                    onMouseEnter={(e) => {
+                                      if (lesson.id !== currentLesson.id) {
+                                        e.target.style.backgroundColor = '#f8f9fa';
+                                        e.target.style.borderColor = '#0d6efd';
+                                        e.target.style.color = '#0d6efd';
+                                      }
+                                    }}
+                                    onMouseLeave={(e) => {
+                                      if (lesson.id !== currentLesson.id) {
+                                        e.target.style.backgroundColor = 'transparent';
+                                        e.target.style.borderColor = '#dee2e6';
+                                        e.target.style.color = '#495057';
+                                      }
+                                    }}
+                                  >
+                                    <div className="d-flex align-items-center">
+                                      <span className="me-2 fw-medium">
+                                        {moduleIndex + 1}.{lessonIndex + 1}
+                                      </span>
+                                      <span className="text-truncate" style={{ maxWidth: '120px' }}>
+                                        {lesson.title}
+                                      </span>
+                                    </div>
+                                    
+                                    {/* Lesson Status */}
+                                    {lesson.completed || lesson.is_completed ? (
+                                      <CheckCircle size={14} className="text-success" />
+                                    ) : (
+                                      <div className="rounded-circle" style={{ 
+                                        width: '6px', 
+                                        height: '6px', 
+                                        backgroundColor: '#dee2e6' 
+                                      }} />
+                                    )}
+                                  </button>
+                                </div>
+                              ))}
+                            </div>
+                          );
+                        } else {
+                          return (
+                            <div className="lessons-list ms-2">
+                              <div className="text-center py-2">
+                                <small className="text-muted">Loading lessons...</small>
+                              </div>
+                            </div>
+                          );
+                        }
+                      })()}
+                    </div>
+                  ))}
                 </div>
-
-                <div className="about-bubble p-3 mb-3">
-                  <div className="d-flex align-items-center mb-2">
-                    <BookOpen size={16} className="me-2 text-primary" />
-                    <span className="about-subtitle">Module</span>
+              ) : (
+                <div className="text-center py-3">
+                                          <div className="spinner-border spinner-border-sm text-main" role="status">
+                    <span className="visually-hidden">Loading...</span>
                   </div>
-                  <p className="mb-0 profile-joined">{currentLesson.module?.title || 'N/A'}</p>
                 </div>
-
-                <div className="about-bubble p-3">
-                  <div className="d-flex align-items-center mb-2">
-                    <CheckCircle size={16} className="me-2 text-primary" />
-                    <span className="about-subtitle">Status</span>
-                  </div>
-                  <p className="mb-0">
-                    <span className={`badge ${isCompleted ? 'bg-success' : 'bg-warning'}`}>
-                      {isCompleted ? 'Completed' : 'In Progress'}
-                    </span>
-                  </p>
-                </div>
-              </div>
+              )}
             </div>
-
-
           </div>
         </div>
       </div>

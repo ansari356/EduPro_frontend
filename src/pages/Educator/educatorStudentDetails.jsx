@@ -114,37 +114,37 @@ function StudentProfile() {
 									<div className="col-xl-8">
 										<div className="d-flex flex-column gap-2">
                         <div className="d-flex align-items-center px-3">
-                          <i className="bi bi-info-circle me-2 text-primary"></i>
+                          <i className="bi bi-info-circle me-2 text-main"></i>
                           <strong className="me-2">Bio:</strong>
                           <span className="small">{data?.student?.bio || "N/A"}</span>
                         </div>
                         <div className="d-flex align-items-center px-3">
-                          <i className="bi bi-calendar me-2 text-primary"></i>
+                          <i className="bi bi-calendar me-2 text-main"></i>
                           <strong className="me-2">Date of Birth:</strong>
                           <span className="small">{data?.student?.date_of_birth ? new Date(data?.student.date_of_birth).toLocaleDateString() : "N/A"}</span>
                         </div>
                         <div className="d-flex align-items-center px-3">
-                          <i className="bi bi-house me-2 text-primary"></i>
+                          <i className="bi bi-house me-2 text-main"></i>
                           <strong className="me-2">Address:</strong>
                           <span className="small">{data?.student?.address || "N/A"}</span>
                         </div>
                         <div className="d-flex align-items-center px-3">
-                          <i className="bi bi-geo-alt me-2 text-primary"></i>
+                          <i className="bi bi-geo-alt me-2 text-main"></i>
                           <strong className="me-2">City:</strong>
                           <span className="small">{data?.student?.city || "N/A"}</span>
                         </div>
                         <div className="d-flex align-items-center px-3">
-                          <i className="bi bi-gender-ambiguous me-2 text-primary"></i>
+                          <i className="bi bi-gender-ambiguous me-2 text-main"></i>
                           <strong className="me-2">Gender:</strong>
                           <span className="small">{data?.student?.gender || "N/A"}</span>
                         </div>
 											<div className="d-flex align-items-center px-3">
-												<i className="bi bi-telephone me-2 text-primary"></i>
+												                <i className="bi bi-telephone me-2 text-main"></i>
 												<strong className="me-2">Phone:</strong>
 												<span className="small">{formData.phone1}</span>
 											</div>
 											<div className="d-flex align-items-center px-3">
-												<i className="bi bi-telephone-plus me-2 text-primary"></i>
+												                <i className="bi bi-telephone-plus me-2 text-main"></i>
 												<strong className="me-2">Parent Phone:</strong>
 												<span className="small">{formData.phone2}</span>
 											</div>
@@ -197,7 +197,7 @@ function StudentProfile() {
 
 								<small
 									className={`d-block profile-progress-text ${
-										progress === 100 ? "text-primary" : "text-danger"
+										                            progress === 100 ? "text-main" : "text-danger"
 									}`}
 								>
 									{progress === 100
@@ -224,7 +224,7 @@ function StudentProfile() {
 												key={idx}
 												className="about-bubble px-3 py-2 mb-2 d-flex align-items-center"
 											>
-												<span className="badge text-primary border border-primary me-2">
+												                            <span className="badge text-main border border-primary me-2">
 													{item.type === "assignment" ? "Assignment" : "Class"}
 												</span>
 												<div className="flex-grow-1">{item.message}</div>

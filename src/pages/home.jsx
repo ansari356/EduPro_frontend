@@ -152,7 +152,7 @@ export default function HomePage() {
               <div className="card-body p-5">
                 <div className="d-flex align-items-center mb-3">
                   <i
-                    className="bi bi-mortarboard-fill me-3 text-primary"
+                    className="bi bi-mortarboard-fill me-3 text-main"
                     style={{ fontSize: "2.2rem" }}
                     aria-hidden="true"
                   />
@@ -279,7 +279,7 @@ export default function HomePage() {
               }}
               transition={{ type: "spring", stiffness: 300 }}
             >
-              <h3 className="fw-bold mb-1 text-primary">
+              <h3 className="fw-bold mb-1 text-main">
                 <CountUp end={totalStudents} />
               </h3>
               <small className="about-subtitle fw-medium">Total Students</small>
@@ -294,7 +294,7 @@ export default function HomePage() {
               }}
               transition={{ type: "spring", stiffness: 300 }}
             >
-              <h3 className="fw-bold mb-1 text-primary">
+              <h3 className="fw-bold mb-1 text-main">
                 <CountUp end={totalCourses} />
               </h3>
               <small className="about-subtitle fw-medium">
@@ -402,7 +402,7 @@ export default function HomePage() {
               <div className="card shadow-sm h-100">
                 <div className="card-body d-flex flex-column align-items-center text-center p-4">
                   <i
-                    className={`${course.icon} text-primary mb-3`}
+                    className={`${course.icon} text-main mb-3`}
                     style={{ fontSize: "2rem" }}
                     aria-hidden="true"
                   />

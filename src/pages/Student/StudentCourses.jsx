@@ -194,13 +194,13 @@ function Courses() {
   const getStatusBadge = (status) => {
     switch (status) {
       case "Active":
-        return "badge-success-custom";
+        return "badge bg-success";
       case "Completed":
-        return "badge-success-custom";
+        return "badge bg-success";
       case "Nearly Complete":
-        return "badge-warning-custom";
+        return "badge bg-warning";
       default:
-        return "badge-warning-custom";
+        return "badge bg-warning";
     }
   };
 
