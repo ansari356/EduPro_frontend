@@ -1,9 +1,11 @@
 import React from 'react';
 import { Link, useNavigate } from 'react-router-dom';
+import { useLanguage } from '../contexts/LanguageContext';
 import '../index.css'; // Import global styles for CSS variables and classes
 
 const NotFoundPage = () => {
   const navigate = useNavigate();
+  const { t } = useLanguage();
   return (
     <div style={{
       display: 'flex',
@@ -30,14 +32,14 @@ const NotFoundPage = () => {
         marginBottom: 'var(--spacing-lg)',
         color: 'var(--color-secondary)',
       }}>
-        Page Not Found
+        {t('notFound.title')}
       </h2>
       <p style={{
         fontSize: 'var(--font-size-lg)',
         marginBottom: 'var(--spacing-xl)',
         color: 'var(--color-text-muted)',
       }}>
-        The page you are looking for might have been removed, had its name changed, or is temporarily unavailable.
+        {t('notFound.message')}
       </p>
       <button onClick={navigate('-1')} style={{
         backgroundColor: 'var(--color-primary-light)',
@@ -51,7 +53,7 @@ const NotFoundPage = () => {
         fontSize: 'var(--font-size-base)',
         textDecoration: 'none',
       }}>
-        Go to Homepage
+        {t('notFound.goHome')}
       </button>
     </div>
   );

@@ -33,8 +33,13 @@ export const studentEndpoints = {
   // Assessment endpoints - Updated to match your EXACT backend structure
   assessments: {
     // Get available assessments for a teacher (EXACT ENDPOINT FROM YOUR BACKEND)
-    available: (teacherUsername, courseId = null) => 
-      `/student/assessments/${teacherUsername}/`,
+    available: (teacherUsername, courseId = null) => {
+      let endpoint = `/student/assessments/${teacherUsername}/`;
+      if (courseId) {
+        endpoint += `?course_id=${courseId}`;
+      }
+      return endpoint;
+    },
     
     // Start an assessment (EXACT ENDPOINT FROM YOUR BACKEND)
     start: (assessmentId, teacherUsername) => `/student/assessments/${assessmentId}/${teacherUsername}/start/`,

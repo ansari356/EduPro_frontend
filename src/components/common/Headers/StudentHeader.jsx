@@ -4,12 +4,17 @@ import { pagePaths } from "../../../pagePaths";
 import logoutUser from "../../../apis/actions/logoutUser";
 import useStudentProfileData from "../../../apis/hooks/student/useStudentProfileData";
 import useStudentRefreshToken from "../../../apis/hooks/student/useStudentRefreshToken";
+import { useLanguage } from "../../../contexts/LanguageContext";
+import { useDarkMode } from "../../../contexts/DarkModeContext";
+import { Moon, Sun, Globe } from 'lucide-react';
 
 export default function StudentHeader() {
   const { mutate } = useStudentRefreshToken();
   const navigate = useNavigate();
   const { educatorUsername } = useParams();
   const { data: studentData, isLoading, error } = useStudentProfileData();
+  const { isDarkMode, toggleDarkMode } = useDarkMode();
+  const { currentLanguage, changeLanguage } = useLanguage();
 
   if (!educatorUsername) {
     return null;
@@ -77,7 +82,7 @@ export default function StudentHeader() {
               className="nav-link-custom"
             >
               <i className="bi bi-person-badge me-2"></i>
-              Dashboard
+              Profile
             </Nav.Link>
             <Nav.Link
               as={NavLink}
@@ -89,8 +94,8 @@ export default function StudentHeader() {
             </Nav.Link>
           </Nav>
 
-          <div className="user-section">
-            <Dropdown align="end">
+          <div className="user-section d-flex align-items-center gap-2">
+            <Dropdown align={currentLanguage === 'ar' ? 'start' : 'end'}>
               <Dropdown.Toggle
                 variant="outline-primary"
                 id="dropdown-user"
@@ -105,14 +110,66 @@ export default function StudentHeader() {
               <Dropdown.Menu className="user-dropdown-menu">
                 <Dropdown.Header className="dropdown-header">
                   <div className="user-info">
-                    <i className="bi bi-person-circle me-2"></i>
-                    <span>{getStudentName()}</span>
+                    {getStudentAvatar()}
+                    <span className="ms-2">{getStudentName()}</span>
                   </div>
                 </Dropdown.Header>
                 <Dropdown.Divider />
+                
+                {/* Dark Mode Toggle */}
+                <Dropdown.Item
+                  onClick={toggleDarkMode}
+                  className="dropdown-item-custom d-flex align-items-center"
+                >
+                  {isDarkMode ? (
+                    <>
+                      <Sun size={16} className="me-2" />
+                      Light Mode
+                    </>
+                  ) : (
+                    <>
+                      <Moon size={16} className="me-2" />
+                      Dark Mode
+                    </>
+                  )}
+                </Dropdown.Item>
+                
+                {/* Language Selection */}
+                <Dropdown.Header className="dropdown-header">
+                  <Globe size={16} className="me-2" />
+                  Language
+                </Dropdown.Header>
+                
+                <Dropdown.Item
+                  onClick={() => changeLanguage('en')}
+                  className={`dropdown-item-custom d-flex align-items-center ${
+                    currentLanguage === 'en' ? 'active' : ''
+                  }`}
+                >
+                  <span className="me-2">🇺🇸</span>
+                  <span className="me-2">English</span>
+                  {currentLanguage === 'en' && (
+                    <span className="ms-auto">✓</span>
+                  )}
+                </Dropdown.Item>
+                
+                <Dropdown.Item
+                  onClick={() => changeLanguage('ar')}
+                  className={`dropdown-item-custom d-flex align-items-center ${
+                    currentLanguage === 'ar' ? 'active' : ''
+                  }`}
+                >
+                  <span className="me-2">🇸🇦</span>
+                  <span className="me-2">العربية</span>
+                  {currentLanguage === 'ar' && (
+                    <span className="ms-auto">✓</span>
+                  )}
+                </Dropdown.Item>
+                
+                <Dropdown.Divider />
                 <Dropdown.Item onClick={handleSignOut}>
                   <i className="bi bi-box-arrow-right me-2"></i>
-                  Sign out
+                  Logout
                 </Dropdown.Item>
               </Dropdown.Menu>
             </Dropdown>

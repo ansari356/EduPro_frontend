@@ -5,6 +5,7 @@ import "bootstrap-icons/font/bootstrap-icons.css";
 import { motion } from "framer-motion";
 import { useInView } from "react-intersection-observer";
 import { useEffect, useState } from "react";
+import { useLanguage } from "../contexts/LanguageContext";
 import {
   LineChart,
   Line,
@@ -130,6 +131,8 @@ const sectionVariants = {
 };
 
 export default function HomePage() {
+  const { currentLanguage, t } = useLanguage();
+  
   return (
     <div
       className="min-vh-100 profile-root"
@@ -156,7 +159,9 @@ export default function HomePage() {
                     style={{ fontSize: "2.2rem" }}
                     aria-hidden="true"
                   />
-                  <h2 className="section-title m-0">Who We Are</h2>
+                  <h2 className="section-title m-0">
+                    {t('home.whoWeAre')}
+                  </h2>
                 </div>
                 <p
                   className="mb-0 fw-medium"
@@ -174,11 +179,51 @@ export default function HomePage() {
                   >
                     EduPlatform
                   </span>{" "}
-                  is a digital hub for educators. Our webapp empowers faculty to
-                  post courses, share material, and manage student interactions.
-                  Built for engagement and flexibility, it's the ultimate space
-                  for teachers to build their classroom community online!
+                  {t('home.whoWeAreDesc')}
                 </p>
+              </div>
+            </div>
+          </div>
+        </motion.div>
+
+
+
+        {/* New Features Showcase */}
+        <motion.div
+          className="row justify-content-center mb-5"
+          initial="hidden"
+          whileInView="visible"
+          viewport={{ once: true, amount: 0.3 }}
+          variants={sectionVariants}
+        >
+          <div className="col-lg-12">
+            <div className="feature-showcase">
+              <h3>
+                <i className="bi bi-stars text-warning"></i>
+                {t('home.newFeatures')}
+              </h3>
+              <div className="feature-grid">
+                <div className="feature-card">
+                  <div className="icon">🌙</div>
+                  <h4>{t('home.darkMode')}</h4>
+                  <p>
+                    {t('home.darkModeDesc')}
+                  </p>
+                </div>
+                <div className="feature-card">
+                  <div className="icon">🌍</div>
+                  <h4>{t('home.multiLanguage')}</h4>
+                  <p>
+                    {t('home.multiLanguageDesc')}
+                  </p>
+                </div>
+                <div className="feature-card">
+                  <div className="icon">⚙️</div>
+                  <h4>{t('home.easySettings')}</h4>
+                  <p>
+                    {t('home.easySettingsDesc')}
+                  </p>
+                </div>
               </div>
             </div>
           </div>

@@ -104,6 +104,8 @@ function LessonDetails() {
         description: apiLessonData.description || "This is a detailed description of the lesson content.",
         duration: apiLessonData.duration ? formatDuration(apiLessonData.duration) : "Duration not available",
         videoUrl: apiLessonData.playback_info || "",
+        otp: apiLessonData.otp || "",
+        playbackInfo: apiLessonData.playback_info || "",
 
         completed: isCompleted, // From lesson status API
         module: findModuleForLesson(apiLessonData.id),
@@ -125,6 +127,8 @@ function LessonDetails() {
         description: foundLesson.description || foundLesson.lesson_description || "This is a detailed description of the lesson content.",
         duration: foundLesson.duration ? formatDuration(foundLesson.duration) : "Duration not available",
         videoUrl: foundLesson.playback_info || foundLesson.videoUrl || foundLesson.video_url || "",
+        otp: foundLesson.otp || "",
+        playbackInfo: foundLesson.playback_info || "",
 
         completed: foundLesson.completed || foundLesson.is_completed || false,
         module: findModuleForLesson(foundLesson.id)
@@ -159,6 +163,8 @@ function LessonDetails() {
               title: lesson.title || "Lesson Content",
               description: lesson.description || "This is a detailed description of the lesson content.",
               videoUrl: lesson.playback_info || lesson.videoUrl || "",
+        otp: lesson.otp || "",
+        playbackInfo: lesson.playback_info || "",
               content: lesson.content || "Lesson content will be displayed here.",
               completed: lesson.completed || lesson.is_completed || false,
               module: courseModules.find(m => m.id === lesson.module) || courseModules[0]
@@ -175,6 +181,8 @@ function LessonDetails() {
       description: "This is a detailed description of the lesson content.",
       duration: "Duration not available",
       videoUrl: "",
+      otp: "",
+      playbackInfo: "",
       completed: false,
       module: findModuleForLesson(lessonId)
     };
@@ -308,71 +316,41 @@ function LessonDetails() {
           <div className="col-lg-8">
             <div className="card mb-4">
               <div className="card-body p-0">
-                <div className="position-relative video-container" style={{ backgroundColor: '#000' }}>
-                  <video
-                    ref={videoRef}
-                    className="w-100"
-                    style={{ height: '400px', objectFit: 'contain' }}
-                    onPlay={() => setIsPlaying(true)}
-                    onPause={() => setIsPlaying(false)}
-                    onEnded={async () => {
-                      setIsPlaying(false);
-                      // Auto-mark lesson as complete when video ends
-                      try {
-                        await markLessonComplete();
-                      } catch (error) {
-                        console.error('Failed to auto-mark lesson complete:', error);
-                      }
-                    }}
-                  >
-                    <source src={currentLesson.videoUrl} type="video/mp4" />
-                    Your browser does not support the video tag.
-                  </video>
-
-                  <div className="video-controls-overlay">
-
-                    <div className="video-controls d-flex align-items-center justify-content-between p-3">
-                      <div className="d-flex align-items-center gap-3">
-                        <button
-                          className="btn btn-sm text-white"
-                          onClick={togglePlay}
-                          style={{ background: 'none', border: 'none' }}
-                        >
-                          {isPlaying ? <Pause size={20} /> : <Play size={20} />}
-                        </button>
-
-
-                      </div>
-
-                      <div className="d-flex align-items-center gap-3">
-                        <div className="d-flex align-items-center">
-                          <Volume2 size={16} className="text-white me-2" />
-                          <input
-                            type="range"
-                            min="0"
-                            max="1"
-                            step="0.1"
-                            value={volume}
-                            onChange={handleVolumeChange}
-                            className="form-range"
-                            style={{ width: '80px' }}
-                          />
-                        </div>
-
-                        <button
-                          className="btn btn-sm text-white"
-                          onClick={toggleFullscreen}
-                          style={{ background: 'none', border: 'none' }}
-                        >
-                          <Maximize size={16} />
-                        </button>
+                <div className="position-relative video-container" style={{ 
+                  backgroundColor: '#000',
+                  borderRadius: '8px',
+                  overflow: 'hidden'
+                }}>
+                  {currentLesson.otp && currentLesson.playbackInfo ? (
+                    <div className="position-relative">
+                      <iframe 
+                        src={`https://player.vdocipher.com/v2/?otp=${currentLesson.otp}&playbackInfo=${currentLesson.playbackInfo}`}
+                        style={{
+                          border: 0,
+                          height: '400px',
+                          width: '100%',
+                          maxWidth: '100%'
+                        }}
+                        allowFullScreen={true}
+                        allow="encrypted-media"
+                        title={currentLesson.title || "Lesson Video"}
+                        onLoad={() => console.log('VdoCipher iframe loaded successfully')}
+                        onError={(e) => console.error('VdoCipher iframe error:', e)}
+                        loading="lazy"
+                      />
+                    </div>
+                  ) : (
+                    <div className="d-flex align-items-center justify-content-center" style={{ height: '400px', color: '#fff' }}>
+                      <div className="text-center">
+                        <BookOpen size={48} className="mb-3" />
+                        <p>Video not available</p>
+                        <small>OTP or playback info missing</small>
                       </div>
                     </div>
-                  </div>
+                  )}                  
                 </div>
               </div>
             </div>
-
             {/* Lesson Description and Actions Card */}
             <div className="card mb-4">
               <div className="card-body">
@@ -383,7 +361,7 @@ function LessonDetails() {
                       <BookOpen size={20} className="me-2 text-main" />
                       Lesson Description
                     </h5>
-                    <div className="lesson-description mb-4" style={{ 
+                    <div className="about-bubble mb-4" style={{ 
                       backgroundColor: '#f8f9fa', 
                       padding: '1rem', 
                       borderRadius: '8px',
@@ -486,7 +464,7 @@ function LessonDetails() {
                   {courseModules.map((module, moduleIndex) => (
                     <div key={module.id} className="module-section mb-3">
                       {/* Chapter Header */}
-                      <div className="chapter-header p-2 rounded mb-2" 
+                      <div className="about-bubble p-2 rounded mb-2" 
                            style={{ 
                              backgroundColor: currentLesson.module?.id === module.id ? '#e3f2fd' : '#f8f9fa',
                              border: currentLesson.module?.id === module.id ? '2px solid #2196f3' : '1px solid #e9ecef'

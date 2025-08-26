@@ -5,6 +5,7 @@ import useEducatorPublicData from '../../apis/hooks/student/useEducatorPublicDat
 import loginStudent from '../../apis/actions/student/loginStudent';
 import { pagePaths } from '../../pagePaths';
 import useStudentRefreshToken from '../../apis/hooks/student/useStudentRefreshToken';
+import { useLanguage } from '../../contexts/LanguageContext';
 
 
 const StudentLoginPage = () => {
@@ -20,20 +21,21 @@ const StudentLoginPage = () => {
   const { educatorUsername } = useParams();
   const { data: educatorData, error, isLoading } = useEducatorPublicData(educatorUsername);
   const {mutate}=useStudentRefreshToken()
+  const { t } = useLanguage();
 
   const validateForm = () => {
     const newErrors = {};
     
     if (!username.trim()) {
-      newErrors.username = 'Username or email is required';
+      newErrors.username = t('auth.usernameOrEmailRequired');
     } else if (username.includes('@') && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(username)) {
-      newErrors.username = 'Please enter a valid email address';
+      newErrors.username = t('profile.invalidEmail');
     }
     
     if (!password) {
-      newErrors.password = 'Password is required';
+      newErrors.password = t('profile.passwordRequired');
     } else if (password.length < 1) {
-      newErrors.password = 'Password cannot be empty';
+      newErrors.password = t('profile.passwordRequired');
     }
     
     return newErrors;
@@ -82,7 +84,7 @@ const StudentLoginPage = () => {
       console.log('Student login successful:', response.data);
       
       // Show success message
-      setSuccessMessage(`Successfully logged in to ${educatorData.full_name}'s ${educatorData.specialization} class!`);
+      setSuccessMessage(t('auth.loginSuccess') + ` ${educatorData.full_name}'s ${educatorData.specialization} class!`);
       setShowSuccess(true);
       
       // Redirect to student dashboard or appropriate page after 2 seconds
@@ -95,9 +97,9 @@ const StudentLoginPage = () => {
       
       // Handle different types of errors
       if (err.response?.status === 401) {
-        setGeneralError('Invalid username/email or password. Please try again.');
+        setGeneralError(t('auth.invalidCredentials'));
       } else if (err.response?.status === 400) {
-        setGeneralError('Please check your input and try again.');
+        setGeneralError(t('auth.checkInput'));
       } else if (err.response?.status === 500) {
         setGeneralError('Server error. Please try again later.');
       } else if (err.message === 'Network Error') {
@@ -187,7 +189,7 @@ const StudentLoginPage = () => {
 
                   <div className="mb-4">
                     <label className="form-label">
-                      Username / Email
+                      {t('profile.username')} / {t('auth.email')}
                     </label>
                     <div className="position-relative">
                       <input
@@ -195,7 +197,7 @@ const StudentLoginPage = () => {
                         className={`form-control ${errors.username ? 'is-invalid' : ''}`}
                         value={username}
                         onChange={(e) => handleInputChange('username', e.target.value)}
-                        placeholder="Enter your username or email"
+                        placeholder={t('auth.enterUsernameOrEmail')}
                       />
                       <User className="position-absolute top-50 translate-middle-y input-icon" size={20} />
                       {errors.username && <div className="invalid-feedback">{errors.username}</div>}
@@ -204,7 +206,7 @@ const StudentLoginPage = () => {
 
                   <div className="mb-4">
                     <label className="form-label">
-                      Password
+                      {t('auth.password')}
                     </label>
                     <div className="position-relative">
                       <input
@@ -234,28 +236,28 @@ const StudentLoginPage = () => {
                     {loginLoading ? (
                       <span className="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
                     ) : (
-                      'Login to ' + educatorData.specialization + ' Class'
+                      <span>{t('auth.login')} {t('common.to')} {educatorData.specialization} {t('common.class')}</span>
                     )}
                   </button>
                 </form>
 
                 <div className="text-center">
                   <p className="profile-joined">
-                    Forgot password? 
+                    {t('auth.forgotPassword')}? 
                     <button 
                       className="btn-link-custom text-accent ms-1"
-                      onClick={() => alert('Password reset feature coming soon!')}
+                      onClick={() => alert(t('auth.passwordReset'))}
                     >
-                      Click here
+                      {t('common.clickHere')}
                     </button>
                   </p>
                   <p className="profile-joined">
-                    Not registered yet?
+                    {t('auth.notRegisteredYet')}?
                     <button 
                       className="btn-link-custom text-accent ms-1"
                       onClick={() => navigate(pagePaths.student.signup(educatorUsername))}
                     >
-                      Create an Account
+                      {t('auth.createAccount')}
                     </button>
                   </p>
                 </div>
@@ -268,10 +270,10 @@ const StudentLoginPage = () => {
             <div className="illustration-card">
               <div className="text-center mb-4">
                 <h2 className="section-title text-white mb-2">
-                  {educatorData.specialization} Class
+                  {educatorData.specialization} {t('common.class')}
                 </h2>
                 <p className="profile-name text-white mb-2">
-                  with {educatorData.full_name}
+                  {t('common.with')} {educatorData.full_name}
                 </p>
                 <p className="text-white opacity-75">
                   {educatorData.bio}
@@ -300,13 +302,13 @@ const StudentLoginPage = () => {
                     <div className="section-title text-accent">
                       {educatorData.number_of_students}
                     </div>
-                    <div className="profile-joined">Registered Students</div>
+                    <div className="profile-joined">{t('common.registeredStudents')}</div>
                   </div>
                   <div className="col-6">
                     <div className="section-title text-accent">
                       {educatorData.experiance}
                     </div>
-                    <div className="profile-joined">Years Experience</div>
+                    <div className="profile-joined">{t('common.yearsExperience')}</div>
                   </div>
                 </div>
               </div>

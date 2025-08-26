@@ -7,6 +7,8 @@ import useListEnrolledCourses from "../../apis/hooks/student/useListEnrolledCour
 import useEducatorPublicData from "../../apis/hooks/student/useEducatorPublicData";
 import useListCourseModules, { useModuleLessons } from "../../apis/hooks/student/useListCourseModules";
 import baseApi from "../../apis/base";
+import { useLanguage } from "../../contexts/LanguageContext";
+
 
 // Hook to fetch assessment attempts
 const useAssessmentAttempts = (educatorUsername) => {
@@ -42,6 +44,8 @@ const useAssessmentAttempts = (educatorUsername) => {
  */
 function StudentProfile() {
   const { educatorUsername } = useParams();
+  const { t } = useLanguage();
+
   const { data: studentData, isLoading, error, mutate } = useStudentProfileData();
   const { enrolledInCourses, isLoading: coursesLoading } = useListEnrolledCourses();
   const { data: educatorData } = useEducatorPublicData(educatorUsername);
@@ -431,7 +435,7 @@ function StudentProfile() {
 								</label>
 								<input
 									type="file"
-									className="form-control"
+									className="form-control btn-edit-profile"
 									name="profile_picture"
 									accept="image/*"
 									onChange={handleInputChange}
@@ -545,15 +549,13 @@ function StudentProfile() {
 						<h2 className="fw-bold main-title" tabIndex={0}>
 							Student Profile
 						</h2>
-						<div className="d-flex align-items-center">
-							<button
-								className="px-4 btn-edit-profile me-2"
-								aria-label="Edit Profile"
-								onClick={() => setShowEditForm(true)}
-							>
-								Edit Profile
-							</button>
-						</div>
+						<button
+							className="px-4 btn-edit-profile me-2"
+							aria-label="Edit Profile"
+							onClick={() => setShowEditForm(true)}
+						>
+							Edit Profile
+						</button>
 					</div>
 
 					<div className="row g-4">
@@ -889,7 +891,7 @@ function StudentProfile() {
 											) : (
 												<div className="assessment-list">
 													{assessmentAttempts.slice(0, 5).map((attempt) => (
-														<div key={attempt.id} className="assessment-item mb-3 p-3 rounded" 
+														<div key={attempt.id} className="about-bubble mb-3 p-3 rounded" 
 															 style={{ 
 																backgroundColor: attempt.is_passed ? '#d4edda' : '#f8d7da',
 																border: `1px solid ${attempt.is_passed ? '#c3e6cb' : '#f5c6cb'}`

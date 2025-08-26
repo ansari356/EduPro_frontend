@@ -131,7 +131,7 @@ export default function EducatorStudentsList() {
 
 
   return (
-		<div className="min-vh-100 profile-root p-4">
+		<div className="min-vh-100 profile-root p-4 educator-students-page">
 			<div className="container">
 				{/* Header */}
 				<div className="card border-0 shadow-sm mb-4">
@@ -154,38 +154,38 @@ export default function EducatorStudentsList() {
 				{/* Stats Overview */}
 				<div className="row g-3 mb-4">
 					<div className="col-md-4">
-						<div className="card">
+						<div className="card stats-card">
 							<div className="card-body text-center">
 								<div className="avatar-circle mx-auto w-fit">
 									<Users size={24} />
 								</div>
-								<h4 className="section-title mb-1">{filteredStudents.length}</h4>
-								<p className="profile-joined mb-0">Filtered Students</p>
+								<h4 className="section-title mb-1 stats-number">{filteredStudents.length}</h4>
+								<p className="profile-joined mb-0 stats-label">Filtered Students</p>
 							</div>
 						</div>
 					</div>
 
 					<div className="col-md-4">
-						<div className="card">
+						<div className="card stats-card">
 							<div className="card-body text-center">
 								<div className="avatar-circle mx-auto w-fit">
 									<CheckCircle size={24} />
 								</div>
-								<h4 className="section-title mb-1">
+								<h4 className="section-title mb-1 stats-number">
 									{filteredStudents.filter(s => s.is_active).length}
 								</h4>
-								<p className="profile-joined mb-0">Active Students</p>
+								<p className="profile-joined mb-0 stats-label">Active Students</p>
 							</div>
 						</div>
 					</div>
 
 					<div className="col-md-4">
-						<div className="card">
+						<div className="card stats-card">
 							<div className="card-body text-center">
 								<div className="avatar-circle mb-2 mx-auto w-fit">
 									<BarChart2 size={24} />
 								</div>
-								<h4 className="section-title mb-1">
+								<h4 className="section-title mb-1 stats-number">
 									{filteredStudents.length > 0 
 										? Math.round(filteredStudents.reduce(
 											(total, student) => total + (student.completed_lessons || 0),
@@ -194,7 +194,7 @@ export default function EducatorStudentsList() {
 										: 0
 									}
 								</h4>
-								<p className="profile-joined mb-0">Average Completed Lessons</p>
+								<p className="profile-joined mb-0 stats-label">Average Completed Lessons</p>
 							</div>
 						</div>
 					</div>
@@ -203,7 +203,7 @@ export default function EducatorStudentsList() {
 				{/* Students Table */}
 				<section>
 					{/* Search and Filter Bar */}
-					<div className="card border-0 shadow-sm mb-3">
+					<div className="card border-0 shadow-sm mb-3 search-filter-card">
 						<div className="card-body">
 							<div className="row align-items-center">
 								<div className="col-md-6">

@@ -3,12 +3,12 @@ import { Eye, EyeOff, User, Lock, Mail, UserPlus, GraduationCap } from 'lucide-r
 import { useNavigate } from 'react-router-dom';
 import registerEducator from '../../apis/actions/educator/registerEducator';
 import { pagePaths } from '../../pagePaths';
+import { useLanguage } from '../../contexts/LanguageContext';
 
 export default function EducatorSignupPage() {
   const [formData, setFormData] = useState({
     firstName: '',
     lastName: '',
-    username: '',
     email: '',
     password: '',
     confirmPassword: '',
@@ -20,6 +20,7 @@ export default function EducatorSignupPage() {
   const [loading, setLoading] = useState(false);
 
   const navigate = useNavigate();
+  const { t } = useLanguage();
 
 
 
@@ -40,28 +41,28 @@ export default function EducatorSignupPage() {
 
   const validateForm = () => {
     const newErrors = {};
-    if (!formData.firstName.trim()) newErrors.firstName = 'First name is required';
-    if (!formData.lastName.trim()) newErrors.lastName = 'Last name is required';
-    if (!formData.username.trim()) newErrors.username = 'Username is required';
+    if (!formData.firstName.trim()) newErrors.firstName = t('profile.invalidName');
+    if (!formData.lastName.trim()) newErrors.lastName = t('profile.invalidName');
+    if (!formData.username.trim()) newErrors.username = t('profile.invalidName');
     if (!formData.email.trim()) {
-      newErrors.email = 'Email is required';
+      newErrors.email = t('profile.emailRequired');
     } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email)) {
-      newErrors.email = 'Please enter a valid email address';
+      newErrors.email = t('profile.invalidEmail');
     }
     if (!formData.phone.trim()) {
-      newErrors.phone = 'Phone number is required';
+      newErrors.phone = t('profile.phoneRequired');
     } else if (!/^01[0125][0-9]{8}$/.test(formData.phone)) {
-      newErrors.phone = 'Please enter a valid phone number';
+      newErrors.phone = t('profile.invalidPhone');
     }
     if (!formData.password) {
-      newErrors.password = 'Password is required';
+      newErrors.password = t('profile.passwordRequired');
     } else if (formData.password.length < 6) {
-      newErrors.password = 'Password must be at least 6 characters';
+      newErrors.password = t('profile.passwordTooShort');
     }
     if (!formData.confirmPassword) {
-      newErrors.confirmPassword = 'Please confirm your password';
+      newErrors.confirmPassword = t('profile.confirmPasswordRequired');
     } else if (formData.password !== formData.confirmPassword) {
-      newErrors.confirmPassword = 'Passwords do not match';
+      newErrors.confirmPassword = t('profile.passwordsMismatch');
     }
     return newErrors;
   };
@@ -110,10 +111,10 @@ export default function EducatorSignupPage() {
               </div>
               <div>
                 <span className="section-title mb-0">
-                  Educator Signup
+                  {t('auth.registerAs')} Educator
                 </span>
                 <p className="profile-role mb-0">
-                  Create your educator account
+                  {t('auth.createAccount')} {t('common.your')} educator account
                 </p>
               </div>
             </div>
@@ -134,10 +135,10 @@ export default function EducatorSignupPage() {
                   <GraduationCap size={40} />
                   </div>
                   <h1 className="section-title mb-2">
-                    Join as Educator
+                    {t('auth.registerAs')} Educator
                   </h1>
                   <p className="profile-role mb-2">
-                    Fill in your details to create your educator account.
+                    {t('auth.fillRequiredFields')} {t('common.to')} {t('auth.createAccount')} {t('common.your')} educator account.
                   </p>
                 </div>
 
@@ -146,7 +147,7 @@ export default function EducatorSignupPage() {
                   <div className="row mb-3">
                     <div className="col-md-6">
                       <label className="form-label">
-                        First Name *
+                        {t('profile.fullName')} *
                       </label>
                       <div className="position-relative">
                         <input
@@ -164,7 +165,7 @@ export default function EducatorSignupPage() {
                     </div>
                     <div className="col-md-6">
                       <label className="form-label">
-                        Last Name *
+                        {t('profile.fullName')} *
                       </label>
                       <div className="position-relative">
                         <input
@@ -185,7 +186,7 @@ export default function EducatorSignupPage() {
                   {/* Username */}
                   <div className="mb-3">
                     <label className="form-label">
-                      Username *
+                      {t('profile.username')} *
                     </label>
                     <div className="position-relative">
                       <input
@@ -205,7 +206,7 @@ export default function EducatorSignupPage() {
                   {/* Email */}
                   <div className="mb-3">
                     <label className="form-label">
-                      Email Address *
+                      {t('auth.email')} *
                     </label>
                     <div className="position-relative">
                       <input
@@ -225,7 +226,7 @@ export default function EducatorSignupPage() {
                   {/* Phone */}
                   <div className="mb-3">
                     <label className="form-label">
-                      Phone Number *
+                      {t('profile.phone')} *
                     </label>
                     <div className="position-relative">
                       <input
@@ -265,7 +266,7 @@ export default function EducatorSignupPage() {
                   {/* Password */}
                   <div className="mb-3">
                     <label className="form-label">
-                      Password *
+                      {t('auth.password')} *
                     </label>
                     <div className="position-relative">
                       <input
@@ -294,7 +295,7 @@ export default function EducatorSignupPage() {
                   {/* Confirm Password */}
                   <div className="mb-4">
                     <label className="form-label">
-                      Confirm Password *
+                      {t('auth.confirmPassword')} *
                     </label>
                     <div className="position-relative">
                       <input
@@ -323,7 +324,7 @@ export default function EducatorSignupPage() {
                   <div className="form-check mb-4">
                     <input className="form-check-input" type="checkbox" id="terms" required disabled={loading} />
                     <label className="form-check-label" htmlFor="terms">
-                      I agree to the terms and conditions and privacy policy
+                      {t('auth.agreeTerms')} {t('common.and')} {t('auth.privacyPolicy')}
                     </label>
                   </div>
 
@@ -336,19 +337,19 @@ export default function EducatorSignupPage() {
                       <div className="loading-spinner me-2" style={{width: '1rem', height: '1rem', display: 'inline-block'}}></div>
                     )}
                     <UserPlus size={20} className="me-2" />
-                    Register as Educator
+                    {t('auth.registerAs')} Educator
                   </button>
                 </form>
 
                 <div className="text-center">
                   <p className="profile-joined">
-                    Already have an account?
+                    {t('auth.alreadyHaveAccount')}?
                     <button
                       className="btn-link-custom text-accent ms-1"
                       onClick={() => navigate('/login')}
                       disabled={loading}
                     >
-                      Login here
+                      {t('auth.loginHere')}
                     </button>
                   </p>
                 </div>
@@ -361,13 +362,13 @@ export default function EducatorSignupPage() {
             <div className="illustration-card">
               <div className="text-center mb-4">
                 <h2 className="section-title text-white mb-2">
-                  Register as Educator
+                  {t('auth.registerAs')} Educator
                 </h2>
                 <p className="profile-name text-white mb-2">
-                  Join EduPro Platform
+                  {t('common.join')} EduPro Platform
                 </p>
                 <p className="text-white opacity-75">
-                  Empower your teaching journey and connect with students.
+                  {t('auth.empowerTeaching')} {t('common.and')} {t('auth.connectStudents')}.
                 </p>
               </div>
 
@@ -393,20 +394,20 @@ export default function EducatorSignupPage() {
                     <div className="section-title text-accent">
                       500+
                     </div>
-                    <div className="profile-joined">Educators</div>
+                    <div className="profile-joined">{t('common.educators')}</div>
                   </div>
                   <div className="col-6">
                     <div className="section-title text-accent">
                       10000+
                     </div>
-                    <div className="profile-joined">Students</div>
+                    <div className="profile-joined">{t('common.students')}</div>
                   </div>
                 </div>
               </div>
 
               <div className="text-center">
                 <p className="profile-role text-white fw-bold">
-                  EduPro Platform - For Educators
+                  EduPro Platform - {t('common.for')} {t('common.educators')}
                 </p>
               </div>
             </div>

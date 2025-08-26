@@ -3,8 +3,12 @@ import { Navbar, Container, Nav } from "react-bootstrap";
 import { Link } from "react-router-dom";
 import "bootstrap-icons/font/bootstrap-icons.css";
 import { pagePaths } from "../../../pagePaths.js";
+import SettingsDropdown from "../SettingsDropdown";
+import { useLanguage } from "../../../contexts/LanguageContext";
 
 export default function HomeHeader() {
+  const { currentLanguage } = useLanguage();
+  
   return (
     <Navbar
       bg="white"
@@ -37,16 +41,17 @@ export default function HomeHeader() {
               style={{ textDecoration: "none" }}
             >
               <i className="bi bi-person me-2"></i>
-              Login as Educator
+                              Login as Educator
             </Link>
             <Link
               to={pagePaths.educator.signup}
-              className="btn-edit-profile px-4"
+              className="btn-edit-profile px-4 me-2"
               style={{ textDecoration: "none" }}
             >
               <i className="bi bi-person-plus me-2"></i>
-              Register a New Educator
+                              Register as Educator
             </Link>
+            <SettingsDropdown />
           </Nav>
         </Navbar.Collapse>
       </Container>

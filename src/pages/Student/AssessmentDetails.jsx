@@ -963,6 +963,15 @@ function AssessmentDetails() {
                   </button>
                 </div>
               </div>
+                <div className="text-center mt-4">
+                  <button
+                    className="btn-edit-profile"
+                    onClick={() => navigate(-1)}
+                  >
+                    <ArrowLeft size={16} className="me-2" />
+                    Back to Courses
+                  </button>
+                </div>
             </div>
           </div>
         </div>
@@ -1151,7 +1160,7 @@ function AssessmentDetails() {
   const progress = totalQuestions > 0 ? ((currentQuestionIndex + 1) / totalQuestions) * 100 : 0;
 
   return (
-    <div className="profile-root">
+    <div className="profile-root assessment-page">
       {/* Header with Timer */}
       <div className="card border-0 shadow-sm sticky-top" style={{ zIndex: 1000 }}>
         <div className="container py-3">
@@ -1164,7 +1173,7 @@ function AssessmentDetails() {
                 <ArrowLeft size={20} />
               </button>
               <div>
-                <h4 className="mb-1">{assessment.title}</h4>
+                <h4 className="mb-1 assessment-title">{assessment.title}</h4>
                 <small className="text-muted">
                   Question {currentQuestionIndex + 1} of {totalQuestions}
                 </small>
@@ -1173,7 +1182,7 @@ function AssessmentDetails() {
             
             <div className="d-flex align-items-center gap-3">
               <div className="text-center">
-                <div className={`h5 mb-0 ${timeRemaining <= 300 ? 'text-danger' : timeRemaining <= 600 ? 'text-warning' : 'text-main'}`}>
+                <div className={`h5 mb-0 timer ${timeRemaining <= 300 ? 'text-danger' : timeRemaining <= 600 ? 'text-warning' : 'text-main'}`}>
                   <Clock size={20} className="me-2" />
                   {formatTime(timeRemaining)}
                 </div>
@@ -1230,7 +1239,7 @@ function AssessmentDetails() {
 
                   {/* Question Text */}
                   <div className="question-text mb-4">
-                    <p className="h6">{currentQuestion.question_text}</p>
+                    <p className="h6 question-text">{currentQuestion.question_text}</p>
                   </div>
 
                   {/* Question Options/Answer */}

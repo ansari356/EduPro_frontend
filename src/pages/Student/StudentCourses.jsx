@@ -82,7 +82,8 @@ function Courses() {
     setSelectedChapter(null);
     setCouponCode("");
     setCouponError("");
-    setIsCouponValid(false);
+    // For free courses, automatically set coupon as valid since no validation is needed
+    setIsCouponValid(course.isFree);
   };
 
   const closeEnrollmentModal = () => {
@@ -101,14 +102,16 @@ function Courses() {
     setSelectedChapter(null);
     setCouponCode("");
     setCouponError("");
-    setIsCouponValid(false);
+    // For free courses, automatically set coupon as valid since no validation is needed
+    setIsCouponValid(selectedCourse?.isFree || false);
   };
 
   const handleChapterSelection = (chapter) => {
     setSelectedChapter(chapter);
     setCouponCode("");
     setCouponError("");
-    setIsCouponValid(false);
+    // For free courses, automatically set coupon as valid since no validation is needed
+    setIsCouponValid(selectedCourse?.isFree || false);
   };
 
   const validateCoupon = async () => {
@@ -139,7 +142,8 @@ function Courses() {
   };
 
   const handleEnrollment = async () => {
-    if (!isCouponValid) {
+    // For paid courses, require coupon validation
+    if (!selectedCourse.isFree && !isCouponValid) {
       setCouponError("Please validate your coupon code first");
       return;
     }
@@ -148,7 +152,9 @@ function Courses() {
     
     try {
       // Call the real enrollment API
-      const response = await enrollStudentInCourse(selectedCourse.id, couponCode.trim());
+      // For free courses, pass empty string for coupon; for paid courses, pass the validated coupon
+      const couponToSend = selectedCourse.isFree ? "" : couponCode.trim();
+      const response = await enrollStudentInCourse(selectedCourse.id, couponToSend);
       
       if (response.status === 201 || response.data) {
         closeEnrollmentModal();
@@ -459,48 +465,66 @@ function Courses() {
                 </div>
               )}
 
-              {/* Coupon Input */}
-              <div className="mb-4">
-                <label className="form-label about-subtitle fw-medium">
-                  Coupon Code
-                </label>
-                <div className="input-group coupon-input-group">
-                  <input
-                    type="text"
-                    className="form-control"
-                    placeholder="Enter your coupon code (e.g., WELCOME2024)"
-                    value={couponCode}
-                    onChange={(e) => setCouponCode(e.target.value)}
-                    disabled={isValidatingCoupon || isEnrolling}
-                  />
-                  <button
-                    className="btn-edit-profile"
-                    onClick={validateCoupon}
-                    disabled={!couponCode.trim() || isValidatingCoupon || isEnrolling}
-                  >
-                    {isValidatingCoupon ? (
-                      <>
-                        <div className="loading-spinner me-2" style={{ width: '1rem', height: '1rem' }}></div>
-                        Validating...
-                      </>
-                    ) : (
-                      'Apply Coupon'
-                    )}
-                  </button>
-                </div>
-                {couponError && (
-                  <div className="text-danger small mt-1">{couponError}</div>
-                )}
-                {isCouponValid && (
-                  <div className="text-success small mt-1">
-                    <CheckCircle size={14} className="me-1" />
-                    Coupon code is valid!
+              {/* Coupon Input - Only show for paid courses */}
+              {!selectedCourse.isFree && (
+                <div className="mb-4">
+                  <label className="form-label about-subtitle fw-medium">
+                    Coupon Code
+                  </label>
+                  <div className="input-group coupon-input-group">
+                    <input
+                      type="text"
+                      className="form-control"
+                      placeholder="Enter your coupon code (e.g., WELCOME2024)"
+                      value={couponCode}
+                      onChange={(e) => setCouponCode(e.target.value)}
+                      disabled={isValidatingCoupon || isEnrolling}
+                    />
+                    <button
+                      className="btn-edit-profile"
+                      onClick={validateCoupon}
+                      disabled={!couponCode.trim() || isValidatingCoupon || isEnrolling}
+                    >
+                      {isValidatingCoupon ? (
+                        <>
+                          <div className="loading-spinner me-2" style={{ width: '1rem', height: '1rem' }}></div>
+                          Validating...
+                        </>
+                      ) : (
+                        'Apply Coupon'
+                      )}
+                    </button>
                   </div>
-                )}
-                <small className="text-muted">
-                  Enter a valid coupon code to unlock this {enrollmentType === 'full' ? 'course' : 'chapter'}.
-                </small>
-              </div>
+                  {couponError && (
+                    <div className="text-danger small mt-1">{couponError}</div>
+                  )}
+                  {isCouponValid && (
+                    <div className="text-success small mt-1">
+                      <CheckCircle size={14} className="me-1" />
+                      Coupon code is valid!
+                    </div>
+                  )}
+                  <small className="text-muted">
+                    Enter a valid coupon code to unlock this {enrollmentType === 'full' ? 'course' : 'chapter'}.
+                  </small>
+                </div>
+              )}
+
+              {/* Free Course Notice */}
+              {selectedCourse.isFree && (
+                <div className="mb-4">
+                  <div className="alert alert-success">
+                    <div className="d-flex align-items-center">
+                      <CheckCircle size={20} className="me-2" />
+                      <div>
+                        <strong>Free Course!</strong> No payment or coupon required.
+                        <br />
+                        <small className="text-muted">You can enroll directly without any additional steps.</small>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              )}
 
               {/* Course/Chapter Info */}
               <div className="about-bubble p-3 mb-4">
@@ -539,7 +563,11 @@ function Courses() {
                   type="button"
                   className="btn-edit-profile flex-fill"
                   onClick={handleEnrollment}
-                  disabled={!isCouponValid || isEnrolling || (enrollmentType === 'chapter' && !selectedChapter)}
+                  disabled={
+                    (!selectedCourse.isFree && !isCouponValid) || 
+                    isEnrolling || 
+                    (enrollmentType === 'chapter' && !selectedChapter)
+                  }
                 >
                   {isEnrolling ? (
                     <>
@@ -547,7 +575,7 @@ function Courses() {
                       Enrolling...
                     </>
                   ) : (
-                    'Enroll Now'
+                    selectedCourse.isFree ? 'Enroll for Free' : 'Enroll Now'
                   )}
                 </button>
               </div>

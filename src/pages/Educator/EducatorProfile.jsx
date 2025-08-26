@@ -9,10 +9,14 @@ import useEducatorCoursesData from "../../apis/hooks/educator/useEducatorCourses
 import { pagePaths } from "../../pagePaths";
 import { QRCodeSVG } from "qrcode.react";
 import { CircleUserRound } from "lucide-react";
+import { useLanguage } from "../../contexts/LanguageContext";
+
 
 function EducatorProfile() {
   const [showEditForm, setShowEditForm] = useState(false);
   const navigate = useNavigate();
+  const { t } = useLanguage();
+
 
   const {
     isLoading,
@@ -110,15 +114,15 @@ function EducatorProfile() {
     e.preventDefault();
 
     if (!formData.full_name.trim()) {
-      alert("Please enter a valid full name.");
+      alert(t('profile.invalidName'));
       return;
     }
     if (!formData.specialization.trim()) {
-      alert("Please enter a valid specialization.");
+      alert(t('profile.invalidSpecialization'));
       return;
     }
     if (!formData.institution.trim()) {
-      alert("Please enter a valid institution.");
+      alert(t('profile.invalidInstitution'));
       return;
     }
 
@@ -141,7 +145,7 @@ function EducatorProfile() {
       })
       .catch((err) => {
         console.error("Error updating profile:", err);
-        alert("Failed to update profile. Please try again.");
+        alert(t('profile.updateFailed'));
       });
   };
 
@@ -182,13 +186,13 @@ function EducatorProfile() {
       {showEditForm ? (
         <div className="container w-75 d-flex justify-content-center">
           <div className="mt-4 card card-body">
-            <h5 className="fw-bold mb-3 section-title">Edit Profile</h5>
+                            <h5 className="fw-bold mb-3 section-title">{t('profile.editProfile')}</h5>
 
             <form onSubmit={handleSubmitRequest}>
               {/* Full Name */}
               <div className="mb-3">
                 <label className="form-label about-subtitle fw-medium">
-                  Full Name
+                  {t('profile.fullName')}
                 </label>
                 <input
                   type="text"
@@ -342,7 +346,7 @@ function EducatorProfile() {
               {/* Institution */}
               <div className="mb-3">
                 <label className="form-label about-subtitle fw-medium">
-                  Institution
+                  {t('profile.institution')}
                 </label>
                 <input
                   type="text"
@@ -470,14 +474,14 @@ function EducatorProfile() {
               {/* Submit Button */}
               <div className="d-flex justify-content-end mt-5">
                 <button type="submit" className="px-4 btn-edit-profile">
-                  Update Profile
+                  {t('profile.saveChanges')}
                 </button>
                 <button
                   type="button"
                   onClick={() => setShowEditForm(false)}
                   className="ms-2 px-4 btn-edit-profile"
                 >
-                  Cancel
+                  {t('profile.cancel')}
                 </button>
               </div>
             </form>
@@ -494,7 +498,7 @@ function EducatorProfile() {
                     <CircleUserRound size={20} />
                   </div>
                   <div>
-                    <span className="section-title">Educator Profile</span>
+                    <span className="section-title">{t('profile.personalInfo')}</span>
                     <p className="profile-role">
                       Manage your profile and quick actions
                     </p>
@@ -505,7 +509,7 @@ function EducatorProfile() {
                   aria-label="Edit Profile"
                   onClick={() => setShowEditForm(true)}
                 >
-                  Edit Profile
+                  {t('profile.editProfile')}
                 </button>
               </div>
             </div>
@@ -552,14 +556,14 @@ function EducatorProfile() {
                   </div>
 
                   {/* About Section */}
-                  <h5 className="fw-bold mb-3">About</h5>
+                  <h5 className="fw-bold mb-3">{t('common.about')}</h5>
                   <div className="row">
                     <div className="col-xl-8">
                       <div className="d-flex flex-column gap-2">
                         <div className="d-flex">
                           <i className="bi bi-building"></i>
                           <div className="d-flex flex-sm-row flex-column px-3">
-                            <strong className="me-2">username:</strong>
+                            <strong className="me-2">{t('profile.username')}:</strong>
                             <span className="text-light small">
                               {educatorData?.user?.username || "__"}
                             </span>
@@ -568,7 +572,7 @@ function EducatorProfile() {
                         <div className="d-flex">
                           <i className="bi bi-envelope"></i>
                           <div className="d-flex flex-sm-row flex-column px-3">
-                            <strong className="me-2">Email:</strong>
+                            <strong className="me-2">{t('profile.email')}:</strong>
                             <span className="small">
                               {educatorData?.user?.email || "__"}
                             </span>
@@ -595,7 +599,7 @@ function EducatorProfile() {
                         <div className="d-flex">
                           <i className="bi bi-mortarboard"></i>
                           <div className="d-flex flex-sm-row flex-column px-3">
-                            <strong className="me-2">Specialization:</strong>
+                            <strong className="me-2">{t('profile.specialization')}:</strong>
                             <span className="small">
                               {educatorData?.specialization || "__"}
                             </span>

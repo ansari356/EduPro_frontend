@@ -4,6 +4,7 @@ import { useNavigate } from "react-router-dom";
 import loginEducator from "../../apis/actions/educator/loginEducator";
 import { pagePaths } from "../../pagePaths";
 import useRefreshToken from "../../apis/hooks/useRefreshToken";
+import { useLanguage } from "../../contexts/LanguageContext";
 
 export default function EducatorLoginPage() {
   const [email, setEmail] = useState("");
@@ -12,13 +13,14 @@ export default function EducatorLoginPage() {
   const [loading, setLoading] = useState(false);
   const [errors, setErrors] = useState({});
   const navigate = useNavigate();
+  const { t } = useLanguage();
 
   const { mutate } = useRefreshToken();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (!email || !password) {
-      alert("Please enter both email and password");
+      alert(t('auth.fillRequiredFields'));
       return;
     }
     setLoading(true);
@@ -50,9 +52,9 @@ export default function EducatorLoginPage() {
                   <span>🎓</span>
                 </div>
                 <div>
-                  <span className="section-title mb-0">Educator Portal</span>
+                  <span className="section-title mb-0">{t('auth.loginAs')} Educator</span>
                   <p className="profile-role mb-0">
-                    Login to your educator account
+                    {t('auth.login')} {t('common.to')} {t('common.your')} educator account
                   </p>
                 </div>
               </div>
@@ -71,22 +73,22 @@ export default function EducatorLoginPage() {
                   <div className="avatar-circle">
                     <GraduationCap size={40} />
                   </div>
-                  <h1 className="section-title mb-2">Welcome Educator</h1>
+                  <h1 className="section-title mb-2">{t('auth.loginAs')} Educator</h1>
                   <p className="profile-role mb-2">
-                    Please login to access your dashboard.
+                    {t('auth.login')} {t('common.to')} {t('common.your')} dashboard.
                   </p>
                 </div>
 
                 <form onSubmit={handleSubmit}>
                   <div className="mb-4">
-                    <label className="form-label">Email</label>
+                    <label className="form-label">{t('auth.email')}</label>
                     <div className="position-relative">
                       <input
                         type="email"
                         className="form-control"
                         value={email}
                         onChange={(e) => setEmail(e.target.value)}
-                        placeholder="Enter your email"
+                        placeholder={t('auth.email')}
                         disabled={loading}
                       />
                       <User
@@ -97,14 +99,14 @@ export default function EducatorLoginPage() {
                   </div>
 
                   <div className="mb-4">
-                    <label className="form-label">Password</label>
+                    <label className="form-label">{t('auth.password')}</label>
                     <div className="position-relative">
                       <input
                         type={showPassword ? "text" : "password"}
                         className="form-control"
                         value={password}
                         onChange={(e) => setPassword(e.target.value)}
-                        placeholder="••••••••"
+                        placeholder={t('auth.password')}
                         disabled={loading}
                       />
                       <Lock
@@ -142,7 +144,7 @@ export default function EducatorLoginPage() {
                         }}
                       ></div>
                     )}
-                    Login
+                    {t('auth.login')}
                   </button>
                 </form>
 

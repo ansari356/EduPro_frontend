@@ -12,11 +12,15 @@ import { useState } from "react";
 import createCourse from "../../apis/actions/educator/createCoure"; // Import the createCourse API
 import { pagePaths } from "../../pagePaths";
 import useCategoryList from "../../apis/actions/educator/useCategoryList";
+import { useLanguage } from "../../contexts/LanguageContext";
+import { useAutoTranslate } from "../../hooks/useAutoTranslate";
 
 export default function CreateCourse() {
   const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
   const [errors, setErrors] = useState({});
+  const { t } = useLanguage();
+  const { translate } = useAutoTranslate();
   
   // Fetch categories using the hook
   const { data: categories, isLoading: categoriesLoading, error: categoriesError } = useCategoryList();
@@ -60,11 +64,11 @@ export default function CreateCourse() {
     const newErrors = {};
     
     if (!formData.title.trim()) {
-      newErrors.title = 'Course title is required';
+      newErrors.title = t('courses.titleRequired');
     }
     
     if (!formData.description.trim()) {
-      newErrors.description = 'Description is required';
+      newErrors.description = t('courses.descriptionRequired');
     }
     
     return newErrors;
@@ -139,8 +143,8 @@ export default function CreateCourse() {
                   <div className="avatar-circle mx-auto mb-3">
                     <BookOpen size={30} />
                   </div>
-                  <h2 className="section-title mb-2">Create Course Details</h2>
-                  <p className="profile-role">Fill in the course information below</p>
+                  <h2 className="section-title mb-2">{t('courses.createCourse')} {t('courses.details')}</h2>
+                                      <p className="profile-role">{t('courses.fillCourseInfo')}</p>
                 </div>
 
                 <form onSubmit={handleSubmit}>
@@ -149,7 +153,7 @@ export default function CreateCourse() {
                     <div className="col-md-6">
                       <label className="form-label d-flex align-items-center gap-2">
                         <LibraryBig size={16} />
-                        Course Title *
+                        {t('courses.courseTitle')} *
                       </label>
                       <input
                         type="text"
@@ -157,7 +161,7 @@ export default function CreateCourse() {
                         name="title"
                         value={formData.title}
                         onChange={handleChange}
-                        placeholder="Enter course title"
+                                                  placeholder={t('courses.enterCourseTitle')}
                         disabled={loading}
                       />
                       {errors.title && <div className="invalid-feedback">{errors.title}</div>}
@@ -210,7 +214,7 @@ export default function CreateCourse() {
                     <div className="col-12">
                       <label className="form-label d-flex align-items-center gap-2">
                         <FileText size={16} />
-                        Description *
+                        {t('courses.courseDescription')} *
                       </label>
                       <textarea
                         className={`form-control ${errors.description ? 'is-invalid' : ''}`}
@@ -218,7 +222,7 @@ export default function CreateCourse() {
                         value={formData.description}
                         onChange={handleChange}
                         rows={4}
-                        placeholder="Enter course description"
+                                                  placeholder={t('courses.enterCourseDescription')}
                         disabled={loading}
                       />
                       {errors.description && <div className="invalid-feedback">{errors.description}</div>}
@@ -289,7 +293,7 @@ export default function CreateCourse() {
                             <div className="loading-spinner me-2" style={{width: '1rem', height: '1rem', display: 'inline-block'}}></div>
                           )}
                           <i className="bi bi-plus-circle me-2"></i>
-                          Create Course
+                          {t('courses.createCourse')}
                         </button>
                         <button
                           type="button"
