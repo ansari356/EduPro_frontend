@@ -18,6 +18,7 @@ import {
 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import useEducatorAssessmentsData from "../../apis/hooks/educator/useEducatorAssessmentsData";
+import useEducatorAllAttempts from "../../apis/hooks/educator/useEducatorAllAttempts";
 import useEducatorPendingGradingData from "../../apis/hooks/educator/useEducatorPendingGradingData";
 import useEducatorCoursesData from "../../apis/hooks/educator/useEducatorCoursesData";
 import useEducatorStudentProfileData from "../../apis/hooks/educator/useEducatorStudentProfileData";
@@ -106,9 +107,15 @@ export default function EducatorAssessmentsPage() {
   // Data hooks
   const { data: assessments, isLoading: assessmentsLoading, error: assessmentsError, mutate: mutateAssessments } = useEducatorAssessmentsData();
   const { data: pendingGrading, isLoading: gradingLoading, error: gradingError, mutate: mutateGrading } = useEducatorPendingGradingData();
-  const { data: courses } = useEducatorCoursesData();
-  const { data: lessons } = useEducatorAllLessonsData();
-  const { data: modules } = useEducatorAllModulesData();
+  // const { attempts: allAttempts, summary: attemptsSummary, isLoading: attemptsLoading, error: attemptsError, mutate: mutateAttempts } = useEducatorAllAttempts();
+  const { data: courses, isLoading: coursesLoading } = useEducatorCoursesData();
+  const { data: lessons, isLoading: lessonsLoading } = useEducatorAllLessonsData();
+  const { data: modules, isLoading: modulesLoading } = useEducatorAllModulesData();
+
+  // Debug logging (remove in production)
+  // console.log("Courses data:", courses);
+  // console.log("Lessons data:", lessons);
+  // console.log("Modules data:", modules);
 
   // Hook to fetch full question details when editing (after editingQuestionId state is declared)
   const {
@@ -918,19 +925,50 @@ export default function EducatorAssessmentsPage() {
                   )}
                 </button>
               </li>
-              <li className="nav-item" role="presentation">
-                <button
-                  className={`nav-link ${activeTab === "analytics" ? "active" : ""}`}
-                  onClick={() => setActiveTab("analytics")}
-                >
-                  <BarChart3 size={16} className="me-2" />
-                  Analytics
-                </button>
-              </li>
             </ul>
           </div>
         </div>
+              <div className="row">
+                <div className="col-md-3 mb-4">
+                  <div className="card bg-primary text-white">
+                    <div className="card-body text-center">
+                      <FileText size={32} className="mb-2" />
+                      <h3 className="mb-1">{assessments?.length || 0}</h3>
+                      <p className="mb-0">Total Assessments</p>
+                    </div>
+                  </div>
+                </div>
 
+                <div className="col-md-3 mb-4">
+                  <div className="card bg-success text-white">
+                    <div className="card-body text-center">
+                      <CheckCircle size={32} className="mb-2" />
+                      <h3 className="mb-1">{pendingGrading?.length || 0}</h3>
+                      <p className="mb-0">Pending Grading</p>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="col-md-3 mb-4">
+                  <div className="card bg-info text-white">
+                    <div className="card-body text-center">
+                      <Users size={32} className="mb-2" />
+                      <h3 className="mb-1">0</h3>
+                      <p className="mb-0">Total Attempts</p>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="col-md-3 mb-4">
+                  <div className="card bg-warning text-white">
+                    <div className="card-body text-center">
+                      <BarChart3 size={32} className="mb-2" />
+                      <h3 className="mb-1">0%</h3>
+                      <p className="mb-0">Avg. Score</p>
+                    </div>
+                  </div>
+                </div>
+              </div> 
         {/* Assessments Tab */}
         {activeTab === "assessments" && (
           <div className="card border-0 shadow-sm">
@@ -1180,62 +1218,6 @@ export default function EducatorAssessmentsPage() {
           </div>
         )}
 
-        {/* Analytics Tab */}
-        {activeTab === "analytics" && (
-          <div className="card border-0 shadow-sm">
-            <div className="card-body">
-              <h4 className="section-title mb-4">Assessment Analytics</h4>
-
-              <div className="row">
-                <div className="col-md-3 mb-4">
-                  <div className="card bg-primary text-white">
-                    <div className="card-body text-center">
-                      <FileText size={32} className="mb-2" />
-                      <h3 className="mb-1">{assessments?.length || 0}</h3>
-                      <p className="mb-0">Total Assessments</p>
-                    </div>
-                  </div>
-                </div>
-
-                <div className="col-md-3 mb-4">
-                  <div className="card bg-success text-white">
-                    <div className="card-body text-center">
-                      <CheckCircle size={32} className="mb-2" />
-                      <h3 className="mb-1">{pendingGrading?.length || 0}</h3>
-                      <p className="mb-0">Pending Grading</p>
-                    </div>
-                  </div>
-                </div>
-
-                <div className="col-md-3 mb-4">
-                  <div className="card bg-info text-white">
-                    <div className="card-body text-center">
-                      <Users size={32} className="mb-2" />
-                      <h3 className="mb-1">0</h3>
-                      <p className="mb-0">Total Attempts</p>
-                    </div>
-                  </div>
-                </div>
-
-                <div className="col-md-3 mb-4">
-                  <div className="card bg-warning text-white">
-                    <div className="card-body text-center">
-                      <BarChart3 size={32} className="mb-2" />
-                      <h3 className="mb-1">0%</h3>
-                      <p className="mb-0">Avg. Score</p>
-                    </div>
-                  </div>
-                </div>
-              </div>
-
-              <div className="text-center py-5">
-                <BarChart3 size={48} className="text-muted mb-3" />
-                <h5 className="text-muted">Analytics Coming Soon</h5>
-                <p className="text-muted">Detailed analytics and insights will be available here</p>
-              </div>
-            </div>
-          </div>
-        )}
       </div>
 
       {/* Create/Edit Assessment Modal */}
@@ -1322,14 +1304,20 @@ export default function EducatorAssessmentsPage() {
                               value={assessmentForm.lesson}
                               onChange={(e) => setAssessmentForm(prev => ({ ...prev, lesson: e.target.value }))}
                               required
+                              disabled={lessonsLoading}
                             >
-                              <option value="">Select Lesson</option>
+                              <option value="">
+                                {lessonsLoading ? "Loading lessons..." : "Select Lesson"}
+                              </option>
                               {lessons?.map(lesson => (
                                 <option key={lesson.id} value={lesson.id}>
                                   {lesson.course_title} → {lesson.module_title} → {lesson.title}
                                 </option>
                               ))}
                             </select>
+                            {lessonsLoading && (
+                              <small className="text-muted">Loading lessons from your courses...</small>
+                            )}
                           </>
                         )}
 
@@ -1341,14 +1329,20 @@ export default function EducatorAssessmentsPage() {
                               value={assessmentForm.module}
                               onChange={(e) => setAssessmentForm(prev => ({ ...prev, module: e.target.value }))}
                               required
+                              disabled={modulesLoading}
                             >
-                              <option value="">Select Module</option>
+                              <option value="">
+                                {modulesLoading ? "Loading modules..." : "Select Module"}
+                              </option>
                               {modules?.map(module => (
                                 <option key={module.id} value={module.id}>
                                   {module.course_title} → {module.title}
                                 </option>
                               ))}
                             </select>
+                            {modulesLoading && (
+                              <small className="text-muted">Loading modules from your courses...</small>
+                            )}
                           </>
                         )}
 
@@ -1360,12 +1354,18 @@ export default function EducatorAssessmentsPage() {
                               value={assessmentForm.course}
                               onChange={(e) => setAssessmentForm(prev => ({ ...prev, course: e.target.value }))}
                               required
+                              disabled={coursesLoading}
                             >
-                              <option value="">Select Course</option>
+                              <option value="">
+                                {coursesLoading ? "Loading courses..." : "Select Course"}
+                              </option>
                               {courses?.map(course => (
                                 <option key={course.id} value={course.id}>{course.title}</option>
                               ))}
                             </select>
+                            {coursesLoading && (
+                              <small className="text-muted">Loading your courses...</small>
+                            )}
                           </>
                         )}
                       </div>

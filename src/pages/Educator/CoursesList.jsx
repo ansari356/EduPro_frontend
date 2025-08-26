@@ -16,11 +16,11 @@ export default function EducatorCoursesList() {
   const { translate } = useAutoTranslate();
 
   const {data:educator} = useEducatorProfileData();
-  const {data:courses} = useEducatorCoursesData();
+  const {data:courses, isLoading:coursesLoading, error:coursesError} = useEducatorCoursesData();
   const {studentsCount} = useEducatorStudentsListData()
   const {totalRevenue}= useEducatorTotalRevenue()
   const totalStudents = studentsCount;
-  const publishedCourses = courses?.results?.filter(
+  const publishedCourses = courses?.filter(
 		(course) => course?.is_published === true
 	);
   const averageRating = educator?.rating
@@ -113,11 +113,39 @@ export default function EducatorCoursesList() {
 
 				{/* Courses Grid */}
 				<section>
-					<div className="row g-4">
-						{courses?.results?.map((course) => (
+					{coursesLoading ? (
+						<div className="text-center py-5">
+							<div className="spinner-border text-primary" role="status">
+								<span className="visually-hidden">Loading courses...</span>
+							</div>
+							<p className="mt-3 text-muted">Loading your courses...</p>
+						</div>
+					) : coursesError ? (
+						<div className="text-center py-5">
+							<div className="text-danger">
+								<i className="bi bi-exclamation-triangle fs-1"></i>
+								<p className="mt-3">Failed to load courses. Please try again later.</p>
+							</div>
+						</div>
+					) : !courses || courses.length === 0 ? (
+						<div className="text-center py-5">
+							<LibraryBig size={64} className="text-muted mb-3" />
+							<h4 className="text-muted">No courses yet</h4>
+							<p className="text-muted mb-4">Start creating your first course to share knowledge with students.</p>
+							<Link to="/courses/create" className="text-decoration-none">
+								<button className="btn-edit-profile">
+									<i className="bi bi-plus-lg me-2"></i>
+									Create Your First Course
+								</button>
+							</Link>
+						</div>
+					) : (
+						<div className="row g-4">
+							{courses.map((course) => (
 								<EducatorCourseCard course={course} key={course?.id} />
-						))}
-					</div>
+							))}
+						</div>
+					)}
 				</section>
 			</div>
 		</div>
@@ -153,38 +181,33 @@ function EducatorCourseCard({ course }) {
   
   const imgPlaceholder = () => `https://placehold.co/300x200?text${course?.title}`
 	/* 
-   New API Response Structure:
-   courses = {
-        "count": 1,
-        "next": null,
-        "previous": null,
-        "results": [
-            {
-                "id": "b259b8be-b0a6-43b1-b5a0-026210797c87",
-                "title": "Introduction to Astrophysics",
-                "description": "Introduction to Astrophysics is the study of the physical nature of celestial objects...",
-                "trailer_video": null,
-                "price": "100.00",
-                "is_published": true,
-                "is_free": false,
-                "category": {
-                    "id": "2c746147-7e28-4f90-8e50-b3af0e662f65",
-                    "name": "Physics",
-                    "icon": null
-                },
-                "thumbnail": "http://127.0.0.1:8000/media/course_thumbnails/maxresdefault.jpg",
-                "created_at": "2025-08-23T13:58:31.197484Z",
-                "total_enrollments": 5,
-                "total_lessons": 3,
-                "total_reviews": 1,
-                "average_rating": "5.00",
-                "total_durations": 0
-            }
-        ]
-    }
-    
-    Individual course object structure remains the same
-    */
+   API Response Structure for educator's own courses:
+   courses = [
+       {
+           "id": "b259b8be-b0a6-43b1-b5a0-026210797c87",
+           "title": "Introduction to Astrophysics",
+           "description": "Introduction to Astrophysics is the study of the physical nature of celestial objects...",
+           "trailer_video": null,
+           "price": "100.00",
+           "is_published": true,
+           "is_free": false,
+           "category": {
+               "id": "2c746147-7e28-4f90-8e50-b3af0e662f65",
+               "name": "Physics",
+               "icon": null
+           },
+           "thumbnail": "http://127.0.0.1:8000/media/course_thumbnails/maxresdefault.jpg",
+           "created_at": "2025-08-23T13:58:31.197484Z",
+           "total_enrollments": 5,
+           "total_lessons": 3,
+           "total_reviews": 1,
+           "average_rating": "5.00",
+           "total_durations": 0
+       }
+   ]
+   
+   Note: This is a direct array, not a paginated response like the public course list
+   */
 	const getStatusColor = (status) => {
 		switch (status) {
       case true:

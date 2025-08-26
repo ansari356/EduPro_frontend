@@ -21,6 +21,7 @@ import {
   AlertCircle
 } from "lucide-react";
 import useEducatorAssessmentDetail from "../../apis/hooks/educator/useEducatorAssessmentDetail";
+import useEducatorAssessmentAttempts from "../../apis/hooks/educator/useEducatorAssessmentAttempts";
 import createQuestion from "../../apis/actions/educator/createQuestion";
 import updateQuestion from "../../apis/actions/educator/updateQuestion";
 import deleteQuestion from "../../apis/actions/educator/deleteQuestion";
@@ -63,6 +64,14 @@ export default function EducatorAssessmentDetailPage() {
     error: assessmentError, 
     mutate: mutateAssessment 
   } = useEducatorAssessmentDetail(assessmentId);
+
+  // Fetch assessment attempts
+  const { 
+    attempts, 
+    isLoading: attemptsLoading, 
+    error: attemptsError, 
+    mutate: mutateAttempts 
+  } = useEducatorAssessmentAttempts(assessmentId);
 
   // State declarations
   const [questionForm, setQuestionForm] = useState({
@@ -1698,33 +1707,200 @@ export default function EducatorAssessmentDetailPage() {
 				{activeTab === "attempts" && (
 					<div className="card border-0 shadow-sm">
 						<div className="card-body">
-							<h4 className="section-title mb-4">Student Attempts</h4>
-							<div className="text-center py-5">
-								<Users size={48} className="text-muted mb-3" />
-								<h5 className="text-muted">Student Attempts Coming Soon</h5>
-								<p className="text-muted">
-									View detailed student performance and results
-								</p>
+							<div className="d-flex justify-content-between align-items-center mb-4">
+								<h4 className="section-title mb-0">Student Attempts</h4>
+								<div className="d-flex align-items-center">
+									<span className="badge bg-primary me-2">
+										{attempts?.length || 0} Total Attempts
+									</span>
+									{attemptsLoading && (
+										<div className="spinner-border spinner-border-sm text-primary" role="status">
+											<span className="visually-hidden">Loading...</span>
+										</div>
+									)}
+								</div>
 							</div>
+
+							{attemptsError && (
+								<div className="alert alert-danger" role="alert">
+									<AlertCircle size={16} className="me-2" />
+									Error loading attempts: {attemptsError.message}
+								</div>
+							)}
+
+							{attemptsLoading ? (
+								<div className="text-center py-5">
+									<div className="spinner-border text-primary" role="status">
+										<span className="visually-hidden">Loading attempts...</span>
+									</div>
+									<p className="text-muted mt-3">Loading student attempts...</p>
+								</div>
+							) : attempts && attempts.length > 0 ? (
+								<div className="table-responsive">
+									<table className="table table-hover">
+										<thead className="table-light">
+											<tr>
+												<th scope="col">Student</th>
+												<th scope="col">Attempt #</th>
+												<th scope="col">Status</th>
+												<th scope="col">Score</th>
+												<th scope="col">Percentage</th>
+												<th scope="col">Started At</th>
+												<th scope="col">Submitted At</th>
+												<th scope="col">Time Taken</th>
+												<th scope="col">Actions</th>
+											</tr>
+										</thead>
+										<tbody>
+											{attempts.map((attempt) => (
+												<tr key={attempt.id}>
+													<td>
+														<div className="d-flex align-items-center">
+															<div className="avatar-sm me-2">
+																<img
+																	src={attempt.student?.avatar || 'https://placehold.co/32x32?text=S'}
+																	alt={attempt.student?.username || 'Student'}
+																	className="rounded-circle"
+																	style={{ width: '32px', height: '32px', objectFit: 'cover' }}
+																/>
+															</div>
+															<div>
+																<div className="fw-medium">
+																	{attempt.student?.first_name} {attempt.student?.last_name}
+																</div>
+																<small className="text-muted">
+																	@{attempt.student?.username}
+																</small>
+															</div>
+														</div>
+													</td>
+													<td>
+														<span className="badge bg-secondary">
+															#{attempt.attempt_number || 1}
+														</span>
+													</td>
+													<td>
+														<span className={`badge ${
+															attempt.status === 'completed' ? 'bg-success' :
+															attempt.status === 'in_progress' ? 'bg-warning' :
+															attempt.status === 'graded' ? 'bg-info' :
+															'bg-secondary'
+														}`}>
+															{attempt.status === 'completed' && <CheckCircle size={12} className="me-1" />}
+															{attempt.status === 'in_progress' && <Clock size={12} className="me-1" />}
+															{attempt.status === 'graded' && <Target size={12} className="me-1" />}
+															{attempt.status?.charAt(0).toUpperCase() + attempt.status?.slice(1) || 'Unknown'}
+														</span>
+													</td>
+													<td>
+														<span className="fw-medium">
+															{attempt.score !== null && attempt.score !== undefined ? 
+																`${attempt.score}/${attempt.total_points || assessment?.total_points || 'N/A'}` : 
+																'Not graded'
+															}
+														</span>
+													</td>
+													<td>
+														{attempt.percentage !== null && attempt.percentage !== undefined ? (
+															<div className="d-flex align-items-center">
+																<div className="progress me-2" style={{ width: '60px', height: '6px' }}>
+																	<div 
+																		className={`progress-bar ${
+																			attempt.percentage >= 70 ? 'bg-success' :
+																			attempt.percentage >= 50 ? 'bg-warning' : 'bg-danger'
+																		}`}
+																		style={{ width: `${Math.min(attempt.percentage, 100)}%` }}
+																	></div>
+																</div>
+																<span className={`small fw-medium ${
+																	attempt.percentage >= 70 ? 'text-success' :
+																	attempt.percentage >= 50 ? 'text-warning' : 'text-danger'
+																}`}>
+																	{attempt.percentage}%
+																</span>
+															</div>
+														) : (
+															<span className="text-muted">-</span>
+														)}
+													</td>
+													<td>
+														<small className="text-muted">
+															{attempt.started_at ? 
+																new Date(attempt.started_at).toLocaleString() : 
+																'N/A'
+															}
+														</small>
+													</td>
+													<td>
+														<small className="text-muted">
+															{attempt.submitted_at ? 
+																new Date(attempt.submitted_at).toLocaleString() : 
+																attempt.status === 'in_progress' ? 'In Progress' : 'N/A'
+															}
+														</small>
+													</td>
+													<td>
+														<small className="text-muted">
+															{attempt.time_taken ? (
+																<span>
+																	{Math.floor(attempt.time_taken / 60)}m {attempt.time_taken % 60}s
+																</span>
+															) : (
+																attempt.started_at && attempt.submitted_at ? (
+																	<span>
+																		{Math.floor((new Date(attempt.submitted_at) - new Date(attempt.started_at)) / 60000)}m
+																	</span>
+																) : 'N/A'
+															)}
+														</small>
+													</td>
+													<td>
+														<div className="d-flex gap-1">
+															<button
+																className="btn btn-sm btn-outline-primary"
+																title="View Details"
+																onClick={() => {
+																	// Navigate to attempt details or show modal
+																	console.log('View attempt details:', attempt.id);
+																}}
+															>
+																<Eye size={14} />
+															</button>
+															{attempt.status === 'completed' && (
+																<button
+																	className="btn btn-sm btn-outline-success"
+																	title="Grade Attempt"
+																	onClick={() => {
+																		// Navigate to grading page or show grading modal
+																		console.log('Grade attempt:', attempt.id);
+																	}}
+																>
+																	<Target size={14} />
+																</button>
+															)}
+														</div>
+													</td>
+												</tr>
+											))}
+										</tbody>
+									</table>
+								</div>
+							) : (
+								<div className="text-center py-5">
+									<Users size={48} className="text-muted mb-3" />
+									<h5 className="text-muted">No Student Attempts Yet</h5>
+									<p className="text-muted">
+										Students haven't started taking this assessment yet.
+										<br />
+										Make sure the assessment is published and available to students.
+									</p>
+								</div>
+							)}
 						</div>
 					</div>
 				)}
 
-				{/* Analytics Tab */}
-				{activeTab === "analytics" && (
-					<div className="card border-0 shadow-sm">
-						<div className="card-body">
-							<h4 className="section-title mb-4">Assessment Analytics</h4>
-							<div className="text-center py-5">
-								<BarChart3 size={48} className="text-muted mb-3" />
-								<h5 className="text-muted">Analytics Coming Soon</h5>
-								<p className="text-muted">
-									Detailed performance insights and trends
-								</p>
-							</div>
-						</div>
-					</div>
-				)}
+
 			</div>
 
 			{/* Assessment Update Modal */}
