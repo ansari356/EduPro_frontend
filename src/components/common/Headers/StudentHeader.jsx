@@ -4,11 +4,13 @@ import { pagePaths } from "../../../pagePaths";
 import logoutUser from "../../../apis/actions/logoutUser";
 import useStudentProfileData from "../../../apis/hooks/student/useStudentProfileData";
 import useStudentRefreshToken from "../../../apis/hooks/student/useStudentRefreshToken";
+import { useTranslation } from "react-i18next";
 import { useLanguage } from "../../../contexts/LanguageContext";
 import { useDarkMode } from "../../../contexts/DarkModeContext";
 import { Moon, Sun, Globe } from 'lucide-react';
 
 export default function StudentHeader() {
+  const { t } = useTranslation();
   const { mutate } = useStudentRefreshToken();
   const navigate = useNavigate();
   const { educatorUsername } = useParams();
@@ -35,8 +37,8 @@ export default function StudentHeader() {
 
   // Get student name from data or show loading/fallback
   const getStudentName = () => {
-    if (isLoading) return "Loading...";
-    if (error || !studentData?.student?.full_name) return "Student";
+    if (isLoading) return t('student.loading');
+    if (error || !studentData?.student?.full_name) return t('student.student');
     return studentData.student.full_name;
   };
 
@@ -46,7 +48,7 @@ export default function StudentHeader() {
       return (
         <img 
           src={studentData.student.profile_picture} 
-          alt="Student Avatar" 
+          alt={t('student.studentAvatar')} 
           className="user-avatar-img"
         />
       );
@@ -74,7 +76,7 @@ export default function StudentHeader() {
               className="nav-link-custom"
             >
               <i className="bi bi-house-door-fill me-2"></i>
-              Home
+              {t('student.home')}
             </Nav.Link>
             <Nav.Link
               as={NavLink}
@@ -82,7 +84,7 @@ export default function StudentHeader() {
               className="nav-link-custom"
             >
               <i className="bi bi-person-badge me-2"></i>
-              Profile
+              {t('student.profile')}
             </Nav.Link>
             <Nav.Link
               as={NavLink}
@@ -90,7 +92,7 @@ export default function StudentHeader() {
               className="nav-link-custom"
             >
               <i className="bi bi-book me-2"></i>
-              Courses
+              {t('student.courses')}
             </Nav.Link>
           </Nav>
 
@@ -124,12 +126,12 @@ export default function StudentHeader() {
                   {isDarkMode ? (
                     <>
                       <Sun size={16} className="me-2" />
-                      Light Mode
+                      {t('student.lightMode')}
                     </>
                   ) : (
                     <>
                       <Moon size={16} className="me-2" />
-                      Dark Mode
+                      {t('student.darkMode')}
                     </>
                   )}
                 </Dropdown.Item>
@@ -137,7 +139,7 @@ export default function StudentHeader() {
                 {/* Language Selection */}
                 <Dropdown.Header className="dropdown-header">
                   <Globe size={16} className="me-2" />
-                  Language
+                  {t('student.language')}
                 </Dropdown.Header>
                 
                 <Dropdown.Item
@@ -147,7 +149,7 @@ export default function StudentHeader() {
                   }`}
                 >
                   <span className="me-2">🇺🇸</span>
-                  <span className="me-2">English</span>
+                  <span className="me-2">{t('student.english')}</span>
                   {currentLanguage === 'en' && (
                     <span className="ms-auto">✓</span>
                   )}
@@ -159,8 +161,8 @@ export default function StudentHeader() {
                     currentLanguage === 'ar' ? 'active' : ''
                   }`}
                 >
-                  <span className="me-2">🇸🇦</span>
-                  <span className="me-2">العربية</span>
+                  <span className="ms-2">🇸🇦</span>
+                  <span className="me-2">{t('student.arabic')}</span>
                   {currentLanguage === 'ar' && (
                     <span className="ms-auto">✓</span>
                   )}
@@ -169,7 +171,7 @@ export default function StudentHeader() {
                 <Dropdown.Divider />
                 <Dropdown.Item onClick={handleSignOut}>
                   <i className="bi bi-box-arrow-right me-2"></i>
-                  Logout
+                  {t('student.logout')}
                 </Dropdown.Item>
               </Dropdown.Menu>
             </Dropdown>

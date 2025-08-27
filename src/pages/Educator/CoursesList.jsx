@@ -6,13 +6,13 @@ import useEducatorProfileData from "../../apis/hooks/educator/useEducatorProfile
 import useEducatorStudentsListData from "../../apis/hooks/educator/useEducatorStudentsListData";
 import useEducatorTotalRevenue from "../../apis/hooks/educator/useEducatorTotalRevenue";
 import {pagePaths} from "../../pagePaths";
-import { useLanguage } from "../../contexts/LanguageContext";
+import { useTranslation } from 'react-i18next';
 import { useAutoTranslate } from "../../hooks/useAutoTranslate";
 
 
 
 export default function EducatorCoursesList() {
-  const { t, currentLanguage } = useLanguage();
+  const { t } = useTranslation();
   const { translate } = useAutoTranslate();
 
   const {data:educator} = useEducatorProfileData();
@@ -25,9 +25,6 @@ export default function EducatorCoursesList() {
 	);
   const averageRating = educator?.rating
   
-  // Debug info
-  console.log('[CoursesList] Current language:', currentLanguage);
-  
   return (
 		<div className="min-vh-100 profile-root p-4">
 			<div className="container">
@@ -36,7 +33,7 @@ export default function EducatorCoursesList() {
 					<div className="container py-3">
 						<div className="d-flex align-items-center justify-content-between">
 							<div className="d-flex align-items-center">
-								<div className="header-avatar me-2 mx-auto w-fit">
+								<div className="header-avatar me-2 d-flex justify-content-center w-fit">
 									<LibraryBig size={20} />
 								</div>
 								<div>
@@ -64,7 +61,7 @@ export default function EducatorCoursesList() {
 					<div className="col-md-3">
 						<div className="card">
 							<div className="card-body text-center">
-								<div className="avatar-circle mb-2 mx-auto w-fit">
+								<div className="avatar-circle mb-2 d-flex justify-content-center w-fit">
 									<LibraryBig size={24} />
 								</div>
 								<h4 className="section-title mb-1">{publishedCourses?.length}</h4>
@@ -75,7 +72,7 @@ export default function EducatorCoursesList() {
 					<div className="col-md-3">
 						<div className="card">
 							<div className="card-body text-center">
-								<div className="avatar-circle mb-2 mx-auto w-fit">
+								<div className="avatar-circle mb-2 d-flex justify-content-center w-fit">
 									<Users size={24} />
 								</div>
 								<h4 className="section-title mb-1">
@@ -88,7 +85,7 @@ export default function EducatorCoursesList() {
 					<div className="col-md-3">
 						<div className="card">
 							<div className="card-body text-center">
-								<div className="avatar-circle mb-2 mx-auto w-fit">
+								<div className="avatar-circle mb-2 d-flex justify-content-center w-fit">
 									<DollarSign size={24} />
 								</div>
 								<h4 className="section-title mb-1">
@@ -101,7 +98,7 @@ export default function EducatorCoursesList() {
 					<div className="col-md-3">
 						<div className="card">
 							<div className="card-body text-center">
-								<div className="avatar-circle mb-2 mx-auto w-fit">
+								<div className="avatar-circle mb-2 d-flex justify-content-center w-fit">
 									<Star size={24} />
 								</div>
 								<h4 className="section-title mb-1">{averageRating}</h4>
@@ -116,26 +113,26 @@ export default function EducatorCoursesList() {
 					{coursesLoading ? (
 						<div className="text-center py-5">
 							<div className="spinner-border text-primary" role="status">
-								<span className="visually-hidden">Loading courses...</span>
+								<span className="visually-hidden">{t('courses.loadingCourses')}</span>
 							</div>
-							<p className="mt-3 text-muted">Loading your courses...</p>
+							<p className="mt-3 text-muted">{t('courses.loadingYourCourses')}</p>
 						</div>
 					) : coursesError ? (
 						<div className="text-center py-5">
 							<div className="text-danger">
 								<i className="bi bi-exclamation-triangle fs-1"></i>
-								<p className="mt-3">Failed to load courses. Please try again later.</p>
+								<p className="mt-3">{t('courses.failedToLoadCourses')}</p>
 							</div>
 						</div>
 					) : !courses || courses.length === 0 ? (
 						<div className="text-center py-5">
 							<LibraryBig size={64} className="text-muted mb-3" />
-							<h4 className="text-muted">No courses yet</h4>
-							<p className="text-muted mb-4">Start creating your first course to share knowledge with students.</p>
+							<h4 className="text-muted">{t('courses.noCoursesYet')}</h4>
+							<p className="text-muted mb-4">{t('courses.startCreatingFirstCourse')}</p>
 							<Link to="/courses/create" className="text-decoration-none">
 								<button className="btn-edit-profile">
 									<i className="bi bi-plus-lg me-2"></i>
-									Create Your First Course
+									{t('courses.createYourFirstCourse')}
 								</button>
 							</Link>
 						</div>
@@ -155,7 +152,7 @@ export default function EducatorCoursesList() {
 function EducatorCourseCard({ course }) {
   const navigate = useNavigate();
   const { translate, translateWithLibreTranslate } = useAutoTranslate();
-  const { t, currentLanguage } = useLanguage();
+  const { t } = useTranslation();
   const [translatedTitle, setTranslatedTitle] = useState(course?.title);
   const [translatedDescription, setTranslatedDescription] = useState(course?.description);
   
@@ -240,7 +237,7 @@ function EducatorCourseCard({ course }) {
 						<span
 							className={`about-bubble ${getStatusColor(course?.is_published)}`}
 						>
-							{course?.is_published ? translate("Published") : translate("Draft")}
+							{course?.is_published ? t('courses.published') : t('courses.draft')}
 						</span>
 
 					</div>
@@ -258,7 +255,7 @@ function EducatorCourseCard({ course }) {
 							<div className="d-flex align-items-center">
 								<Users size={14} className="me-1 text-muted" />
 								<small className="profile-joined">
-									{course?.total_enrollments} {translate("students")}
+									{course?.total_enrollments} {t('courses.students')}
 								</small>
 							</div>
 						</div>
@@ -266,7 +263,7 @@ function EducatorCourseCard({ course }) {
 							<div className="d-flex align-items-center">
 								<Star size={14} className="me-1 text-muted" />
 								<small className="profile-joined">
-									{course?.average_rating	 || translate("No rating")}
+									{course?.average_rating	 || t('courses.noRating')}
 								</small>
 							</div>
 						</div>
@@ -274,7 +271,7 @@ function EducatorCourseCard({ course }) {
 							<div className="d-flex align-items-center">
 								<Clock size={14} className="me-1 text-muted" />
 								<small className="profile-joined">
-									{course?.total_lessons} {translate("lessons")}
+									{course?.total_lessons} {t('courses.lessons')}
 								</small>
 							</div>
 						</div>
@@ -298,7 +295,7 @@ function EducatorCourseCard({ course }) {
 							<span
 								className={`fw-bold ${getStatusColor(course?.is_published)}`}
 							>
-								{course?.is_published ? translate("Published") : translate("Draft")}
+								{course?.is_published ? t('courses.published') : t('courses.draft')}
 							</span>
 						</div>
 

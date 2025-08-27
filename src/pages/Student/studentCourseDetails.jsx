@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useMemo } from "react";
 import { useParams, useNavigate } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 import {
   LibraryBig,
   Clock,
@@ -15,6 +16,7 @@ import {
   X,
   SkipForward,
   BadgeCheck,
+  Info,
 } from "lucide-react";
 import useGetCourseDetails from "../../apis/hooks/student/useGetCourseDetails";
 import useListCourseModules, { useModuleLessons } from "../../apis/hooks/student/useListCourseModules";
@@ -30,6 +32,7 @@ import { pagePaths } from "../../pagePaths";
 
 /* StudentCourseDetails Component */
 function StudentCourseDetails() {
+  const { t } = useTranslation();
   const params = useParams();
   const courseId = params.id;
   const educatorUsername = params.educatorUsername;
@@ -87,12 +90,12 @@ function StudentCourseDetails() {
   const course = courseDetails ? {
     ...courseDetails,
     id: courseDetails.id || courseDetails.course_id,
-    title: courseDetails.title || courseDetails.course || courseDetails.name || "Untitled Course",
-    description: courseDetails.description || courseDetails.course_description || "Course description not available",
+    title: courseDetails.title || courseDetails.course || courseDetails.name || t('student.untitledCourse'),
+    description: courseDetails.description || courseDetails.course_description || t('student.courseDescriptionNotAvailable'),
     image: courseDetails.image_url || courseDetails.thumbnail || courseDetails.image || "",
-    category: courseDetails.category?.name || courseDetails.category_name || courseDetails.category || "General",
+    category: courseDetails.category?.name || courseDetails.category_name || courseDetails.category || t('student.general'),
     totalLessons: courseModules && courseModules.length > 0 ? courseModules.length : (courseDetails.total_lessons || courseDetails.lessons_count || 0),
-    duration: courseDetails.total_durations || courseDetails.duration ? `${courseDetails.total_durations || courseDetails.duration} weeks` : "N/A",
+    duration: courseDetails.total_durations || courseDetails.duration ? `${courseDetails.total_durations || courseDetails.duration} ${t('student.weeks')}` : "N/A",
     price: courseDetails.price || courseDetails.course_price || "0.00",
     isFree: courseDetails.is_free || courseDetails.free || false,
     modules: courseModules || [],
@@ -314,38 +317,64 @@ function StudentCourseDetails() {
       <div className="profile-root min-vh-100 d-flex align-items-center justify-content-center">
         <div className="text-center">
           <div className="loading-spinner mb-3" role="status">
-            <span className="visually-hidden">Loading...</span>
+            <span className="visually-hidden">{t('common.loading')}</span>
           </div>
-          <p className="profile-joined">Loading course details...</p>
+          <p className="profile-joined">{t('student.loadingCourseData')}</p>
         </div>
       </div>
     );
   }
 
   // Check if student has access to course content (enrolled or course is free)
-  const isEnrolled = enrolledInCourses?.some(course => course.id === courseId) || false;
-  const hasCourseAccess = courseDetails?.is_free || isEnrolled;
+  const studentEnrollment = enrolledInCourses?.find(course => course.id === courseId);
+  
+  // Check if student has active enrollment with proper access
+  const hasActiveEnrollment = studentEnrollment && 
+    studentEnrollment.status === 'active' && 
+    studentEnrollment.access_type === 'full_access' && 
+    studentEnrollment.is_active === true;
+  
+  // Check if student has any enrollment (including pending)
+  const hasAnyEnrollment = !!studentEnrollment;
+  
+  // Student has access if course is free OR they have active enrollment
+  const hasCourseAccess = courseDetails?.is_free || hasActiveEnrollment;
+  
+  // Show enrollment message if no access and no lessons error
   const showEnrollmentMessage = !hasCourseAccess && !lessonsError;
+  
+  // Debug logging
+  console.log('🔍 Enrollment Debug:', {
+    courseId,
+    courseIsFree: courseDetails?.is_free,
+    studentEnrollment,
+    hasActiveEnrollment,
+    hasAnyEnrollment,
+    hasCourseAccess,
+    enrollmentStatus: studentEnrollment?.status,
+    accessType: studentEnrollment?.access_type,
+    isActive: studentEnrollment?.is_active
+  });
 
   if (courseError || !course) {
     return (
       <div className="profile-root min-vh-100 d-flex align-items-center justify-content-center">
         <div className="text-center">
-          <h2 className="main-title mb-3">Course Not Found</h2>
+          <h2 className="main-title mb-3">{t('student.courseNotFound')}</h2>
           <p className="profile-joined mb-4">
-            Sorry, we couldn't find the course you're looking for.
+            {t('student.courseNotFoundMessage')}
           </p>
           {courseError && (
             <div className="alert alert-danger mb-3">
-              <strong>Error Details:</strong> {courseError.message || courseError}
+              <strong>{t('student.errorDetails')}</strong> {courseError.message || courseError}
             </div>
           )}
           <div className="mb-3">
             <small className="text-muted">
-              Course ID: {courseId}<br />
-              Educator: {educatorUsername}<br />
-              Course Details: {courseDetails ? 'Loaded' : 'Not loaded'}<br />
-              Educator Data: {educatorData ? 'Loaded' : 'Not loaded'}
+              {t('student.courseId')} {courseId}<br />
+              {t('student.educator')} {educatorUsername}<br />
+              {t('student.courseDetails')} {courseDetails ? t('student.loaded') : t('student.notLoaded')}<br />
+              {t('student.educatorData')} {educatorData ? t('student.loaded') : t('student.notLoaded')}
             </small>
           </div>
           <button
@@ -353,7 +382,7 @@ function StudentCourseDetails() {
             onClick={() => navigate(-1)}
           >
             <ArrowLeft size={16} className="me-2" />
-            Go Back
+            {t('student.goBack')}
           </button>
         </div>
       </div>
@@ -379,7 +408,7 @@ function StudentCourseDetails() {
       setIsPlaying(true);
     } else if (lessonForVideo.type === 'quiz') {
       // Handle quiz opening - you can implement quiz modal here
-      alert(`Opening quiz: ${lessonForVideo.title}`);
+      alert(t('student.openingQuiz', { title: lessonForVideo.title }));
     }
   };
 
@@ -403,7 +432,7 @@ function StudentCourseDetails() {
     if (nextLesson) {
       openVideoPlayer(nextLesson);
     } else {
-      alert("Congratulations! You've completed all available lessons.");
+      alert(t('student.congratulationsCompleted'));
     }
   };
 
@@ -420,14 +449,41 @@ function StudentCourseDetails() {
   const handleReviewSubmit = async (e) => {
     e.preventDefault();
     if (reviewRating === 0) {
-      alert("Please select a rating");
+      alert(t('student.pleaseSelectRating'));
+      return;
+    }
+
+    // Validate comment is not empty
+    if (!reviewComment.trim()) {
+      alert(t('student.shareThoughts'));
+      return;
+    }
+
+    // Validate comment length
+    if (reviewComment.trim().length < 3) {
+      alert(t('student.commentMinLength'));
+      return;
+    }
+
+    if (reviewComment.trim().length > 500) {
+      alert(t('student.commentMaxLength'));
+      return;
+    }
+
+    // Check if student has access to submit a review
+    if (!hasCourseAccess) {
+      if (hasAnyEnrollment) {
+        alert(t('student.enrollmentPendingReview'));
+      } else {
+        alert(t('student.mustBeEnrolledToReview'));
+      }
       return;
     }
 
     try {
       const ratingData = {
         rating: reviewRating,
-        comment: reviewComment
+        comment: reviewComment.trim()
       };
 
       const response = await submitCourseRating(courseId, ratingData);
@@ -451,7 +507,7 @@ function StudentCourseDetails() {
         window.location.reload();
       }
 
-      alert("Thank you for your review! Your feedback helps us improve.");
+      alert(t('student.thankYouForReview'));
 
     } catch (error) {
       console.error('Failed to submit review:', error);
@@ -459,16 +515,23 @@ function StudentCourseDetails() {
       // Handle specific error cases based on backend logic
       if (error.response?.status === 403) {
         if (error.response?.data?.detail?.includes("already rated")) {
-          alert("You have already reviewed this course. You cannot submit another review.");
+          alert(t('student.alreadyReviewed'));
           // Refresh the page to show the existing review
           window.location.reload();
-        } else if (error.response?.data?.detail?.includes("must have full access")) {
-          alert("You must be enrolled in this course to submit a review.");
+        } else if (error.response?.data?.detail?.includes("must have full access") || 
+                   error.response?.data?.detail?.includes("enrolled")) {
+          if (hasAnyEnrollment) {
+            alert(t('student.enrollmentPendingApproval'));
+          } else {
+            alert(t('student.mustEnrollFirst'));
+          }
+          // Hide the review form since they can't submit
+          setShowReviewForm(false);
         } else {
-          alert("You don't have permission to review this course. Please make sure you are enrolled.");
+          alert(t('student.noPermissionToReview'));
         }
       } else {
-        alert(`Failed to submit review: ${error.response?.data?.detail || error.message}`);
+        alert(t('student.failedToSubmitReview', { error: error.response?.data?.detail || error.message }));
       }
     }
   };
@@ -618,7 +681,7 @@ function StudentCourseDetails() {
               onClick={() => navigate(-1)}
             >
               <ArrowLeft size={16} className="me-2" />
-              Back to Courses
+              							{t('student.backToCourses')}
             </button>
           </div>
         </div>
@@ -649,25 +712,25 @@ function StudentCourseDetails() {
                     className={`btn-link-custom flex-fill text-center py-3 ${activeTab === 'overview' ? 'text-accent border-bottom border-primary border-3' : 'profile-joined'}`}
                     onClick={() => setActiveTab('overview')}
                   >
-                    Overview
+                    {t('student.overview')}
                   </button>
                   <button
                     className={`btn-link-custom flex-fill text-center py-3 ${activeTab === 'curriculum' ? 'text-accent border-bottom border-primary border-3' : 'profile-joined'}`}
                     onClick={() => setActiveTab('curriculum')}
                   >
-                    Curriculum
+                    {t('student.curriculum')}
                   </button>
                   <button
                     className={`btn-link-custom flex-fill text-center py-3 ${activeTab === 'assessments' ? 'text-accent border-bottom border-primary border-3' : 'profile-joined'}`}
                     onClick={() => setActiveTab('assessments')}
                   >
-                    Assessments
+                    {t('student.assessments')}
                   </button>
                   <button
                     className={`btn-link-custom flex-fill text-center py-3 ${activeTab === 'review' ? 'text-accent border-bottom border-primary border-3' : 'profile-joined'}`}
                     onClick={() => setActiveTab('review')}
                   >
-                    Review
+                    {t('student.review')}
                   </button>
                 </div>
               </div>
@@ -677,7 +740,7 @@ function StudentCourseDetails() {
             {activeTab === 'overview' && (
               <div className="card">
                 <div className="card-body">
-                  <h3 className="section-title mb-4">Course Overview</h3>
+                  							<h3 className="section-title mb-4">{t('student.courseOverview')}</h3>
 
                   {/* Enrollment Required Message */}
                   {showEnrollmentMessage && (
@@ -685,16 +748,16 @@ function StudentCourseDetails() {
                       <div className="d-flex align-items-center">
                         <BookOpen size={20} className="me-2" />
                         <div>
-                          <strong>Enrollment Required</strong>
+                          <strong>{t('student.enrollmentRequired')}</strong>
                           <br />
-                          <small>You need to enroll in this course to access the full content, including lessons and progress tracking.</small>
+                          <small>{t('student.enrollmentRequiredMessage')}</small>
                         </div>
                       </div>
                     </div>
                   )}
 
                   <div className="mb-4">
-                    <h4 className="about-subtitle mb-2">Description</h4>
+                    <h4 className="about-subtitle mb-2">{t('student.description')}</h4>
                     <p className="about-bubble">{course.description}</p>
                   </div>
                 </div>
@@ -704,7 +767,7 @@ function StudentCourseDetails() {
             {activeTab === 'curriculum' && (
               <div className="card">
                 <div className="card-body">
-                  <h3 className="section-title mb-4">Course Curriculum</h3>
+                  <h3 className="section-title mb-4">{t('student.courseCurriculum')}</h3>
                   {hasModules ? (
                     course.tableOfContents.map((chapter, index) => (
                       <div key={chapter.id} className="mb-4">
@@ -712,7 +775,7 @@ function StudentCourseDetails() {
                           <h4 className="about-subtitle mb-0">{chapter.chapter}</h4>
                           <div className="d-flex align-items-center">
                             <span className="badge bg-secondary me-2">
-                              {chapter.completed}/{chapter.lessons} completed
+                              {chapter.completed}/{chapter.lessons} {t('student.completed')}
                             </span>
                           </div>
                         </div>
@@ -726,7 +789,7 @@ function StudentCourseDetails() {
                         {/* Chapter Lessons */}
                         {chapter.chapterLessons && chapter.chapterLessons.length > 0 ? (
                           <div className="ms-4">
-                            <h6 className="text-muted mb-2">Lessons:</h6>
+                            <h6 className="text-muted mb-2">{t('student.lessons')}</h6>
                             {chapter.chapterLessons.map((lesson, lessonIndex) => (
                               <div
                                 key={lesson.id}
@@ -763,9 +826,9 @@ function StudentCourseDetails() {
                                   <Clock size={16} className="text-warning" />
                                 </div>
                                 <div>
-                                  <strong>Enrollment Required</strong>
+                                  <strong>{t('student.enrollmentRequired')}</strong>
                                   <br />
-                                  <small>You need to be enrolled in this course to access lessons.</small>
+                                  <small>{t('student.enrollmentRequiredForLessons')}</small>
                                 </div>
                               </div>
                             </div>
@@ -776,7 +839,7 @@ function StudentCourseDetails() {
                               <div className="me-2">
                                 <Clock size={14} className="text-muted" />
                               </div>
-                              <span className="text-muted">No lessons available yet</span>
+                              <span className="text-muted">{t('student.noLessonsAvailableYet')}</span>
                             </div>
                           </div>
                         )}
@@ -786,8 +849,8 @@ function StudentCourseDetails() {
                     ))
                   ) : (
                     <div className="text-center py-5">
-                      <p className="profile-joined">No curriculum available for this course yet.</p>
-                      <p className="profile-joined">Please check back later or contact the instructor.</p>
+                      <p className="profile-joined">{t('student.noCurriculumAvailable')}</p>
+                      <p className="profile-joined">{t('student.checkBackLater')}</p>
                     </div>
                   )}
                 </div>
@@ -798,7 +861,7 @@ function StudentCourseDetails() {
               <div className="card">
                 <div className="card-body">
                   <div className="d-flex justify-content-between align-items-center mb-4">
-                    <h3 className="section-title mb-0">Course Assessments</h3>
+                    <h3 className="section-title mb-0">{t('student.courseAssessments')}</h3>
                   </div>
 
 
@@ -809,9 +872,9 @@ function StudentCourseDetails() {
                       <div className="d-flex align-items-center">
                         <BookOpen size={16} className="me-2" />
                         <div>
-                          <strong>Enrollment Required</strong>
+                          <strong>{t('student.enrollmentRequired')}</strong>
                           <br />
-                          <small>You need to enroll in this course to access assessments and track your progress.</small>
+                          <small>{t('student.enrollmentRequiredForAssessments')}</small>
                         </div>
                       </div>
                     </div>
@@ -820,9 +883,9 @@ function StudentCourseDetails() {
                   {assessmentsLoading ? (
                     <div className="text-center py-5">
                       <div className="loading-spinner mb-3" role="status">
-                        <span className="visually-hidden">Loading...</span>
+                        <span className="visually-hidden">{t('common.loading')}</span>
                       </div>
-                      <p className="profile-joined">Loading assessments...</p>
+                      <p className="profile-joined">{t('student.loadingAssessments')}</p>
                     </div>
                   ) : assessments && assessments.length > 0 ? (
                     assessments.map((assessment) => (
@@ -853,32 +916,32 @@ function StudentCourseDetails() {
                                   borderColor: "var(--color-primary)"
                                 }}
                               >
-                                {assessment.assessment_type === 'quiz' ? 'Quiz' : 
-                                 assessment.assessment_type === 'assignment' ? 'Assignment' : 
-                                 assessment.assessment_type === 'course_exam' ? 'Final Exam' : 'Assessment'}
+                                {assessment.assessment_type === 'quiz' ? t('student.quiz') : 
+                                 assessment.assessment_type === 'assignment' ? t('student.assignment') : 
+                                 assessment.assessment_type === 'course_exam' ? t('student.finalExam') : t('student.assessment')}
                               </small>
                               {assessment.total_questions > 0 && (
                                 <small className="badge bg-secondary">
-                                  {assessment.total_questions} Questions
+                                  {assessment.total_questions} {t('student.questions')}
                                 </small>
                               )}
                               {assessment.total_marks > 0 && (
                                 <small className="badge bg-secondary">
-                                  {assessment.total_marks} Marks
+                                  {assessment.total_marks} {t('student.marks')}
                                 </small>
                               )}
                             </div>
                             <small className="text-muted d-block">
-                              {assessment.related_to || 'Course assessment'}
+                              {assessment.related_to || t('student.courseAssessment')}
                             </small>
                             {assessment.is_timed && (
                               <small className="text-warning d-block mt-1">
-                                ⏰ Timed Assessment
+                                ⏰ {t('student.timedAssessment')}
                               </small>
                             )}
                             {!assessment.is_available && (
                               <small className="text-danger d-block mt-1">
-                                ⚠️ Assessment not available
+                                ⚠️ {t('student.assessmentNotAvailable')}
                               </small>
                             )}
                           </div>
@@ -887,9 +950,9 @@ function StudentCourseDetails() {
                               className={`btn-edit-profile btn-sm ${!assessment.is_available ? 'disabled' : ''}`}
                               onClick={() => {
                                 if (showEnrollmentMessage) {
-                                  alert("Please enroll in this course to access assessments.");
+                                  alert(t('student.pleaseEnrollToAccessAssessments'));
                                 } else if (!assessment.is_available) {
-                                  alert("This assessment is not available at the moment.");
+                                  alert(t('student.assessmentNotAvailableAtMoment'));
                                 } else {
                                   navigate(pagePaths.student.assessmentDetails(educatorUsername, assessment.id), {
                                     state: { assessment }
@@ -908,8 +971,8 @@ function StudentCourseDetails() {
                     ))
                   ) : (
                     <div className="text-center py-5">
-                      <p className="profile-joined">No assessments available for this course yet.</p>
-                      <p className="profile-joined">Please check back later or contact the instructor.</p>
+                      <p className="profile-joined">{t('student.noAssessmentsAvailable')}</p>
+                      <p className="profile-joined">{t('student.checkBackLater')}</p>
                     </div>
                   )}
 
@@ -921,16 +984,16 @@ function StudentCourseDetails() {
             {activeTab === 'review' && (
               <div className="card">
                 <div className="card-body">
-                  <h3 className="section-title mb-4">Course Review</h3>
+                  <h3 className="section-title mb-4">{t('student.courseReview')}</h3>
 
 
 
                   {reviewLoading ? (
                     <div className="text-center py-5">
                       <div className="loading-spinner mb-3" role="status">
-                        <span className="visually-hidden">Loading...</span>
+                        <span className="visually-hidden">{t('common.loading')}</span>
                       </div>
-                      <p className="profile-joined">Loading review data...</p>
+                      <p className="profile-joined">{t('student.loadingReviewData')}</p>
                     </div>
                   ) : hasReview ? (
                     <div className="alert alert-success">
@@ -962,19 +1025,49 @@ function StudentCourseDetails() {
                     </div>
                   ) : (
                     <div>
-                      <p className="profile-joined mb-4">
-                        Share your experience with this course to help other students make informed decisions.
-                      </p>
+                      {!hasCourseAccess ? (
+                        <div className="alert alert-info">
+                          <h5 className="alert-heading d-flex align-items-center">
+                            <Info size={20} className="me-2" />
+                            {hasAnyEnrollment ? 'Enrollment Pending' : 'Enrollment Required'}
+                          </h5>
+                          <p className="mb-0">
+                            {hasAnyEnrollment ? (
+                              <>
+                                Your enrollment is currently <strong>pending</strong> and needs to be approved by the instructor.
+                                <br />
+                                <strong>Status:</strong> {studentEnrollment?.status} | <strong>Access:</strong> {studentEnrollment?.access_type}
+                                <br />
+                                You'll be able to submit a review once your enrollment is approved and activated.
+                              </>
+                            ) : (
+                              <>
+                                You need to be enrolled in this course to submit a review. 
+                                {!courseDetails?.is_free && (
+                                  <>
+                                    <br />
+                                    													<strong>{t('common.note')}:</strong> {t('student.courseRequiresEnrollment')}
+                                  </>
+                                )}
+                              </>
+                            )}
+                          </p>
+                        </div>
+                      ) : (
+                        <>
+                          <p className="profile-joined mb-4">
+                            Share your experience with this course to help other students make informed decisions.
+                          </p>
 
-                      {!showReviewForm && !hasReview ? (
-                        <button
-                          className="btn-edit-profile"
-                          onClick={() => setShowReviewForm(true)}
-                        >
-                          <Star size={16} className="me-2" />
-                          Write a Review
-                        </button>
-                      ) : showReviewForm ? (
+                          {!showReviewForm && !hasReview ? (
+                            <button
+                              className="btn-edit-profile"
+                              onClick={() => setShowReviewForm(true)}
+                            >
+                              <Star size={16} className="me-2" />
+                              Write a Review
+                            </button>
+                          ) : showReviewForm ? (
                         <form onSubmit={handleReviewSubmit}>
                           <div className="mb-4">
                             <h5 className="about-subtitle mb-3">Rate this course</h5>
@@ -1004,22 +1097,41 @@ function StudentCourseDetails() {
 
                           <div className="mb-4">
                             <label className="form-label about-subtitle">
-                              Share your thoughts (optional)
+                              Share your thoughts <span className="text-danger">*</span>
                             </label>
                             <textarea
-                              className="form-control"
+                              className={`form-control ${reviewComment.trim() === '' && reviewComment !== '' ? 'is-invalid' : reviewComment.trim().length > 0 && reviewComment.trim().length < 3 ? 'is-invalid' : reviewComment.trim().length > 500 ? 'is-invalid' : reviewComment.trim().length >= 3 ? 'is-valid' : ''}`}
                               rows="4"
                               placeholder="Tell other students about your experience with this course..."
                               value={reviewComment}
                               onChange={(e) => setReviewComment(e.target.value)}
+                              required
                             />
+                            <div className="d-flex justify-content-between align-items-center mt-1">
+                              <small className={`${reviewComment.trim().length < 3 ? 'text-danger' : reviewComment.trim().length > 500 ? 'text-danger' : reviewComment.trim().length >= 3 ? 'text-success' : 'text-muted'}`}>
+                                {reviewComment.trim().length < 3 ? 'Comment too short' : reviewComment.trim().length > 500 ? 'Comment too long' : reviewComment.trim().length >= 3 ? 'Comment looks good!' : 'Minimum 3 characters required'}
+                              </small>
+                              <small className={`${reviewComment.trim().length > 500 ? 'text-danger' : 'text-muted'}`}>
+                                {reviewComment.trim().length}/500 characters
+                              </small>
+                            </div>
+                            {reviewComment.trim() === '' && reviewComment !== '' && (
+                              <div className="invalid-feedback">
+                                Please share your thoughts about this course.
+                              </div>
+                            )}
+                            {reviewComment.trim().length > 0 && reviewComment.trim().length < 3 && (
+                              <div className="invalid-feedback">
+                                Comment must be at least 3 characters long.
+                              </div>
+                            )}
                           </div>
 
                           <div className="d-flex gap-2">
                             <button
                               type="submit"
                               className="btn-edit-profile"
-                              disabled={reviewRating === 0}
+                              disabled={reviewRating === 0 || !reviewComment.trim() || reviewComment.trim().length < 3 || reviewComment.trim().length > 500}
                             >
                               Submit Review
                             </button>
@@ -1038,6 +1150,8 @@ function StudentCourseDetails() {
                           </div>
                         </form>
                       ) : null}
+                        </>
+                      )}
                     </div>
                   )}
                 </div>

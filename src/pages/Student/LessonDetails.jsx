@@ -432,7 +432,7 @@ function LessonDetails() {
         </div>
       </div>
 
-      {/* Floating Right Sidebar - Fixed Position */}
+            {/* Floating Right Sidebar - Fixed Position */}
       <div className="floating-sidebar" 
            style={{
              position: 'fixed',
@@ -449,14 +449,13 @@ function LessonDetails() {
                width: '320px',
                height: '100%',
                overflow: 'hidden',
-               boxShadow: '0 4px 12px rgba(0,0,0,0.15)',
                borderRadius: '8px 0 0 8px'
              }}>
-          
-          <div className="card-body p-3" style={{ paddingTop: '0' }}>
+            
+          <div className="card-body p-3" style={{ paddingTop: '0', paddingBottom: '0' }}>
             {/* Course Content */}
             <div className="sidebar-content">
-              <h5 className="section-title mb-3 text-center">Course Content</h5>
+              <h5 className="section-title text-center primary-text">Course Content</h5>
               
               {/* Course Navigation */}
               {courseModules && courseModules.length > 0 ? (
@@ -464,11 +463,7 @@ function LessonDetails() {
                   {courseModules.map((module, moduleIndex) => (
                     <div key={module.id} className="module-section mb-3">
                       {/* Chapter Header */}
-                      <div className="about-bubble p-2 rounded mb-2" 
-                           style={{ 
-                             backgroundColor: currentLesson.module?.id === module.id ? '#e3f2fd' : '#f8f9fa',
-                             border: currentLesson.module?.id === module.id ? '2px solid #2196f3' : '1px solid #e9ecef'
-                           }}>
+                      <div className={`module-header p-2 rounded mb-2 ${currentLesson.module?.id === module.id ? 'module-active' : ''}`}>
                         <h6 className="mb-0 fw-bold text-main" style={{ fontSize: '0.9rem' }}>
                           Ch {moduleIndex + 1}: {module.title}
                         </h6>
@@ -494,35 +489,16 @@ function LessonDetails() {
                               {lessons.map((lesson, lessonIndex) => (
                                 <div key={lesson.id} className="lesson-item mb-2">
                                   <button
-                                    className={`btn btn-sm w-100 text-start d-flex align-items-center justify-content-between ${
-                                      lesson.id === currentLesson.id 
-                                        ? 'btn-primary' 
-                                        : 'btn-outline-secondary'
+                                    className={`lesson-nav-btn w-100 text-start d-flex align-items-center justify-content-between ${
+                                      lesson.id === currentLesson.id ? 'lesson-active' : ''
                                     }`}
                                     onClick={() => navigate(pagePaths.student.lessonDetails(educatorUsername, courseId, lesson.id))}
                                     style={{
                                       fontSize: '0.8rem',
                                       padding: '0.5rem 0.75rem',
                                       borderRadius: '6px',
-                                      border: lesson.id === currentLesson.id ? 'none' : '1px solid #dee2e6',
-                                      backgroundColor: lesson.id === currentLesson.id ? '#0d6efd' : 'transparent',
-                                      color: lesson.id === currentLesson.id ? 'white' : '#495057',
-                                      transition: 'all 0.2s ease-in-out',
-                                      cursor: 'pointer'
-                                    }}
-                                    onMouseEnter={(e) => {
-                                      if (lesson.id !== currentLesson.id) {
-                                        e.target.style.backgroundColor = '#f8f9fa';
-                                        e.target.style.borderColor = '#0d6efd';
-                                        e.target.style.color = '#0d6efd';
-                                      }
-                                    }}
-                                    onMouseLeave={(e) => {
-                                      if (lesson.id !== currentLesson.id) {
-                                        e.target.style.backgroundColor = 'transparent';
-                                        e.target.style.borderColor = '#dee2e6';
-                                        e.target.style.color = '#495057';
-                                      }
+                                      cursor: 'pointer',
+                                      margin: 'var(--spacing-xs) 0'
                                     }}
                                   >
                                     <div className="d-flex align-items-center">
@@ -553,7 +529,7 @@ function LessonDetails() {
                           return (
                             <div className="lessons-list ms-2">
                               <div className="text-center py-2">
-                                <small className="text-muted">Loading lessons...</small>
+                                <small className="text-muted">No lessons found</small>
                               </div>
                             </div>
                           );
@@ -564,7 +540,7 @@ function LessonDetails() {
                 </div>
               ) : (
                 <div className="text-center py-3">
-                                          <div className="spinner-border spinner-border-sm text-main" role="status">
+                  <div className="spinner-border spinner-border-sm text-main" role="status">
                     <span className="visually-hidden">Loading...</span>
                   </div>
                 </div>

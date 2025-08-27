@@ -147,6 +147,12 @@ div.text-main {
   line-height: 1.3;
 }
 
+/* Dark Mode Variant for Section Title */
+.dark-mode .section-title {
+  color: var(--color-primary-light) !important;
+  text-shadow: 0 0 10px rgba(51, 144, 236, 0.3) !important;
+}
+
 .text-accent {
   color: var(--color-primary-dark) !important;
   font-weight: 600;
@@ -354,6 +360,11 @@ div.text-main {
   color: var(--color-secondary);
 }
 
+.badge.bg-danger {
+  background-color: transparent !important;
+  color: red
+}
+
 /* Bootstrap text color classes using CSS variables */
 .text-success {
   color: var(--color-success) !important;
@@ -446,6 +457,322 @@ form .form-check-input {
 form .form-check-input:checked {
   background-color: var(--color-primary-dark);
   border-color: var(--color-primary-dark);
+}
+
+/* Comprehensive Form Control Styling */
+.form-control {
+  border: 1px solid var(--color-border) !important;
+  border-radius: var(--border-radius-sm) !important;
+  padding: var(--spacing-sm) var(--spacing-md) !important;
+  font-size: 1rem !important;
+  transition: all var(--transition-fast) !important;
+  background-color: white !important;
+  color: var(--color-text) !important;
+  width: 100% !important;
+  outline: none !important;
+  box-shadow: var(--shadow-light) !important;
+}
+
+.form-control:focus {
+  border-color: var(--color-primary) !important;
+  box-shadow: 0 0 0 3px rgba(51, 144, 236, 0.1) !important;
+  outline: none !important;
+}
+
+.form-control:hover {
+  border-color: var(--color-primary-light) !important;
+}
+
+.form-control::placeholder {
+  color: var(--color-text-muted) !important;
+  opacity: 0.7 !important;
+}
+
+/* Dark Mode Variant for Form Control */
+.dark-mode .form-control {
+  background-color: var(--color-bg-dark) !important;
+  border-color: var(--color-border-dark) !important;
+  color: var(--color-text-light) !important;
+  box-shadow: var(--shadow-medium) !important;
+}
+
+.dark-mode .form-control:focus {
+  border-color: var(--color-primary-light) !important;
+  box-shadow: 0 0 0 3px rgba(51, 144, 236, 0.2), var(--shadow-medium) !important;
+  background-color: var(--color-bg-darker) !important;
+}
+
+.dark-mode .form-control:hover {
+  border-color: var(--color-primary) !important;
+  background-color: var(--color-bg-darker) !important;
+}
+
+.dark-mode .form-control::placeholder {
+  color: var(--color-text-muted-dark) !important;
+  opacity: 0.8 !important;
+}
+
+/* Form Control States */
+.form-control.is-valid {
+  border-color: var(--color-success) !important;
+  box-shadow: 0 0 0 3px rgba(40, 167, 69, 0.1) !important;
+}
+
+.form-control.is-invalid {
+  border-color: var(--color-danger) !important;
+  box-shadow: 0 0 0 3px rgba(220, 53, 69, 0.1) !important;
+}
+
+.dark-mode .form-control.is-valid {
+  border-color: var(--color-success-light) !important;
+  box-shadow: 0 0 0 3px rgba(40, 167, 69, 0.2) !important;
+}
+
+.dark-mode .form-control.is-invalid {
+  border-color: var(--color-danger-light) !important;
+  box-shadow: 0 0 0 3px rgba(220, 53, 69, 0.2) !important;
+}
+
+/* Course Card Hover Animations */
+.course-card {
+  transition: all var(--transition-fast) !important;
+  cursor: pointer !important;
+  border: 1px solid transparent !important;
+  overflow: hidden !important;
+  position: relative !important;
+}
+
+.course-card:hover {
+  transform: translateY(-8px) !important;
+  box-shadow: var(--shadow-large), 0 10px 30px rgba(0, 0, 0, 0.15) !important;
+  border-color: var(--color-primary-light) !important;
+}
+
+.course-card:hover .card-img-top {
+  transform: scale(1.05) !important;
+}
+
+.course-card:hover .course-card-overlay {
+  opacity: 1 !important;
+  transform: translateY(0) !important;
+}
+
+.course-card .card-img-top {
+  transition: transform var(--transition-fast) !important;
+}
+
+.course-card .course-card-overlay {
+  position: absolute !important;
+  top: 0 !important;
+  left: 0 !important;
+  right: 0 !important;
+  bottom: 0 !important;
+  background: linear-gradient(135deg, rgba(51, 144, 236, 0.1), rgba(51, 144, 236, 0.05)) !important;
+  opacity: 0 !important;
+  transform: translateY(20px) !important;
+  transition: all var(--transition-fast) !important;
+  pointer-events: none !important;
+  z-index: 1 !important;
+}
+
+/* Dark Mode Course Card Hover */
+.dark-mode .course-card:hover {
+  box-shadow: var(--shadow-large), 0 10px 30px rgba(51, 144, 236, 0.2) !important;
+  border-color: var(--color-primary) !important;
+}
+
+.dark-mode .course-card:hover .course-card-overlay {
+  background: linear-gradient(135deg, rgba(51, 144, 236, 0.2), rgba(51, 144, 236, 0.1)) !important;
+}
+
+/* Course Card Button Hover Effects */
+.course-card .btn-edit-profile,
+.course-card .btn-secondary-action {
+  transition: all var(--transition-fast) !important;
+  position: relative !important;
+  overflow: hidden !important;
+}
+
+.course-card .btn-edit-profile:hover,
+.course-card .btn-secondary-action:hover {
+  transform: translateY(-2px) !important;
+  box-shadow: var(--shadow-medium) !important;
+}
+
+.course-card .btn-edit-profile::before,
+.course-card .btn-secondary-action::before {
+  content: '' !important;
+  position: absolute !important;
+  top: 0 !important;
+  left: -100% !important;
+  width: 100% !important;
+  height: 100% !important;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent) !important;
+  transition: left var(--transition-fast) !important;
+}
+
+.course-card .btn-edit-profile:hover::before,
+.course-card .btn-secondary-action:hover::before {
+  left: 100% !important;
+}
+
+/* Student Profile Course Cards - Compact Design */
+.student-profile .course-card {
+  transition: all var(--transition-fast) !important;
+  cursor: pointer !important;
+  border: 1px solid transparent !important;
+  overflow: hidden !important;
+  position: relative !important;
+  height: 100% !important;
+}
+
+.student-profile .course-card:hover {
+  transform: translateY(-6px) !important;
+  box-shadow: var(--shadow-large), 0 8px 25px rgba(0, 0, 0, 0.12) !important;
+  border-color: var(--color-primary-light) !important;
+}
+
+.student-profile .course-card:hover .card-img-top {
+  transform: scale(1.03) !important;
+}
+
+.student-profile .course-card .card-img-top {
+  transition: transform var(--transition-fast) !important;
+  height: 120px !important;
+  object-fit: cover !important;
+}
+
+.student-profile .course-card .card-body {
+  padding: var(--spacing-sm) !important;
+}
+
+.student-profile .course-card .section-title {
+  font-size: var(--font-size-base) !important;
+  margin-bottom: var(--spacing-xs) !important;
+  line-height: 1.2 !important;
+  font-weight: 600 !important;
+}
+
+.student-profile .course-card .text-muted {
+  font-size: 0.8rem !important;
+  line-height: 1.3 !important;
+  margin-bottom: var(--spacing-sm) !important;
+  display: -webkit-box !important;
+  -webkit-line-clamp: 2 !important;
+  -webkit-box-orient: vertical !important;
+  overflow: hidden !important;
+  text-overflow: ellipsis !important;
+}
+
+.student-profile .course-card .btn-edit-profile {
+  padding: var(--spacing-xs) var(--spacing-sm) !important;
+  font-size: 0.8rem !important;
+  margin-top: auto !important;
+  height: 32px !important;
+  min-height: 32px !important;
+}
+
+/* Dark Mode for Student Profile Course Cards */
+.dark-mode .student-profile .course-card:hover {
+  box-shadow: var(--shadow-large), 0 8px 25px rgba(51, 144, 236, 0.15) !important;
+  border-color: var(--color-primary) !important;
+}
+
+/* File Input Upload Button Styling */
+input[type="file"] {
+  position: relative !important;
+  cursor: pointer !important;
+  background: transparent !important;
+  border: none !important;
+  padding: 0 !important;
+  margin: 0 !important;
+  font-size: 0 !important;
+  line-height: 0 !important;
+  overflow: hidden !important;
+}
+
+input[type="file"]::-webkit-file-upload-button {
+  background: linear-gradient(135deg, var(--color-primary), var(--color-primary-light)) !important;
+  color: white !important;
+  border: none !important;
+  border-radius: var(--border-radius-sm) !important;
+  padding: var(--spacing-md) var(--spacing-lg) !important;
+  height: 44px !important;
+  min-height: 44px !important;
+  font-size: 0.9rem !important;
+  font-weight: 500 !important;
+  cursor: pointer !important;
+  transition: all var(--transition-fast) !important;
+  box-shadow: var(--shadow-light) !important;
+  margin-right: var(--spacing-sm) !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+}
+
+input[type="file"]::-webkit-file-upload-button:hover {
+  background: linear-gradient(135deg, var(--color-primary-dark), var(--color-primary)) !important;
+  transform: translateY(-1px) !important;
+  box-shadow: var(--shadow-medium) !important;
+}
+
+input[type="file"]::-webkit-file-upload-button:active {
+  transform: translateY(0) !important;
+  box-shadow: var(--shadow-light) !important;
+}
+
+/* Firefox file input styling */
+input[type="file"]::file-selector-button {
+  background: linear-gradient(135deg, var(--color-primary), var(--color-primary-light)) !important;
+  color: white !important;
+  border: none !important;
+  border-radius: var(--border-radius-sm) !important;
+  padding: var(--spacing-md) var(--spacing-lg) !important;
+  height: 44px !important;
+  min-height: 44px !important;
+  font-size: 0.9rem !important;
+  font-weight: 500 !important;
+  cursor: pointer !important;
+  transition: all var(--transition-fast) !important;
+  box-shadow: var(--shadow-light) !important;
+  margin-right: var(--spacing-sm) !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+}
+
+input[type="file"]::file-selector-button:hover {
+  background: linear-gradient(135deg, var(--color-primary-dark), var(--color-primary)) !important;
+  transform: translateY(-1px) !important;
+  box-shadow: var(--shadow-medium) !important;
+}
+
+input[type="file"]::file-selector-button:active {
+  transform: translateY(0) !important;
+  box-shadow: var(--shadow-light) !important;
+}
+
+/* Dark Mode Variant for File Input Upload Button */
+.dark-mode input[type="file"]::-webkit-file-upload-button {
+  background: linear-gradient(135deg, var(--color-primary-dark), var(--color-primary)) !important;
+  color: var(--color-text-light) !important;
+  box-shadow: var(--shadow-medium) !important;
+}
+
+.dark-mode input[type="file"]::-webkit-file-upload-button:hover {
+  background: linear-gradient(135deg, var(--color-primary), var(--color-primary-light)) !important;
+  box-shadow: var(--shadow-large), 0 0 15px rgba(51, 144, 236, 0.3) !important;
+}
+
+.dark-mode input[type="file"]::file-selector-button {
+  background: linear-gradient(135deg, var(--color-primary-dark), var(--color-primary)) !important;
+  color: var(--color-text-light) !important;
+  box-shadow: var(--shadow-medium) !important;
+}
+
+.dark-mode input[type="file"]::file-selector-button:hover {
+  background: linear-gradient(135deg, var(--color-primary), var(--color-primary-light)) !important;
+  box-shadow: var(--shadow-large), 0 0 15px rgba(51, 144, 236, 0.3) !important;
 }
 
 /* Alert components */
@@ -606,6 +933,38 @@ form .form-check-input:checked {
   box-shadow: var(--shadow-medium);
 }
 
+/* Dark Mode Variant for Avatar Circle */
+.dark-mode .avatar-circle {
+  background-color: var(--color-primary-dark) !important;
+  border: 2px solid var(--color-primary-light) !important;
+  box-shadow: var(--shadow-medium), 0 0 15px rgba(51, 144, 236, 0.4) !important;
+  position: relative !important;
+}
+
+.dark-mode .avatar-circle::before {
+  content: '' !important;
+  position: absolute !important;
+  top: -2px !important;
+  left: -2px !important;
+  right: -2px !important;
+  bottom: -2px !important;
+  background: linear-gradient(45deg, var(--color-primary-light), var(--color-primary), var(--color-primary-light)) !important;
+  border-radius: 50% !important;
+  z-index: -1 !important;
+  animation: avatarGlow 2s ease-in-out infinite alternate !important;
+}
+
+.dark-mode .avatar-circle:hover {
+  box-shadow: var(--shadow-large), 0 0 25px rgba(51, 144, 236, 0.6) !important;
+  transform: scale(1.05) !important;
+  transition: all var(--transition-fast) !important;
+}
+
+@keyframes avatarGlow {
+  0% { opacity: 0.6; }
+  100% { opacity: 1; }
+}
+
 .avatar-circle img {
   width: 100%;
   height: 100%;
@@ -675,6 +1034,33 @@ form .form-check-input:checked {
   color: var(--color-border) !important;
   border: var(--color-border) !important;
   border-radius: var(--border-radius-sm);
+}
+
+/* Dark Mode Variant for Illustration Card */
+.dark-mode .illustration-card {
+  background: linear-gradient(135deg, var(--color-primary-dark), var(--color-primary)) !important;
+  box-shadow: var(--shadow-medium), 0 0 20px rgba(51, 144, 236, 0.3) !important;
+  color: var(--color-text-light) !important;
+  border: 1px solid var(--color-primary-light) !important;
+  position: relative !important;
+  overflow: hidden !important;
+}
+
+.dark-mode .illustration-card::before {
+  content: '' !important;
+  position: absolute !important;
+  top: 0 !important;
+  left: 0 !important;
+  right: 0 !important;
+  bottom: 0 !important;
+  background: linear-gradient(45deg, transparent 30%, rgba(51, 144, 236, 0.1) 50%, transparent 70%) !important;
+  animation: shimmer 3s ease-in-out infinite !important;
+  pointer-events: none !important;
+}
+
+@keyframes shimmer {
+  0% { transform: translateX(-100%); }
+  100% { transform: translateX(100%); }
 }
 
 /* Floating Elements */
@@ -804,6 +1190,8 @@ form .form-check-input:checked {
 .illustration-container {
   width: 300px;
   height: 200px;
+  display: block;
+  margin-inline: auto; 
 }
 
 /* Utility Classes */
@@ -922,8 +1310,8 @@ form .form-check-input:checked {
 }
 
 .user-avatar-img {
-  width: 100%;
-  height: 100%;
+  width: 40px;
+  height: 40px;
   border-radius: 50%;
   object-fit: cover;
   border: 2px solid white;
@@ -1204,6 +1592,108 @@ form .form-check-input:checked {
   100% {
     transform: rotate(360deg);
   }
+}
+
+/* Modal Content Styling */
+.modal-content {
+  background: var(--color-background);
+  border: 1px solid var(--color-border);
+  border-radius: var(--border-radius-lg);
+  box-shadow: var(--shadow-large);
+  color: var(--color-text);
+  transition: all var(--transition-fast);
+}
+
+/* Dark Mode Variant for Modal Content */
+.dark-mode .modal-content {
+  background: linear-gradient(135deg, var(--color-bg-dark) 0%, var(--color-bg-darker) 100%);
+  border-color: rgba(51, 144, 236, 0.2);
+  box-shadow: var(--shadow-large), 0 0 20px rgba(51, 144, 236, 0.15);
+  color: var(--color-text-light);
+}
+
+.dark-mode .modal-content::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(135deg, rgba(51, 144, 236, 0.05) 0%, rgba(51, 144, 236, 0.02) 100%);
+  border-radius: var(--border-radius-lg);
+  pointer-events: none;
+  z-index: -1;
+}
+
+/* Dark Mode Variants for Modal Elements */
+.dark-mode .modal-header {
+  background: linear-gradient(135deg, var(--color-bg-darker) 0%, var(--color-bg-dark) 100%);
+  border-bottom-color: rgba(51, 144, 236, 0.2);
+  color: var(--color-text-light);
+}
+
+.dark-mode .modal-backdrop {
+  background: rgba(0, 0, 0, 0.8);
+  backdrop-filter: blur(8px);
+}
+
+.dark-mode .modal-body {
+  background: var(--color-bg-dark);
+  color: var(--color-text-light);
+}
+
+.dark-mode .modal-footer {
+  background: linear-gradient(135deg, var(--color-bg-dark) 0%, var(--color-bg-darker) 100%);
+  border-top-color: rgba(51, 144, 236, 0.2);
+  color: var(--color-text-light);
+}
+
+.dark-mode .modal-title {
+  color: var(--color-text-light);
+}
+
+.dark-mode .modal-close {
+  color: var(--color-text-light);
+  background: rgba(51, 144, 236, 0.1);
+  border: 1px solid rgba(51, 144, 236, 0.2);
+  transition: all var(--transition-fast);
+}
+
+.dark-mode .modal-close:hover {
+  background: rgba(51, 144, 236, 0.2);
+  border-color: rgba(51, 144, 236, 0.4);
+  transform: scale(1.05);
+}
+
+/* Dark Mode Styling for Form Elements in Modals */
+.dark-mode .modal-content .form-control {
+  background: var(--color-bg-darker);
+  border-color: rgba(51, 144, 236, 0.3);
+  color: var(--color-text-light);
+}
+
+.dark-mode .modal-content .form-control:focus {
+  background: var(--color-bg-darker);
+  border-color: var(--color-primary);
+  box-shadow: 0 0 0 0.2rem rgba(51, 144, 236, 0.25);
+  color: var(--color-text-light);
+}
+
+.dark-mode .modal-content .form-label {
+  color: var(--color-text-light);
+}
+
+.dark-mode .modal-content .btn {
+  background: linear-gradient(135deg, var(--color-primary) 0%, var(--color-primary-dark) 100%);
+  border-color: var(--color-primary);
+  color: white;
+  transition: all var(--transition-fast);
+}
+
+.dark-mode .modal-content .btn:hover {
+  background: linear-gradient(135deg, var(--color-primary-dark) 0%, var(--color-primary) 100%);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(51, 144, 236, 0.3);
 }
 
 /* Video Modal Styling */
@@ -1633,21 +2123,9 @@ form .form-check-input:checked {
   }
 }
 
-/* ======================================== */
+/* ================================================ */
 /* DARK MODE SYSTEM - Non-destructive overlay */
-
-/* IMPORTANT COLOR PRESERVATION PRINCIPLE:
- * - If an element has a BRIGHT background, DO NOT change its text/icon color
- * - If an element has a DARK background, we can safely change text/icon color for better contrast
- * - This ensures icons and text remain visible on bright backgrounds
- * - We only modify colors when it improves readability without breaking visibility
- * 
- * NEW APPROACH: Only target elements that actually need dark mode styling
- * - Avoid overriding elements with good existing contrast
- * - Use specific selectors to prevent conflicts
- * - Preserve teacher's custom colors and styling
- */
-/* ======================================== */
+/* ================================================ */
 
 /* Dark mode variables - these work with existing teacher colors */
 .dark-mode {
@@ -1778,7 +2256,7 @@ form .form-check-input:checked {
 
 .dark-mode .btn-secondary-action {
   background-color: var(--color-primary-light) !important;
-  color: #ffffff !important;
+  color: var(--color-primary-dark) !important;
   border-color: var(--color-primary-light) !important;
 }
 
@@ -2922,4 +3400,252 @@ form .form-check-input:checked {
 [dir="rtl"] .dropdown-item i {
   margin-left: 0.5rem;
   margin-right: 0;
+}
+
+/* ======================================== */
+/* SIDEBAR STYLING */
+/* ======================================== */
+
+/* General Sidebar */
+.sidebar {
+  position: sticky;
+  top: 80px;
+  overflow-y: auto;
+  border-radius: 1.5rem 0 0 1.5rem;
+  box-shadow: -2px 0 12px rgba(50, 143, 236, 0.03);
+  padding-top: 2rem;
+}
+
+/* Sidebar Links */
+.sidebar-link {
+  color: var(--color-primary-dark) !important;
+  font-weight: 500;
+  border-radius: 0.8rem;
+  padding: 0.7rem 1rem;
+  transition: background 0.15s, color 0.15s;
+  text-decoration: none !important;
+  display: flex;
+  align-items: center;
+}
+
+.sidebar-link:hover,
+.sidebar-link.active {
+  background: #e3f0fd;
+  color: var(--color-primary-light) !important;
+  font-weight: 600;
+  text-decoration: none !important;
+  box-shadow: 0 2px 8px var(--transparent-color);
+}
+
+.sidebar-link * {
+  font-size: 1.3rem;
+  color: var(--color-primary-light);
+}
+
+/* Responsive Adjustments for Sidebar */
+@media (max-width: 767.98px) {
+  .sidebar {
+    position: static;
+    border-radius: 1.5rem;
+    box-shadow: none;
+    padding-top: 1rem;
+    margin-bottom: 1.5rem;
+  }
+}
+
+/* Lesson Details Sidebar - Original Structure with Enhanced Styling */
+.floating-sidebar {
+  /* Position is handled by inline styles */
+}
+
+.sidebar-expanded {
+  /* Card styling is handled by Bootstrap classes */
+}
+
+.sidebar-content {
+  /* Content container */
+}
+
+.course-navigation {
+  /* Navigation area with scrolling */
+  scrollbar-width: thin !important;
+  scrollbar-color: rgba(50, 143, 236, 0.3) transparent !important;
+}
+
+.dark-mode .course-navigation {
+  scrollbar-color: rgba(51, 144, 236, 0.5) transparent !important;
+}
+
+/* Module Sections */
+.module-section {
+  margin-bottom: var(--spacing-md) !important;
+}
+
+/* Module Headers */
+.module-header {
+  background-color: var(--color-secondary) !important;
+  border: 1px solid var(--color-border) !important;
+  border-radius: var(--border-radius-sm) !important;
+  transition: all var(--transition-fast) !important;
+  cursor: pointer !important;
+  position: relative !important;
+  overflow: hidden !important;
+}
+
+.module-header:hover {
+  transform: translateX(4px) !important;
+  box-shadow: var(--shadow-light) !important;
+  background-color: var(--color-primary-light) !important;
+  border-color: var(--color-primary-light) !important;
+}
+
+.module-active {
+  background-color: var(--color-primary-light) !important;
+  border: 2px solid var(--color-primary-light) !important;
+  box-shadow: var(--shadow-medium) !important;
+}
+
+/* Dark Mode for Module Headers */
+.dark-mode .module-header {
+  background-color: rgba(51, 144, 236, 0.1) !important;
+  border-color: rgba(51, 144, 236, 0.2) !important;
+}
+
+.dark-mode .module-header:hover {
+  background-color: rgba(51, 144, 236, 0.2) !important;
+  border-color: var(--color-primary-light) !important;
+  box-shadow: var(--shadow-medium), 0 0 10px rgba(51, 144, 236, 0.2) !important;
+}
+
+.dark-mode .module-active {
+  background-color: rgba(51, 144, 236, 0.25) !important;
+  border-color: var(--color-primary-light) !important;
+  box-shadow: var(--shadow-large), 0 0 15px rgba(51, 144, 236, 0.3) !important;
+}
+
+/* Lessons List */
+.lessons-list {
+  margin-left: var(--spacing-sm) !important;
+}
+
+.lesson-item {
+  margin-bottom: var(--spacing-sm) !important;
+}
+
+/* Lesson Navigation Buttons */
+.lesson-nav-btn {
+  background-color: transparent !important;
+  border: 1px solid var(--color-border) !important;
+  color: var(--color-text) !important;
+  transition: all var(--transition-fast) !important;
+  position: relative !important;
+  overflow: hidden !important;
+}
+
+.lesson-nav-btn:hover {
+  transform: translateX(4px) !important;
+  box-shadow: var(--shadow-light) !important;
+  background-color: var(--color-primary-light) !important;
+  border-color: var(--color-primary-light) !important;
+  color: white !important;
+}
+
+.lesson-active {
+  background-color: var(--color-primary-light) !important;
+  color: white !important;
+  border: none !important;
+  box-shadow: var(--shadow-medium) !important;
+}
+
+/* Dark Mode for Lesson Navigation Buttons */
+.dark-mode .lesson-nav-btn {
+  background-color: rgba(51, 144, 236, 0.05) !important;
+  border-color: rgba(51, 144, 236, 0.1) !important;
+  color: var(--color-text-light) !important;
+}
+
+.dark-mode .lesson-nav-btn:hover {
+  background-color: rgba(51, 144, 236, 0.15) !important;
+  border-color: rgba(51, 144, 236, 0.3) !important;
+  color: var(--color-primary-light) !important;
+  box-shadow: var(--shadow-medium), 0 0 10px rgba(51, 144, 236, 0.2) !important;
+}
+
+.dark-mode .lesson-active {
+  background-color: var(--color-primary-light) !important;
+  color: var(--color-text-light) !important;
+  box-shadow: var(--shadow-large), 0 0 15px rgba(51, 144, 236, 0.3) !important;
+}
+
+/* Hover Effects for Lesson Navigation */
+.lesson-nav-btn::before {
+  content: '' !important;
+  position: absolute !important;
+  top: 0 !important;
+  left: -100% !important;
+  width: 100% !important;
+  height: 100% !important;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent) !important;
+  transition: left var(--transition-fast) !important;
+}
+
+.dark-mode .lesson-nav-btn::before {
+  background: linear-gradient(90deg, transparent, rgba(51, 144, 236, 0.2), transparent) !important;
+}
+
+.lesson-nav-btn:hover::before {
+  left: 100% !important;
+}
+
+/* Dark Mode Card Styling */
+.dark-mode .sidebar-expanded {
+  background: linear-gradient(180deg, var(--color-bg-dark) 0%, var(--color-bg-darker) 100%) !important;
+  border-color: rgba(51, 144, 236, 0.2) !important;
+  box-shadow: var(--shadow-large), 0 0 20px rgba(51, 144, 236, 0.15) !important;
+}
+
+.dark-mode .sidebar-expanded .card-body {
+  background: transparent !important;
+}
+
+.dark-mode .sidebar-expanded .section-title {
+  color: var(--color-primary-light) !important;
+  text-shadow: 0 0 10px rgba(51, 144, 236, 0.3) !important;
+}
+
+.dark-mode .sidebar-expanded .text-muted {
+  color: var(--color-text-muted-dark) !important;
+}
+
+.dark-mode .sidebar-expanded .text-main {
+  color: var(--color-primary-light) !important;
+}
+
+/* Responsive Design for Lesson Sidebar */
+@media (max-width: 1200px) {
+  .floating-sidebar {
+    right: 10px !important;
+  }
+  
+  .sidebar-expanded {
+    width: 280px !important;
+  }
+}
+
+@media (max-width: 768px) {
+  .floating-sidebar {
+    position: static !important;
+    width: 100% !important;
+    height: auto !important;
+    margin-bottom: var(--spacing-lg) !important;
+  }
+  
+  .sidebar-expanded {
+    width: 100% !important;
+    border-radius: 8px !important;
+  }
+  
+  .course-navigation {
+    max-height: 400px !important;
+  }
 }

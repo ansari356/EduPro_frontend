@@ -1,5 +1,6 @@
 export const pagePaths = {
   home: "/",
+  forgetPassword: "/forget-password",
   student: {
     home: (educator_username) => `/${educator_username}`,
     about: (educator_username) => `/${educator_username}/student/about`,

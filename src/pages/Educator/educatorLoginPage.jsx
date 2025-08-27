@@ -4,6 +4,7 @@ import { useNavigate } from "react-router-dom";
 import loginEducator from "../../apis/actions/educator/loginEducator";
 import { pagePaths } from "../../pagePaths";
 import useRefreshToken from "../../apis/hooks/useRefreshToken";
+import { useTranslation } from "react-i18next";
 import { useLanguage } from "../../contexts/LanguageContext";
 
 export default function EducatorLoginPage() {
@@ -13,7 +14,8 @@ export default function EducatorLoginPage() {
   const [loading, setLoading] = useState(false);
   const [errors, setErrors] = useState({});
   const navigate = useNavigate();
-  const { t } = useLanguage();
+  const { t } = useTranslation();
+  const { currentLanguage } = useLanguage();
 
   const { mutate } = useRefreshToken();
 
@@ -66,7 +68,7 @@ export default function EducatorLoginPage() {
       {/* Main Content */}
       <div className="container py-5">
         <div className="row align-items-center min-vh-100">
-          <div className="col-lg-6 col-xl-5 mx-auto">
+          <div className={`col-lg-6 col-xl-5 ${currentLanguage === 'ar' ? 'ms-auto' : 'mx-auto'}`}>
             <div className="card">
               <div className="card-body">
                 <div className="text-center mb-5">
@@ -150,25 +152,23 @@ export default function EducatorLoginPage() {
 
                 <div className="text-center">
                   <p className="profile-joined">
-                    Forgot password?
+                    {t('auth.forgotPassword')}
                     <button
                       className="btn-link-custom text-accent ms-1"
-                      onClick={() =>
-                        alert("Password reset feature coming soon!")
-                      }
+                      onClick={() => navigate("/forget-password")}
                       disabled={loading}
                     >
-                      Click here
+                      {t('common.clickHere')}
                     </button>
                   </p>
                   <p className="profile-joined">
-                    Not registered yet?
+                    {t('common.notRegisteredYet')}
                     <button
                       className="btn-link-custom text-accent ms-1"
                       onClick={() => navigate("/signup")}
                       disabled={loading}
                     >
-                      Create an Account
+                      {t('auth.createAnAccount')}
                     </button>
                   </p>
                 </div>
@@ -181,30 +181,32 @@ export default function EducatorLoginPage() {
             <div className="illustration-card">
               <div className="text-center mb-4">
                 <h2 className="section-title text-white mb-2">
-                  Educator Portal
+                  {t('educatorPortal.title')}
                 </h2>
                 <p className="profile-name text-white mb-2">
-                  Manage your classes and students
+                  {t('educatorPortal.subtitle')}
                 </p>
                 <p className="text-white opacity-75">
-                  Access your dashboard, manage students, and more.
+                  {t('educatorPortal.description')}
                 </p>
               </div>
 
-              <div className="position-relative mx-auto mb-4 illustration-container">
-                <div className="card h-100 d-flex align-items-center justify-content-center">
-                  <div className="text-center">
-                    <div className="display-1 mb-3">🎓</div>
-                    <div className="progress-bar-primary"></div>
-                    <div className="progress-bar-light"></div>
-                    <div className="progress-bar-accent"></div>
+              <div className="position-relative mb-4 d-flex justify-content-center">
+                <div className="illustration-container">
+                  <div className="card h-100 d-flex align-items-center justify-content-center">
+                    <div className="text-center">
+                      <div className="display-1 mb-3">🎓</div>
+                      <div className="progress-bar-primary"></div>
+                      <div className="progress-bar-light"></div>
+                      <div className="progress-bar-accent"></div>
+                    </div>
                   </div>
                 </div>
               </div>
 
               <div className="text-center">
                 <p className="profile-role text-white fw-bold">
-                  EduPro Platform - For Educators
+                  {t('educatorPortal.platform')}
                 </p>
               </div>
             </div>

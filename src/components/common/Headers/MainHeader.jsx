@@ -4,10 +4,10 @@ import { Link } from "react-router-dom";
 import "bootstrap-icons/font/bootstrap-icons.css";
 import { pagePaths } from "../../../pagePaths.js";
 import SettingsDropdown from "../SettingsDropdown";
-import { useLanguage } from "../../../contexts/LanguageContext";
+import { useTranslation } from "react-i18next";
 
 export default function HomeHeader() {
-  const { currentLanguage } = useLanguage();
+  const { t } = useTranslation();
   
   return (
     <Navbar
@@ -41,7 +41,7 @@ export default function HomeHeader() {
               style={{ textDecoration: "none" }}
             >
               <i className="bi bi-person me-2"></i>
-                              Login as Educator
+              {t('mainHeader.loginAsEducator')}
             </Link>
             <Link
               to={pagePaths.educator.signup}
@@ -49,7 +49,7 @@ export default function HomeHeader() {
               style={{ textDecoration: "none" }}
             >
               <i className="bi bi-person-plus me-2"></i>
-                              Register as Educator
+              {t('mainHeader.registerAsEducator')}
             </Link>
             <SettingsDropdown />
           </Nav>

@@ -7,17 +7,19 @@ import useEducatorProfileData from "../../../apis/hooks/educator/useEducatorProf
 import { useLanguage } from "../../../contexts/LanguageContext";
 import { useDarkMode } from "../../../contexts/DarkModeContext";
 import { Moon, Sun, Globe } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 
 export default function EducatorHeader() {
   const { mutate } = useRefreshToken();
   const { currentLanguage, changeLanguage } = useLanguage();
   const { isDarkMode, toggleDarkMode } = useDarkMode();
   const { data: educatorData, isLoading, error } = useEducatorProfileData();
+  const { t } = useTranslation();
   
   // Get educator name from data or show loading/fallback
   const getEducatorName = () => {
-    if (isLoading) return "Loading...";
-    if (error || !educatorData?.full_name) return "Educator";
+    if (isLoading) return t('header.loading');
+    if (error || !educatorData?.full_name) return t('header.educator');
     return educatorData.full_name;
   };
 
@@ -27,7 +29,7 @@ export default function EducatorHeader() {
       return (
         <img 
           src={educatorData.profile_picture} 
-          alt="Educator Avatar" 
+          alt={`${t('header.educator')} Avatar`}
           className="user-avatar-img"
         />
       );
@@ -41,7 +43,7 @@ export default function EducatorHeader() {
         <Navbar.Brand as={Link} to={pagePaths.home} className="brand-logo">
           <div className="logo-container">
             <i className="bi bi-mortarboard-fill logo-icon"></i>
-            <span className="brand-text">EduPlatform</span>
+            <span className="brand-text">{t('header.brandName')}</span>
           </div>
         </Navbar.Brand>
 
@@ -55,7 +57,7 @@ export default function EducatorHeader() {
               className="nav-link-custom"
             >
               <i className="bi bi-person-badge me-2"></i>
-              Profile
+              {t('nav.profile')}
             </Nav.Link>
             <Nav.Link
               as={NavLink}
@@ -63,7 +65,7 @@ export default function EducatorHeader() {
               className="nav-link-custom"
             >
               <i className="bi bi-book me-2"></i>
-              Courses
+              {t('nav.courses')}
             </Nav.Link>
             <Nav.Link
               as={NavLink}
@@ -71,7 +73,7 @@ export default function EducatorHeader() {
               className="nav-link-custom"
             >
               <i className="bi bi-file-text me-2"></i>
-              Assessments
+              {t('nav.assessments')}
             </Nav.Link>
             <Nav.Link
               as={NavLink}
@@ -79,7 +81,7 @@ export default function EducatorHeader() {
               className="nav-link-custom"
             >
               <i className="bi bi-people me-2"></i>
-              Students
+              {t('nav.students')}
             </Nav.Link>
             {/* New Coupons Link Added Below */}
             <Nav.Link
@@ -88,7 +90,7 @@ export default function EducatorHeader() {
               className="nav-link-custom"
             >
               <i className="bi bi-ticket-perforated me-2"></i>
-              Coupons
+              {t('nav.coupons')}
             </Nav.Link>
           </Nav>
 
@@ -98,7 +100,7 @@ export default function EducatorHeader() {
                 variant="outline-primary"
                 id="dropdown-user"
                 className="user-dropdown-toggle"
-                aria-label="User menu"
+                aria-label={t('header.userMenu')}
               >
                 <div className="user-avatar">
                   {getEducatorAvatar()}
@@ -119,7 +121,7 @@ export default function EducatorHeader() {
                   className="dropdown-item-custom"
                 >
                   <i className="bi bi-person me-2"></i>
-                  Profile
+                  {t('nav.profile')}
                 </Dropdown.Item>
                 <Dropdown.Divider />
                 
@@ -131,12 +133,12 @@ export default function EducatorHeader() {
                   {isDarkMode ? (
                     <>
                       <Sun size={16} className="me-2" />
-                      Light Mode
+                      {t('settings.lightMode')}
                     </>
                   ) : (
                     <>
                       <Moon size={16} className="me-2" />
-                      Dark Mode
+                      {t('settings.darkMode')}
                     </>
                   )}
                 </Dropdown.Item>
@@ -144,7 +146,7 @@ export default function EducatorHeader() {
                 {/* Language Selection */}
                 <Dropdown.Header className="dropdown-header">
                   <Globe size={16} className="me-2" />
-                  Language
+                  {t('settings.language')}
                 </Dropdown.Header>
                 
                 <Dropdown.Item
@@ -183,7 +185,7 @@ export default function EducatorHeader() {
                   className="dropdown-item-custom text-danger"
                 >
                   <i className="bi bi-box-arrow-right me-2"></i>
-                  Logout
+                  {t('action.logout')}
                 </Dropdown.Item>
               </Dropdown.Menu>
             </Dropdown>

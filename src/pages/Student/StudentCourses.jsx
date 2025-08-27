@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { useParams, useNavigate, NavLink } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 import { Search, Filter, BookOpen, Play, Lock, Star, Clock, Users, ArrowRight, User, BarChart3, CheckCircle, Plus } from "lucide-react";
 
 import { pagePaths } from "../../pagePaths";
@@ -16,6 +17,7 @@ import enrollStudentInCourse from "../../apis/actions/student/enrollStudentInCou
  * Courses Component - Shows all courses created by the educator
  */
 function Courses() {
+  const { t } = useTranslation();
   const { educatorUsername } = useParams();
   const navigate = useNavigate();
   const [searchTerm, setSearchTerm] = useState("");
@@ -31,9 +33,9 @@ function Courses() {
   const [isCouponValid, setIsCouponValid] = useState(false);
   const [isEnrolling, setIsEnrolling] = useState(false);
 
-  const { data: allCourses, isLoading: allCoursesLoading } = useListAllEducatorCourses();
+  const { data: allCourses, isLoading: allCoursesLoading, error: allCoursesError } = useListAllEducatorCourses();
   const { enrolledInCourses, isLoading: enrolledLoading } = useListEnrolledCourses();
-  const { data: educatorData } = useEducatorPublicData();
+  const { data: educatorData, error: educatorDataError } = useEducatorPublicData(educatorUsername);
   const { data: detailedCourseData, isLoading: detailedCourseLoading, error: detailedCourseError } = useGetCourseDetails(selectedCourseId);
   const { data: courseModules, isLoading: modulesLoading, error: modulesError } = useGetCourseModules(selectedCourseId);
 
@@ -42,13 +44,13 @@ function Courses() {
       .map(course => ({
         ...course,
         id: course.id,
-        title: course.title || course.name || "Untitled Course",
-        description: course.description || "No description available",
+        title: course.title || course.name || t('student.untitledCourse'),
+        description: course.description || t('student.noDescriptionAvailable'),
         instructor: educatorData?.full_name || educatorUsername,
         image: course.thumbnail || course.image_url || course.image || "",
-        category: course.category?.name || course.category || "General",
+        category: course.category?.name || course.category || t('student.general'),
         totalLessons: course.total_lessons || course.lessons_count || 0,
-        duration: course.total_durations ? `${course.total_durations} weeks` : "N/A",
+        duration: course.total_durations ? `${course.total_durations} ${t('student.weeks')}` : "N/A",
         price: course.price || "0.00",
         isFree: course.is_free || course.price === "0.00" || course.price === 0,
         rating: course.average_rating || course.rating || "0.00",
@@ -71,6 +73,31 @@ function Courses() {
                          (filterType === "enrolled" && isCourseEnrolled(course.id));
     
     return matchesSearch && matchesFilter;
+  });
+  
+  // Debug logging - after filteredCourses is defined
+  console.log('🔍 StudentCourses Debug:', {
+    educatorUsername,
+    educatorData,
+    allCourses,
+    processedAllCourses: processedAllCourses.length,
+    filteredCoursesLength: filteredCourses.length
+  });
+  
+  // API Response Debugging
+  console.log('📡 API Responses:', {
+    'useListAllEducatorCourses': {
+      endpoint: `course/teacher-list/${educatorUsername}`,
+      data: allCourses,
+      isLoading: allCoursesLoading,
+      error: allCoursesError
+    },
+    'useEducatorPublicData': {
+      endpoint: `/teacher/teacher-profile/${educatorUsername}`,
+      data: educatorData,
+      isLoading: false, // Add isLoading if available
+      error: educatorDataError
+    }
   });
 
   // ===== ENROLLMENT FUNCTIONS =====
@@ -152,8 +179,19 @@ function Courses() {
     
     try {
       // Call the real enrollment API
-      // For free courses, pass empty string for coupon; for paid courses, pass the validated coupon
-      const couponToSend = selectedCourse.isFree ? "" : couponCode.trim();
+      // For free courses, pass "FREE" as coupon code; for paid courses, pass the validated coupon
+      const couponToSend = selectedCourse.isFree ? "FREE" : couponCode.trim();
+      
+      // Debug logging
+      console.log('🔍 Enrollment Debug:', {
+        courseId: selectedCourse.id,
+        courseTitle: selectedCourse.title,
+        isFree: selectedCourse.isFree,
+        couponToSend,
+        enrollmentType,
+        selectedChapter: selectedChapter?.id
+      });
+      
       const response = await enrollStudentInCourse(selectedCourse.id, couponToSend);
       
       if (response.status === 201 || response.data) {
@@ -197,7 +235,7 @@ function Courses() {
     return "text-danger";
   };
 
-  const getStatusBadge = (status) => {
+  const getStatust = (status) => {
     switch (status) {
       case "Active":
         return "badge bg-success";
@@ -230,9 +268,12 @@ function Courses() {
         {/* Header */}
         <div className="d-flex justify-content-between align-items-center mb-4">
           <div>
-            <h1 className="main-title mb-2">Courses</h1>
+                          <h1 className="main-title mb-2">{t('student.courses')}</h1>
             <p className="section-title">
-              Explore courses by {educatorData?.full_name || educatorUsername} • {filteredCourses.length} courses available
+              {t('student.exploreCoursesBy', { 
+                educator: educatorData?.full_name || educatorUsername || 'Unknown Educator', 
+                count: filteredCourses.length || 0 
+              })}
             </p>
           </div>
         </div>
@@ -245,7 +286,7 @@ function Courses() {
               <input
                 type="text"
                 className="form-control ps-5"
-                placeholder="Search courses by title, instructor, or category..."
+                placeholder={t('student.searchPlaceholder')}
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
               />
@@ -259,8 +300,8 @@ function Courses() {
                 value={filterType}
                 onChange={(e) => setFilterType(e.target.value)}
               >
-                <option value="all">All Courses</option>
-                <option value="enrolled">Enrolled Courses</option>
+                              <option value="all">{t('student.allCourses')}</option>
+              <option value="enrolled">{t('student.enrolledCourses')}</option>
               </select>
             </div>
           </div>
@@ -270,13 +311,13 @@ function Courses() {
         {filteredCourses.length === 0 ? (
           <div className="text-center py-5">
             <BookOpen size={64} className="text-muted mb-3" />
-            <h3 className="section-title mb-2">No courses found</h3>
+            <h3 className="section-title mb-2">{t('student.noCoursesAvailable')}</h3>
             <p className="profile-joined">
               {searchTerm || filterType !== "all" 
-                ? "Try adjusting your search or filter criteria."
+                ? t('student.searchPlaceholder')
                 : filterType === "enrolled" 
-                  ? "You haven't enrolled in any courses yet."
-                  : "No courses available at the moment."
+                  ? t('student.noEnrolledCourses')
+                  : t('student.noCoursesAvailable')
               }
             </p>
           </div>
@@ -297,12 +338,12 @@ function Courses() {
                       {isCourseEnrolled(course.id) ? (
                         <span className="badge bg-success px-2 py-1">
                           <CheckCircle size={14} className="me-1" />
-                          Enrolled
+                          {t('student.alreadyEnrolled')}
                         </span>
                       ) : (
                         <span className="badge bg-warning px-2 py-1">
                           <Lock size={14} className="me-1" />
-                          Locked
+                          {t('common.locked')}
                         </span>
                       )}
                     </div>
@@ -351,7 +392,7 @@ function Courses() {
                       <div className="d-flex justify-content-between align-items-center">
                         <div>
                           {course.isFree ? (
-                            <span className="badge bg-success px-3 py-2">Free</span>
+                            <span className="badge bg-success px-3 py-2">{t('student.free')}</span>
                           ) : (
                             <span className="badge bg-warning px-3 py-2">${course.price}</span>
                           )}
@@ -368,7 +409,7 @@ function Courses() {
                           className="btn-edit-profile w-100 text-center text-decoration-none"
                         >
                           <Play size={16} className="me-2" />
-                          Continue Learning
+                          {t('student.continueLearning')}
                         </NavLink>
                       ) : (
                         <button
@@ -376,7 +417,7 @@ function Courses() {
                           onClick={() => openEnrollmentModal(course)}
                         >
                           <Plus size={16} className="me-2" />
-                          Enroll Now
+                          {t('student.enrollInCourse')}
                         </button>
                       )}
                     </div>
@@ -402,7 +443,7 @@ function Courses() {
             <div className="card-header" style={{ backgroundColor: 'var(--color-primary)', color: 'white' }}>
               <h5 className="mb-0 d-flex align-items-center">
                 <BookOpen size={20} className="me-2" />
-                Enroll in Course
+                {t('student.enrollInCourse')}
               </h5>
             </div>
             <div className="card-body p-4">
@@ -410,7 +451,7 @@ function Courses() {
               
               {/* Enrollment Type Selection */}
               <div className="mb-4">
-                <label className="form-label about-subtitle fw-medium">Enrollment Type</label>
+                <label className="form-label about-subtitle fw-medium">{t('student.selectEnrollmentType')}</label>
                 <div className="d-flex gap-2">
                   <button
                     type="button"
@@ -418,7 +459,7 @@ function Courses() {
                     onClick={() => handleEnrollmentTypeChange('full')}
                   >
                     <BookOpen size={16} className="me-2" />
-                    Full Course
+                    {t('student.fullCourse')}
                   </button>
                   <button
                     type="button"
@@ -426,7 +467,7 @@ function Courses() {
                     onClick={() => handleEnrollmentTypeChange('chapter')}
                   >
                     <Play size={16} className="me-2" />
-                    Single Chapter
+                    {t('student.singleChapter')}
                   </button>
                 </div>
               </div>
@@ -434,7 +475,7 @@ function Courses() {
               {/* Chapter Selection (if single chapter) */}
               {enrollmentType === 'chapter' && (
                 <div className="mb-4">
-                  <label className="form-label about-subtitle fw-medium">Select Chapter</label>
+                  <label className="form-label about-subtitle fw-medium">{t('student.selectChapter')}</label>
                   {courseModules && courseModules.length > 0 ? (
                     <div className="row g-2">
                       {courseModules.map((module) => (
@@ -455,10 +496,10 @@ function Courses() {
                   ) : (
                     <div className="text-center py-3">
                       <p className="text-muted mb-2">
-                        {modulesLoading ? 'Loading chapters...' : 'No chapters available for this course.'}
+                        {modulesLoading ? t('student.loading') : t('student.noChaptersAvailable')}
                       </p>
                       <small className="text-muted">
-                        {modulesLoading ? 'Please wait while we load the course details.' : 'Please select "Full Course" enrollment instead.'}
+                        {modulesLoading ? t('student.loadingCourseData') : t('student.selectChapterToEnroll')}
                       </small>
                     </div>
                   )}
@@ -469,13 +510,13 @@ function Courses() {
               {!selectedCourse.isFree && (
                 <div className="mb-4">
                   <label className="form-label about-subtitle fw-medium">
-                    Coupon Code
+                    {t('student.enterCouponCode')}
                   </label>
                   <div className="input-group coupon-input-group">
                     <input
                       type="text"
                       className="form-control"
-                      placeholder="Enter your coupon code (e.g., WELCOME2024)"
+                      placeholder={t('student.enterCouponCode')}
                       value={couponCode}
                       onChange={(e) => setCouponCode(e.target.value)}
                       disabled={isValidatingCoupon || isEnrolling}
@@ -488,10 +529,10 @@ function Courses() {
                       {isValidatingCoupon ? (
                         <>
                           <div className="loading-spinner me-2" style={{ width: '1rem', height: '1rem' }}></div>
-                          Validating...
+                          {t('student.validating')}
                         </>
                       ) : (
-                        'Apply Coupon'
+                        t('student.validateCoupon')
                       )}
                     </button>
                   </div>
@@ -505,7 +546,7 @@ function Courses() {
                     </div>
                   )}
                   <small className="text-muted">
-                    Enter a valid coupon code to unlock this {enrollmentType === 'full' ? 'course' : 'chapter'}.
+                    {t('student.enterValidCouponCode', { type: enrollmentType === 'full' ? t('student.course') : t('student.chapter') })}
                   </small>
                 </div>
               )}
@@ -517,9 +558,9 @@ function Courses() {
                     <div className="d-flex align-items-center">
                       <CheckCircle size={20} className="me-2" />
                       <div>
-                        <strong>Free Course!</strong> No payment or coupon required.
+                        <strong>{t('student.freeCourse')}!</strong> {t('student.noPaymentRequired')}
                         <br />
-                        <small className="text-muted">You can enroll directly without any additional steps.</small>
+                        <small className="text-muted">{t('student.automaticEnrollmentSystem')}</small>
                       </div>
                     </div>
                   </div>
@@ -572,10 +613,10 @@ function Courses() {
                   {isEnrolling ? (
                     <>
                       <div className="loading-spinner me-2" style={{ width: '1rem', height: '1rem' }}></div>
-                      Enrolling...
+                                              {t('student.enrolling')}
                     </>
                   ) : (
-                    selectedCourse.isFree ? 'Enroll for Free' : 'Enroll Now'
+                                          selectedCourse.isFree ? t('student.enrollInCourse') : t('student.enrollInCourse')
                   )}
                 </button>
               </div>

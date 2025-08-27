@@ -30,6 +30,7 @@ import EducatorAssessmentsPage from "./pages/Educator/EducatorAssessmentsPage";
 import EducatorAssessmentDetailPage from "./pages/Educator/EducatorAssessmentDetailPage";
 import StudentHome from "./pages/Student/StudentHome";
 import StudentMainNavbarLayout from "./components/layout/StudentMainNavbarLayout";
+import ForgetPassword from "./pages/ForgetPassword";
 
 function App() {
   return (
@@ -43,6 +44,9 @@ function App() {
           <Route path="login" element={<EducatorLoginPage />} />
         </Route>
       </Route>
+
+      {/* Forget Password Route */}
+      <Route path="/forget-password" element={<ForgetPassword />} />
 
       {/* Educator Protected Routes */}
       <Route element={<EducatorProtectedRoutes />}>

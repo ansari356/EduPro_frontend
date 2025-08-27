@@ -5,7 +5,7 @@ import useEducatorPublicData from '../../apis/hooks/student/useEducatorPublicDat
 import loginStudent from '../../apis/actions/student/loginStudent';
 import { pagePaths } from '../../pagePaths';
 import useStudentRefreshToken from '../../apis/hooks/student/useStudentRefreshToken';
-import { useLanguage } from '../../contexts/LanguageContext';
+import { useTranslation } from 'react-i18next';
 
 
 const StudentLoginPage = () => {
@@ -20,24 +20,24 @@ const StudentLoginPage = () => {
   const navigate = useNavigate();
   const { educatorUsername } = useParams();
   const { data: educatorData, error, isLoading } = useEducatorPublicData(educatorUsername);
-  const {mutate}=useStudentRefreshToken()
-  const { t } = useLanguage();
+  const { mutate } = useStudentRefreshToken()
+  const { t } = useTranslation();
 
   const validateForm = () => {
     const newErrors = {};
-    
+
     if (!username.trim()) {
       newErrors.username = t('auth.usernameOrEmailRequired');
     } else if (username.includes('@') && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(username)) {
       newErrors.username = t('profile.invalidEmail');
     }
-    
+
     if (!password) {
       newErrors.password = t('profile.passwordRequired');
     } else if (password.length < 1) {
       newErrors.password = t('profile.passwordRequired');
     }
-    
+
     return newErrors;
   };
 
@@ -47,7 +47,7 @@ const StudentLoginPage = () => {
     } else if (field === 'password') {
       setPassword(value);
     }
-    
+
     // Clear error when user starts typing
     if (errors[field]) {
       setErrors(prev => ({
@@ -55,7 +55,7 @@ const StudentLoginPage = () => {
         [field]: ''
       }));
     }
-    
+
     // Clear general error when user starts typing
     if (generalError) {
       setGeneralError('');
@@ -65,47 +65,47 @@ const StudentLoginPage = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (!educatorData) return;
-    
+
     // Clear previous errors
     setErrors({});
     setGeneralError('');
-    
+
     // Validate form
     const validationErrors = validateForm();
     if (Object.keys(validationErrors).length > 0) {
       setErrors(validationErrors);
       return;
     }
-    
+
     setLoginLoading(true);
     try {
       const response = await loginStudent({ email: username, password }, educatorData?.user.username)
       mutate();
       console.log('Student login successful:', response.data);
-      
+
       // Show success message
       setSuccessMessage(t('auth.loginSuccess') + ` ${educatorData.full_name}'s ${educatorData.specialization} class!`);
       setShowSuccess(true);
-      
+
       // Redirect to student dashboard or appropriate page after 2 seconds
       setTimeout(() => {
         // navigate(pagePaths.student.dashboard(educatorData.username)); // Assuming a student dashboard path
       }, 2000);
-      
+
     } catch (err) {
       console.error('Student login failed:', err);
-      
+
       // Handle different types of errors
       if (err.response?.status === 401) {
         setGeneralError(t('auth.invalidCredentials'));
       } else if (err.response?.status === 400) {
         setGeneralError(t('auth.checkInput'));
       } else if (err.response?.status === 500) {
-        setGeneralError('Server error. Please try again later.');
+        setGeneralError(t('student.serverError'));
       } else if (err.message === 'Network Error') {
-        setGeneralError('Connection error. Please check your internet connection.');
+        setGeneralError(t('student.connectionError'));
       } else {
-        setGeneralError(err.response?.data?.detail || err.message || 'Login failed. Please try again.');
+        setGeneralError(err.response?.data?.detail || err.message || t('student.loginFailed'));
       }
     } finally {
       setLoginLoading(false);
@@ -122,11 +122,11 @@ const StudentLoginPage = () => {
           <div className="d-flex align-items-center justify-content-between">
             <div className="d-flex align-items-center">
               <div className="header-avatar">
-                <img src={educatorData.profile_picture} alt="Educator Profile" className="rounded-circle" style={{ width: '50px', height: '50px', objectFit: 'cover' }} />
+                <img src={educatorData.profile_picture} alt={t('student.educatorProfile')} className="rounded-circle" style={{ width: '50px', height: '50px', objectFit: 'cover' }} />
               </div>
               <div>
                 <span className="section-title mb-0">
-                  {educatorData.full_name}'s Class
+                  {educatorData.full_name}'s {t('student.class')}
                 </span>
                 <p className="profile-role mb-0">
                   {educatorData.specialization}
@@ -140,23 +140,23 @@ const StudentLoginPage = () => {
       {/* Main Content */}
       <div className="container py-5">
         <div className="row align-items-center min-vh-100">
-          
+
           {/* Login Form */}
           <div className="col-lg-6 col-xl-5 mx-auto">
             <div className="card">
               <div className="card-body">
                 <div className="text-center mb-5">
                   <div className="avatar-rectangle">
-                    <img src={educatorData.profile_picture} alt="Educator Profile" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                    <img src={educatorData.profile_picture} alt={t('student.educatorProfile')} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
                   </div>
                   <h1 className="section-title mb-2">
-                    Welcome to
+                    {t('student.welcomeTo')}
                   </h1>
                   <h2 className="profile-name text-accent mb-2">
-                    {educatorData.full_name}'s Class
+                    {educatorData.full_name}'s {t('student.class')}
                   </h2>
                   <p className="profile-joined">
-                    {educatorData.experiance} years experience • {educatorData.number_of_students} registered students
+                    {educatorData.experiance} {t('student.yearsExperience')} • {educatorData.number_of_students} {t('student.registeredStudents')}
                   </p>
                 </div>
 
@@ -166,9 +166,9 @@ const StudentLoginPage = () => {
                     <div className="alert alert-success alert-dismissible fade show mb-4" role="alert">
                       <i className="fas fa-check-circle me-2"></i>
                       {successMessage}
-                      <button 
-                        type="button" 
-                        className="btn-close" 
+                      <button
+                        type="button"
+                        className="btn-close"
                         onClick={() => setShowSuccess(false)}
                       ></button>
                     </div>
@@ -179,11 +179,11 @@ const StudentLoginPage = () => {
                     <div className="alert alert-danger alert-dismissible fade show mb-4" role="alert">
                       <i className="fas fa-exclamation-triangle me-2"></i>
                       {generalError}
-                                              <button 
-                          type="button" 
-                          className="btn-close" 
-                          onClick={() => setGeneralError('')}
-                        ></button>
+                      <button
+                        type="button"
+                        className="btn-close"
+                        onClick={() => setGeneralError('')}
+                      ></button>
                     </div>
                   )}
 
@@ -236,28 +236,28 @@ const StudentLoginPage = () => {
                     {loginLoading ? (
                       <span className="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
                     ) : (
-                      <span>{t('auth.login')} {t('common.to')} {educatorData.specialization} {t('common.class')}</span>
+                      <span>{t('auth.loginToClass', { specialization: educatorData.specialization }) || `تسجيل الدخول إلى ${educatorData.specialization} فصل`}</span>
                     )}
                   </button>
                 </form>
 
                 <div className="text-center">
                   <p className="profile-joined">
-                    {t('auth.forgotPassword')}? 
-                    <button 
+                    {t('auth.forgotPassword') || 'نسيت كلمة المرور؟'}?
+                    <button
                       className="btn-link-custom text-accent ms-1"
-                      onClick={() => alert(t('auth.passwordReset'))}
+                      onClick={() => navigate("/forget-password")}
                     >
-                      {t('common.clickHere')}
+                      {t('common.clickHere') || 'انقر هنا'}
                     </button>
                   </p>
                   <p className="profile-joined">
-                    {t('auth.notRegisteredYet')}?
-                    <button 
+                    {t('auth.notRegisteredYet') || 'غير مسجل بعد'}?
+                    <button
                       className="btn-link-custom text-accent ms-1"
                       onClick={() => navigate(pagePaths.student.signup(educatorUsername))}
                     >
-                      {t('auth.createAccount')}
+                      {t('auth.createAccount') || 'إنشاء حساب'}
                     </button>
                   </p>
                 </div>
@@ -270,7 +270,7 @@ const StudentLoginPage = () => {
             <div className="illustration-card">
               <div className="text-center mb-4">
                 <h2 className="section-title text-white mb-2">
-                  {educatorData.specialization} {t('common.class')}
+                  {educatorData.specialization} {t('student.class')}
                 </h2>
                 <p className="profile-name text-white mb-2">
                   {t('common.with')} {educatorData.full_name}
@@ -279,40 +279,47 @@ const StudentLoginPage = () => {
                   {educatorData.bio}
                 </p>
               </div>
-              
-              <div className="position-relative mx-auto mb-4 illustration-container">
+
+              <div className="position-relative mb-4 illustration-container">
                 <div className="card h-100 d-flex align-items-center justify-content-center">
                   <div className="text-center">
-                    <img src={educatorData.logo} alt="Educator Logo" className="img-fluid" style={{ maxHeight: '150px' }} />
+                    <img
+                      src={educatorData.logo}
+                      alt={t('student.educatorLogo')}
+                      className="img-fluid"
+                      style={{ maxHeight: '150px' }}
+                    />
                     <div className="progress-bar-primary"></div>
                     <div className="progress-bar-light"></div>
                     <div className="progress-bar-accent"></div>
                   </div>
                 </div>
-                
+
+                {/* Floating Elements */}
                 <div className="floating-element">
                   {educatorData.number_of_students}
                 </div>
                 <div className="floating-pulse"></div>
               </div>
-              
+
+
               <div className="card p-4 mb-4">
                 <div className="row text-center">
                   <div className="col-6">
                     <div className="section-title text-accent">
                       {educatorData.number_of_students}
                     </div>
-                    <div className="profile-joined">{t('common.registeredStudents')}</div>
+                    <div className="profile-joined">{t('student.registeredStudents')}</div>
                   </div>
                   <div className="col-6">
                     <div className="section-title text-accent">
                       {educatorData.experiance}
                     </div>
-                    <div className="profile-joined">{t('common.yearsExperience')}</div>
+                    <div className="profile-joined">{t('student.yearsExperience')}</div>
                   </div>
                 </div>
               </div>
-              
+
               <div className="text-center">
                 <p className="profile-role text-white fw-bold">
                   {educatorData.full_name} - {educatorData.specialization}

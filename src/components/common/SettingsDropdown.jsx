@@ -3,10 +3,14 @@ import { Dropdown, Button } from 'react-bootstrap';
 import { useDarkMode } from '../../contexts/DarkModeContext';
 import { useLanguage } from '../../contexts/LanguageContext';
 import { Moon, Sun, Globe, Settings } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 
 export default function SettingsDropdown() {
   const { isDarkMode, toggleDarkMode } = useDarkMode();
   const { currentLanguage, changeLanguage, t } = useLanguage();
+  
+  // Determine dropdown alignment based on language direction
+  const dropdownAlign = currentLanguage === 'ar' ? 'start' : 'end';
 
   const languages = [
     { code: 'en', name: 'English', flag: '🇺🇸' },
@@ -16,7 +20,7 @@ export default function SettingsDropdown() {
   const currentLang = languages.find(lang => lang.code === currentLanguage);
 
   return (
-    <Dropdown align="end">
+    <Dropdown align={dropdownAlign}>
       <Dropdown.Toggle
         variant="outline-secondary"
         id="settings-dropdown"

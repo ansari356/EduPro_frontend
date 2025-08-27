@@ -13,6 +13,7 @@ import {
 } from "lucide-react";
 import { useNavigate, useParams } from "react-router-dom";
 import { useState, useEffect } from "react";
+import { useTranslation } from "react-i18next";
 import AddModulePopup from "../../components/common/ModulePopup/AddModulePopup";
 import getCoursesDetails from "../../apis/hooks/educator/getCoursesDetails";
 import getModules from "../../apis/hooks/educator/getModules";
@@ -21,6 +22,7 @@ import updateCourseDetailsRequest from "../../apis/actions/educator/updateCourse
 import ModuleItem from "../../components/common/ModuleItem";
 
 export default function EditCourse() {
+	const { t } = useTranslation();
 	const { courseId } = useParams();
 	const navigate = useNavigate();
 	const [errors, setErrors] = useState({});
@@ -115,11 +117,11 @@ export default function EditCourse() {
 		const newErrors = {};
 
 		if (!formData.title.trim()) {
-			newErrors.title = 'Course title is required';
+			newErrors.title = t('courses.titleRequired');
 		}
 
 		if (!formData.description.trim()) {
-			newErrors.description = 'Description is required';
+			newErrors.description = t('courses.descriptionRequired');
 		}
 
 		return newErrors;
@@ -158,12 +160,12 @@ export default function EditCourse() {
 			// Refresh the data
 			mutate();
 
-			alert('Course updated successfully!');
+			alert(t('courses.courseUpdatedSuccessfully'));
 			navigate(`/courses/${courseId}`);
 
 		} catch (error) {
 			console.error("Error updating course:", error);
-			alert('Failed to update course. Please try again.');
+			alert(t('courses.failedToUpdateCourse'));
 		}
 	};
 
@@ -193,8 +195,8 @@ export default function EditCourse() {
 								<Edit3 size={20} />
 							</div>
 							<div>
-								<span className="section-title mb-0">Edit Course</span>
-								<p className="profile-role mb-0">Loading course data...</p>
+								<span className="section-title mb-0">{t('courses.editCourse')}</span>
+								<p className="profile-role mb-0">{t('courses.loadingCourseData')}</p>
 							</div>
 						</div>
 					</div>
@@ -206,9 +208,9 @@ export default function EditCourse() {
 							<div className="card">
 								<div className="card-body text-center">
 									<div className="loading-spinner mb-3 mx-auto w-fit" role="status">
-										<span className="visually-hidden">Loading...</span>
+										<span className="visually-hidden">{t('common.loading')}</span>
 									</div>
-									<p className="profile-joined">Loading course information...</p>
+									<p className="profile-joined">{t('courses.loadingCourseInformation')}</p>
 								</div>
 							</div>
 						</div>
@@ -229,8 +231,8 @@ export default function EditCourse() {
 								<i className="bi bi-exclamation-triangle"></i>
 							</div>
 							<div>
-								<span className="section-title mb-0">Error</span>
-								<p className="profile-role mb-0">Failed to load course data</p>
+								<span className="section-title mb-0">{t('common.error')}</span>
+								<p className="profile-role mb-0">{t('courses.failedToLoadCourseData')}</p>
 							</div>
 						</div>
 					</div>
@@ -244,15 +246,15 @@ export default function EditCourse() {
 									<div className="avatar-circle mb-4">
 										<i className="bi bi-exclamation-triangle"></i>
 									</div>
-									<h2 className="main-title mb-3">Course Not Found</h2>
+									<h2 className="main-title mb-3">{t('courses.courseNotFound')}</h2>
 									<p className="profile-joined mb-4">
-										Sorry, we couldn't find the course you're trying to edit.
+										{t('courses.courseNotFoundMessage')}
 									</p>
 									<button
 										onClick={() => navigate('/educator')}
 										className="btn-edit-profile"
 									>
-										Back to Profile
+										{t('courses.backToProfile')}
 									</button>
 								</div>
 							</div>

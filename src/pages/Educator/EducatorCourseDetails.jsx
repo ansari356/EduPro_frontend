@@ -1,6 +1,7 @@
 //EducatorCourseDetails.jsx
 import React, { useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
+import { useTranslation } from 'react-i18next';
 import getCoursesDetails from "../../apis/hooks/educator/getCoursesDetails";
 import getModules from "../../apis/hooks/educator/getModules";
 import getLessonList from "../../apis/hooks/educator/getLessonList";
@@ -194,6 +195,7 @@ const fixedcourses = [
 export default function EducatorCourseDetailsPage() {
   const { id } = useParams();
   const navigate = useNavigate();
+  const { t } = useTranslation();
   const [activeTab, setActiveTab] = useState("overview");
   const [selectedModuleId, setSelectedModuleId] = useState(null);
 
@@ -249,7 +251,7 @@ const {
       <div className="profile-root">
         <div className="container py-5 text-center">
           <div className="spinner-border text-main" role="status">
-            <span className="visually-hidden">Loading...</span>
+            <span className="visually-hidden">{t('courses.loading')}</span>
           </div>
         </div>
       </div>
@@ -268,9 +270,9 @@ const {
                 <TriangleAlert size={20} />
               </div>
               <div>
-                <span className="section-title mb-0">Course Not Found</span>
+                <span className="section-title mb-0">{t('courses.courseNotFound')}</span>
                 <p className="profile-role mb-0">
-                  The requested course could not be found
+                  {t('courses.courseNotFoundMessage')}
                 </p>
               </div>
             </div>
@@ -282,19 +284,19 @@ const {
             <div className="col-lg-6">
               <div className="card">
                 <div className="card-body text-center">
-                  <div className="avatar-circle mb-4 mx-auto w-fit">
+                  <div className="avatar-circle mb-4 d-flex justify-content-center w-fit">
                     <TriangleAlert size={40} />
                   </div>
-                  <h2 className="main-title mb-3">Course Not Found</h2>
+                  <h2 className="main-title mb-3">{t('courses.courseNotFound')}</h2>
                   <p className="profile-joined mb-4">
-                    Sorry, we couldn't find the course you're looking for.
+                    {t('courses.courseNotFoundDescription')}
                   </p>
                   <button
                     className="btn-edit-profile"
                     onClick={() => navigate("/educator")}
                   >
                     <i className="bi bi-arrow-left me-2"></i>
-                    Back to Profile
+                    {t('courses.backToProfile')}
                   </button>
                 </div>
               </div>
@@ -320,9 +322,9 @@ const {
                 <TriangleAlert size={20} />
               </div>
               <div>
-                <span className="section-title mb-0">Course Not Found</span>
+                <span className="section-title mb-0">{t('courses.courseNotFound')}</span>
                 <p className="profile-role mb-0">
-                  The requested course could not be found
+                  {t('courses.courseNotFoundMessage')}
                 </p>
               </div>
             </div>
@@ -334,19 +336,19 @@ const {
             <div className="col-lg-6">
               <div className="card">
                 <div className="card-body text-center">
-                  <div className="avatar-circle mb-4 mx-auto w-fit">
+                  <div className="avatar-circle mb-4 d-flex justify-content-center w-fit">
                     <TriangleAlert size={40} />
                   </div>
-                  <h2 className="main-title mb-3">Course Not Found</h2>
+                  <h2 className="main-title mb-3">{t('courses.courseNotFound')}</h2>
                   <p className="profile-joined mb-4">
-                    Sorry, we couldn't find the course you're looking for.
+                    {t('courses.courseNotFoundDescription')}
                   </p>
                   <button
                     className="btn-edit-profile"
                     onClick={() => navigate("/courses")}
                   >
                     <i className="bi bi-arrow-left me-2"></i>
-                    Back to Courses
+                    {t('courses.backToCourses')}
                   </button>
                 </div>
               </div>
@@ -369,7 +371,7 @@ const {
               </div>
               <div>
                 <span className="section-title mb-0">{course.title}</span>
-                <p className="profile-role mb-0">Course Management Dashboard</p>
+                <p className="profile-role mb-0">{t('courses.courseManagementDashboard')}</p>
               </div>
             </div>
 
@@ -379,7 +381,7 @@ const {
                 onClick={() => navigate(`/courses`)}
               >
                 <i className="bi bi-arrow-left me-2"></i>
-                Back to Courses
+                {t('courses.backToCourses')}
               </button>
             </div>
           </div>
@@ -392,70 +394,70 @@ const {
           <div className="col-md-2">
             <div className="card">
               <div className="card-body text-center">
-                <div className="avatar-circle mb-2 mx-auto w-fit">
+                <div className="avatar-circle mb-2 d-flex justify-content-center w-fit">
                   <Users size={20} />
                 </div>
                 <h5 className="section-title mb-1">
                   {course.total_enrollments}
                 </h5>
-                <small className="profile-joined">Enrolled</small>
+                <small className="profile-joined">{t('courses.enrolled')}</small>
               </div>
             </div>
           </div>
           <div className="col-md-2">
             <div className="card">
               <div className="card-body text-center">
-                <div className="avatar-circle mb-2 mx-auto w-fit">
+                <div className="avatar-circle mb-2 d-flex justify-content-center w-fit">
                   <Award size={20} />
                 </div>
                 <h5 className="section-title mb-1">
                   {course.total_lessons}
                 </h5>
-                <small className="profile-joined">Total Lesson</small>
+                <small className="profile-joined">{t('courses.totalLesson')}</small>
               </div>
             </div>
           </div>
           <div className="col-md-2">
             <div className="card">
               <div className="card-body text-center">
-                <div className="avatar-circle mb-2 mx-auto w-fit">
+                <div className="avatar-circle mb-2 d-flex justify-content-center w-fit">
                   <TrendingUp size={20} />
                 </div>
                 <h5 className="section-title mb-1">{course.total_durations}</h5>
-                <small className="profile-joined">Total Duration</small>
+                <small className="profile-joined">{t('courses.totalDuration')}</small>
               </div>
             </div>
           </div>
           <div className="col-md-2">
             <div className="card">
               <div className="card-body text-center">
-                <div className="avatar-circle mb-2 mx-auto w-fit">
+                <div className="avatar-circle mb-2 d-flex justify-content-center w-fit">
                   <Star size={20} />
                 </div>
                 <h5 className="section-title mb-1">{course.average_rating}</h5>
-                <small className="profile-joined">Average Rating</small>
+                <small className="profile-joined">{t('courses.averageRating')}</small>
               </div>
             </div>
           </div>
           <div className="col-md-2">
             <div className="card">
               <div className="card-body text-center">
-                <div className="avatar-circle mb-2 mx-auto w-fit">
+                <div className="avatar-circle mb-2 d-flex justify-content-center w-fit">
                   <MessageCircle size={20} />
                 </div>
                 <h5 className="section-title mb-1">{course.total_reviews}</h5>
-                <small className="profile-joined">Reviews</small>
+                <small className="profile-joined">{t('courses.reviews')}</small>
               </div>
             </div>
           </div>
           <div className="col-md-2">
             <div className="card">
               <div className="card-body text-center">
-                <div className="avatar-circle mb-2 mx-auto w-fit">
+                <div className="avatar-circle mb-2 d-flex justify-content-center w-fit">
                   <DollarSign size={24} />
                 </div>
                 <h5 className="section-title mb-1">{course.total_revenue}</h5>
-                <small className="profile-joined">Revenue</small>
+                <small className="profile-joined">{t('courses.revenue')}</small>
               </div>
             </div>
           </div>
@@ -484,7 +486,7 @@ const {
                     }`}
                     onClick={() => setActiveTab("overview")}
                   >
-                    Overview
+                    {t('courses.overview')}
                   </button>
                   <button
                     className={`btn-link-custom flex-fill text-center py-3 ${
@@ -494,7 +496,7 @@ const {
                     }`}
                     onClick={() => setActiveTab("curriculum")}
                   >
-                    Curriculum
+                    {t('courses.curriculum')}
                   </button>
                   <button
                     className={`btn-link-custom flex-fill text-center py-3 ${
@@ -504,7 +506,7 @@ const {
                     }`}
                     onClick={() => setActiveTab("students")}
                   >
-                    Students
+                    {t('courses.students')}
                   </button>
                   <button
                     className={`btn-link-custom flex-fill text-center py-3 ${
@@ -514,7 +516,7 @@ const {
                     }`}
                     onClick={() => setActiveTab("reviews")}
                   >
-                    Reviews
+                    {t('courses.reviews')}
                   </button>
                   <button
                     className={`btn-link-custom flex-fill text-center py-3 ${
@@ -524,7 +526,7 @@ const {
                     }`}
                     onClick={() => setActiveTab("assessments")}
                   >
-                    Assessments
+                    {t('courses.assessments')}
                   </button>
 
                 </div>
@@ -535,10 +537,10 @@ const {
             {activeTab === "overview" && (
               <div className="card">
                 <div className="card-body">
-                  <h3 className="section-title mb-4">Course Information</h3>
+                  <h3 className="section-title mb-4">{t('courses.courseInformation')}</h3>
 
                   <div className="mb-4">
-                    <h4 className="about-subtitle mb-2">Description</h4>
+                    <h4 className="about-subtitle mb-2">{t('courses.description')}</h4>
                     <p className="profile-joined">{course.description}</p>
                   </div>
 
@@ -546,25 +548,25 @@ const {
                     <div className="col-md-6 mb-3">
                       <div className="about-bubble">
                         <Clock size={16} className="me-2" />
-                        <strong>Duration:</strong> {course.total_durations}
+                        <strong>{t('courses.duration')}:</strong> {course.total_durations}
                       </div>
                     </div>
                     <div className="col-md-6 mb-3">
                       <div className="about-bubble">
                         <i className="bi bi-bookmark me-2"></i>
-                        <strong>Category:</strong> {course.category.name}
+                        <strong>{t('courses.category')}:</strong> {course.category.name}
                       </div>
                     </div>
                     <div className="col-md-6 mb-3">
                       <div className="about-bubble">
                         <i className="bi bi-currency-dollar me-2"></i>
-                        <strong>Price:</strong> {course.price}
+                        <strong>{t('courses.price')}:</strong> {course.price}
                       </div>
                     </div>
                     <div className="col-md-6 mb-3">
                       <div className="about-bubble">
                         <i className="bi bi-globe me-2"></i>
-                        <strong>Total Enrollments:</strong> {course.total_enrollments}
+                        <strong>{t('courses.totalEnrollments')}:</strong> {course.total_enrollments}
                       </div>
                     </div>
                   </div>
@@ -578,28 +580,28 @@ const {
               <div className="card">
                 <div className="card-body">
                   <div className="d-flex justify-content-between align-items-center mb-4">
-                    <h3 className="section-title mb-0">Course Curriculum</h3>
+                    <h3 className="section-title mb-0">{t('courses.courseCurriculum')}</h3>
                     {/* <button className="btn-edit-profile d-flex align-items-center">
                       <i className="bi bi-plus me-2"></i>
-                      Add Module
+                      {t('courses.addModule')}
                     </button> */}
                   </div>
 
                   {moduleLoading ? (
                     <div className="text-center py-4">
                       <div className="spinner-border text-main" role="status">
-                        <span className="visually-hidden">Loading modules...</span>
+                        <span className="visually-hidden">{t('courses.loadingModules')}</span>
                       </div>
                     </div>
                   ) : moduleError || !moduleData ? (
                     <div className="card mb-3">
                       <div className="card-body text-center">
                         <TriangleAlert size={40} className="text-muted mb-3" />
-                        <h5 className="section-title">No Modules Found</h5>
-                        <p className="profile-joined">This course doesn't have any modules yet.</p>
+                        <h5 className="section-title">{t('courses.noModulesFound')}</h5>
+                        <p className="profile-joined">{t('courses.noModulesYet')}</p>
                         <button className="btn-edit-profile">
                           <i className="bi bi-plus me-2"></i>
-                          Create First Module
+                          {t('courses.createFirstModule')}
                         </button>
                       </div>
                     </div>
@@ -619,21 +621,21 @@ const {
                               <div className="d-flex gap-3 mb-2">
                                 <small className="profile-joined">
                                   <i className="bi bi-list-ol me-1"></i>
-                                  Order: {module.order}
+                                  {t('courses.order')}: {module.order}
                                 </small>
                                 <small className="profile-joined">
                                   <i className="bi bi-play-circle me-1"></i>
-                                  {module.total_lessons} lessons
+                                  {module.total_lessons} {t('courses.lessons')}
                                 </small>
 
                                 
                                 <small className="profile-joined">
                                   <Clock size={12} className="me-1" />
-                                  {Math.floor(module.total_duration / 60)}min
+                                  {Math.floor(module.total_duration / 60)}{t('courses.min')}
                                 </small>
                                 <small className={`${module.is_free ? 'text-success' : 'text-accent'}`}>
                                   <i className={`bi ${module.is_free ? 'bi-unlock' : 'bi-lock'} me-1`}></i>
-                                  {module.is_free ? 'Free' : `$${module.price}`}
+                                  {module.is_free ? t('courses.free') : `$${module.price}`}
                                 </small>
                               </div>
                             </div>
@@ -654,13 +656,13 @@ const {
                               <div className="ms-3">
                                 {lessonLoading ? (
                                   <div className="text-center py-2">
-                                    <small className="profile-joined">Loading lessons...</small>
+                                    <small className="profile-joined">{t('courses.loadingLessons')}</small>
                                   </div>
                                 ) : lessonError || !lessonData || !Array.isArray(lessonData) || lessonData.length === 0 ? (
                                   <div className="about-bubble mb-2 text-center">
                                     <span className="profile-joined">
                                       <i className="bi bi-info-circle me-2"></i>
-                                      No lessons available for this module
+                                      {t('courses.noLessonsAvailable')}
                                     </span>
                                   </div>
                                 ) : (
@@ -676,10 +678,10 @@ const {
                                             <i className="bi bi-play-circle me-2"></i>
                                             <span className="me-2">{lesson.title}</span>
                                             <small className="profile-joined me-2">
-                                              ({Math.floor(lesson.duration / 60)}min)
+                                              ({Math.floor(lesson.duration / 60)}{t('courses.min')})
                                             </small>
                                             <small className={`badge ${lesson.is_published ? 'bg-success' : 'bg-warning'}`}>
-                                              {lesson.is_published ? 'Published' : 'Draft'}
+                                              {lesson.is_published ? t('courses.published') : t('courses.draft')}
                                             </small>
                                             {/* {lesson.is_free && (
                                               <small className="badge bg-info ms-1">Free</small>
@@ -724,23 +726,23 @@ const {
                             <div className="mt-3 pt-2 border-top">
                               <div className="row text-center">
                                 <div className="col-3">
-                                  <small className="profile-joined d-block">Total Lessons</small>
+                                  <small className="profile-joined d-block">{t('courses.totalLessons')}</small>
                                   <strong className="text-accent">{module.total_lessons}</strong>
                                 </div>
                                 <div className="col-3">
-                                  <small className="profile-joined d-block">Duration</small>
+                                  <small className="profile-joined d-block">{t('courses.duration')}</small>
                                   <strong className="text-accent">
                                     {Math.floor(module.total_duration / 3600)}h {Math.floor((module.total_duration % 3600) / 60)}m
                                   </strong>
                                 </div>
                                 <div className="col-3">
-                                  <small className="profile-joined d-block">Price</small>
+                                  <small className="profile-joined d-block">{t('courses.price')}</small>
                                   <strong className={module.is_free ? 'text-success' : 'text-accent'}>
-                                    {module.is_free ? 'Free' : `$${module.price}`}
+                                    {module.is_free ? t('courses.free') : `$${module.price}`}
                                   </strong>
                                 </div>
                                 <div className="col-3">
-                                  <small className="profile-joined d-block">Order</small>
+                                  <small className="profile-joined d-block">{t('courses.order')}</small>
                                   <strong className="text-accent">{module.order}</strong>
                                 </div>
                               </div>
@@ -755,20 +757,20 @@ const {
                   {moduleData && moduleData.length > 0 && (
                     <div className="card ">
                       <div className="card-body">
-                        <h5 className="about-subtitle mb-3">Course Summary</h5>
+                        <h5 className="about-subtitle mb-3">{t('courses.courseSummary')}</h5>
                         <div className="row text-center">
                           <div className="col-md-3">
                             <div className="mb-2">
                               <i className="bi bi-collection text-main" style={{fontSize: '1.5rem'}}></i>
                             </div>
-                            <small className="profile-joined d-block">Total Modules</small>
+                            <small className="profile-joined d-block">{t('courses.totalModules')}</small>
                             <strong className="text-accent">{moduleData.length}</strong>
                           </div>
                           <div className="col-md-3">
                             <div className="mb-2">
                               <i className="bi bi-play-circle text-main" style={{fontSize: '1.5rem'}}></i>
                             </div>
-                            <small className="profile-joined d-block">Total Lessons</small>
+                            <small className="profile-joined d-block">{t('courses.totalLessons')}</small>
                             <strong className="text-accent">
                               {moduleData.reduce((total, module) => total + module.total_lessons, 0)}
                             </strong>
@@ -777,7 +779,7 @@ const {
                             <div className="mb-2">
                               <Clock size={24} className="text-main" />
                             </div>
-                            <small className="profile-joined d-block">Total Duration</small>
+                            <small className="profile-joined d-block">{t('courses.totalDuration')}</small>
                             <strong className="text-accent">
                               {Math.floor(moduleData.reduce((total, module) => total + module.total_duration, 0) / 3600)}h {Math.floor((moduleData.reduce((total, module) => total + module.total_duration, 0) % 3600) / 60)}m
                             </strong>
@@ -786,7 +788,7 @@ const {
                             <div className="mb-2">
                               <DollarSign size={24} className="text-main" />
                             </div>
-                            <small className="profile-joined d-block">Free Modules</small>
+                            <small className="profile-joined d-block">{t('courses.freeModules')}</small>
                             <strong className="text-success">
                               {moduleData.filter(module => module.is_free).length} / {moduleData.length}
                             </strong>
@@ -804,29 +806,29 @@ const {
               <div className="card">
                 <div className="card-body">
                   <div className="d-flex justify-content-between align-items-center mb-4">
-                    <h3 className="section-title mb-0">Course Students</h3>
+                    <h3 className="section-title mb-0">{t('courses.courseStudents')}</h3>
                   </div>
                   <div className="mb-4">
                     {enrollmentsLoading ? (
                       <div className="text-center py-4">
                         <div className="spinner-border text-main" role="status">
-                          <span className="visually-hidden">Loading students...</span>
+                          <span className="visually-hidden">{t('courses.loadingStudents')}</span>
                         </div>
                       </div>
                     ) : enrollmentsError ? (
                       <div className="card mb-3">
                         <div className="card-body text-center">
                           <TriangleAlert size={40} className="text-muted mb-3" />
-                          <h5 className="section-title">Error Loading Students</h5>
-                          <p className="profile-joined">Failed to load student data. Please try again.</p>
+                          <h5 className="section-title">{t('courses.errorLoadingStudents')}</h5>
+                          <p className="profile-joined">{t('courses.failedToLoadStudents')}</p>
                         </div>
                       </div>
                     ) : enrollments.length === 0 ? (
                       <div className="card mb-3">
                         <div className="card-body text-center">
                           <Users size={40} className="text-muted mb-3" />
-                          <h5 className="section-title">No Students Enrolled</h5>
-                          <p className="profile-joined">This course doesn't have any enrolled students yet.</p>
+                          <h5 className="section-title">{t('courses.noStudentsEnrolled')}</h5>
+                          <p className="profile-joined">{t('courses.noStudentsYet')}</p>
                         </div>
                       </div>
                     ) : (
@@ -834,11 +836,11 @@ const {
                         <table className="table table-borderless">
                           <thead>
                             <tr>
-                              <th>Student</th>
-                              <th>Email</th>
-                              <th>Username</th>
-                              <th>Phone</th>
-                              <th>Status</th>
+                              <th>{t('courses.student')}</th>
+                              <th>{t('courses.email')}</th>
+                              <th>{t('courses.username')}</th>
+                              <th>{t('courses.phone')}</th>
+                              <th>{t('courses.status')}</th>
                             </tr>
                           </thead>
                           <tbody>
@@ -869,7 +871,7 @@ const {
                                 </td>
                                 <td>
                                   <span className={`badge ${enrollment.user?.is_active ? "bg-success" : "bg-secondary"}`}>
-                                    {enrollment.user?.is_active ? "Active" : "Inactive"}
+                                    {enrollment.user?.is_active ? t('courses.active') : t('courses.inactive')}
                                   </span>
                                 </td>
                               </tr>
@@ -886,7 +888,7 @@ const {
             {activeTab === "reviews" && (
               <div className="card">
                 <div className="card-body">
-                  <h3 className="section-title mb-4">Student Reviews</h3>
+                  <h3 className="section-title mb-4">{t('courses.studentReviews')}</h3>
 
                   {/* Ratings Summary */}
                   <div className="row mb-4">
@@ -918,7 +920,7 @@ const {
                         ))}
                       </div>
                       <p className="profile-joined">
-                        Based on {ratesandReviewsData ? ratesandReviewsData.length : 0} reviews
+                        {t('courses.basedOnReviews', { count: ratesandReviewsData ? ratesandReviewsData.length : 0 })}
                       </p>
                     </div>
                     <div className="col-md-8">
@@ -931,7 +933,7 @@ const {
                             : 0;
                         return (
                           <div key={rating} className="d-flex align-items-center mb-2">
-                            <span className="me-2">{rating} star</span>
+                            <span className="me-2">{rating} {t('courses.star')}</span>
                             <div className="progress flex-grow-1 me-2">
                               <div
                                 className="progress-bar-filled"
@@ -947,7 +949,7 @@ const {
 
                   {/* Recent Reviews */}
                   <div>
-                    <h4 className="about-subtitle mb-3">Recent Reviews</h4>
+                    <h4 className="about-subtitle mb-3">{t('courses.recentReviews')}</h4>
                     {ratesandReviewsData && ratesandReviewsData.length > 0 ? (
                       ratesandReviewsData.map((review) => (
                         <div key={review.id} className="card mb-3">
@@ -955,7 +957,7 @@ const {
                             <div className="d-flex justify-content-between align-items-start mb-2">
                               <div>
                                 <h6 className="about-subtitle mb-1">
-                                  {review.student?.full_name || "Unknown"}
+                                  {review.student?.full_name || t('courses.unknown')}
                                 </h6>
                                 <div className="mb-2">
                                   {[...Array(5)].map((_, i) => (
@@ -979,7 +981,7 @@ const {
                       ))
                     ) : (
                       <div className="text-center text-muted py-3">
-                        No reviews available.
+                        {t('courses.noReviewsAvailable')}
                       </div>
                     )}
                   </div>
@@ -991,42 +993,42 @@ const {
               <div className="card">
                 <div className="card-body">
                   <div className="d-flex justify-content-between align-items-center mb-4">
-                    <h3 className="section-title mb-0">Course Assessments</h3>
+                    <h3 className="section-title mb-0">{t('courses.courseAssessments')}</h3>
                     <button 
                       className="btn-edit-profile d-flex align-items-center"
                       onClick={() => navigate(`/assessments`)}
                     >
                       <i className="bi bi-plus me-2"></i>
-                      Create Assessment
+                      {t('courses.createAssessment')}
                     </button>
                   </div>
 
                   {assessmentsLoading ? (
                     <div className="text-center py-4">
                       <div className="spinner-border text-main" role="status">
-                        <span className="visually-hidden">Loading assessments...</span>
+                        <span className="visually-hidden">{t('courses.loadingAssessments')}</span>
                       </div>
                     </div>
                   ) : assessmentsError ? (
                     <div className="card mb-3">
                       <div className="card-body text-center">
                         <TriangleAlert size={40} className="text-muted mb-3" />
-                        <h5 className="section-title">Error Loading Assessments</h5>
-                        <p className="profile-joined">Failed to load assessment data. Please try again.</p>
+                        <h5 className="section-title">{t('courses.errorLoadingAssessments')}</h5>
+                        <p className="profile-joined">{t('courses.failedToLoadAssessments')}</p>
                       </div>
                     </div>
                   ) : !assessments || Object.keys(assessments).length === 0 ? (
                     <div className="card mb-3">
                       <div className="card-body text-center">
                         <FileText size={40} className="text-muted mb-3" />
-                        <h5 className="section-title">No Assessments Found</h5>
-                        <p className="profile-joined">This course doesn't have any assessments yet.</p>
+                        <h5 className="section-title">{t('courses.noAssessmentsFound')}</h5>
+                        <p className="profile-joined">{t('courses.noAssessmentsYet')}</p>
                         <button 
                           className="btn-edit-profile"
                           onClick={() => navigate(`/assessments`)}
                         >
                           <i className="bi bi-plus me-2"></i>
-                          Create First Assessment
+                          {t('courses.createFirstAssessment')}
                         </button>
                       </div>
                     </div>
@@ -1061,7 +1063,7 @@ const {
                                 <div className="mb-2">
                                   <small className="profile-joined">
                                     <i className="bi bi-link-45deg me-1"></i>
-                                    {assessment.related_to || 'Course Assessment'}
+                                    {assessment.related_to || t('courses.courseAssessments')}
                                   </small>
                                 </div>
 
@@ -1069,31 +1071,31 @@ const {
                                 <div className="d-flex flex-wrap gap-3 mb-2">
                                   <small className="profile-joined">
                                     <i className="bi bi-list-ol me-1"></i>
-                                    {assessment.total_questions} questions
+                                    {assessment.total_questions} {t('courses.questions')}
                                   </small>
                                   <small className="profile-joined">
                                     <i className="bi bi-award me-1"></i>
-                                    {assessment.total_marks} marks
+                                    {assessment.total_marks} {t('courses.marks')}
                                   </small>
                                   {assessment.is_timed && assessment.time_limit && (
                                     <small className="profile-joined">
                                       <i className="bi bi-clock me-1"></i>
-                                      {assessment.time_limit} min
+                                      {assessment.time_limit} {t('courses.min')}
                                     </small>
                                   )}
                                   <small className="profile-joined">
                                     <i className="bi bi-arrow-repeat me-1"></i>
-                                    {assessment.max_attempts} attempt{assessment.max_attempts !== 1 ? 's' : ''}
+                                    {assessment.max_attempts} {assessment.max_attempts !== 1 ? t('courses.attempts') : t('courses.attempt')}
                                   </small>
                                 </div>
 
                                 {/* Availability */}
                                 <div className="d-flex align-items-center gap-2">
                                   <span className={`badge badge-sm ${assessment.is_available ? 'bg-success' : 'bg-warning'}`}>
-                                    {assessment.is_available ? 'Available' : 'Not Available'}
+                                    {assessment.is_available ? t('courses.available') : t('courses.notAvailable')}
                                   </span>
                                   <small className="profile-joined">
-                                    Created: {assessment.created_at ? new Date(assessment.created_at).toLocaleDateString() : 'N/A'}
+                                    {t('courses.created')}: {assessment.created_at ? new Date(assessment.created_at).toLocaleDateString() : 'N/A'}
                                   </small>
                                 </div>
                               </div>
@@ -1102,7 +1104,7 @@ const {
                               <div className="d-flex gap-1">
                                 <button 
                                   className="btn btn-sm p-1 border-0 bg-transparent text-primary"
-                                  title="View Assessment Details"
+                                  title={t('courses.viewAssessmentDetails')}
                                   onClick={() => navigate(`/assessments/${assessment.id}`)}
                                 >
                                   <Eye size={16} />
@@ -1120,20 +1122,20 @@ const {
                   {assessments && Object.keys(assessments).length > 0 && (
                     <div className="card mt-4">
                       <div className="card-body">
-                        <h5 className="about-subtitle mb-3">Assessment Summary</h5>
+                        <h5 className="about-subtitle mb-3">{t('courses.assessmentSummary')}</h5>
                         <div className="row text-center">
                           <div className="col-6 col-md-3">
                             <div className="mb-2">
                               <FileText size={24} className="text-main" />
                             </div>
-                            <small className="profile-joined d-block">Total</small>
+                            <small className="profile-joined d-block">{t('courses.total')}</small>
                             <strong className="text-accent">{Object.keys(assessments).length}</strong>
                           </div>
                           <div className="col-6 col-md-3">
                             <div className="mb-2">
                               <CheckCircle size={24} className="text-success" />
                             </div>
-                            <small className="profile-joined d-block">Published</small>
+                            <small className="profile-joined d-block">{t('courses.published')}</small>
                             <strong className="text-success">
                               {Object.values(assessments).filter(a => a.is_published).length}
                             </strong>
@@ -1142,7 +1144,7 @@ const {
                             <div className="mb-2">
                               <AlertCircle size={24} className="text-warning" />
                             </div>
-                            <small className="profile-joined d-block">Available</small>
+                            <small className="profile-joined d-block">{t('courses.available')}</small>
                             <strong className="text-success">
                               {Object.values(assessments).filter(a => a.is_available).length}
                             </strong>
@@ -1151,7 +1153,7 @@ const {
                             <div className="mb-2">
                               <i className="bi bi-clock text-main" style={{fontSize: '24px'}}></i>
                             </div>
-                            <small className="profile-joined d-block">Timed</small>
+                            <small className="profile-joined d-block">{t('courses.timed')}</small>
                             <strong className="text-accent">
                               {Object.values(assessments).filter(a => a.is_timed).length}
                             </strong>
@@ -1172,12 +1174,12 @@ const {
             {/* Quick Actions */}
             <div className="card mb-4">
               <div className="card-body">
-                <h4 className="section-title mb-3">Quick Actions</h4>
+                <h4 className="section-title mb-3">{t('courses.quickActions')}</h4>
 
                 <div className="d-grid gap-2">
                   <button onClick={() => navigate(`/courses/edit/${course.id}`)} className="btn-edit-profile d-flex align-items-center justify-content-center">
                     <Edit size={16} className="me-2" />
-                    Edit Course Content
+                    {t('courses.editCourseContent')}
                   </button>
                 </div>
               </div>
@@ -1186,34 +1188,34 @@ const {
             {/* Course Status */}
             <div className="card mb-4">
               <div className="card-body">
-                <h4 className="section-title mb-3">Course Status</h4>
+                <h4 className="section-title mb-3">{t('courses.courseStatus')}</h4>
 
                 <div className="mb-3">
                   <div className="d-flex justify-content-between mb-1">
-                    <span className="about-subtitle">Status</span>
-                    <span className="text-accent fw-bold">{course?.is_free ? "Free" : "Paid"}</span>
+                    <span className="about-subtitle">{t('courses.status')}</span>
+                    <span className="text-accent fw-bold">{course?.is_free ? t('courses.free') : t('courses.paid')}</span>
                   </div>
                 </div>
 
                 <div className="mb-3">
                   <div className="d-flex justify-content-between mb-1">
-                    <span className="about-subtitle">Created</span>
+                    <span className="about-subtitle">{t('courses.created')}</span>
                     <span className="profile-joined">    {course?.created_at ? course.created_at.split("T")[0] : ""} </span>
                   </div>
                 </div>
 
                 <div className="mb-3">
                   <div className="d-flex justify-content-between mb-1">
-                    <span className="about-subtitle">Published</span>
+                    <span className="about-subtitle">{t('courses.published')}</span>
                     <span className="profile-joined">
-                      {course?.is_published ? "Published" : "Unpublished"}
+                      {course?.is_published ? t('courses.published') : t('courses.unpublished')}
                     </span>
                   </div>
                 </div>
 
                 <div className="mb-3">
                   <div className="d-flex justify-content-between mb-1">
-                    <span className="about-subtitle">Last Updated</span>
+                    <span className="about-subtitle">{t('courses.courseLastUpdated')}</span>
                     <span className="profile-joined">{course.lastUpdated}</span>
                   </div>
                 </div>
@@ -1223,25 +1225,25 @@ const {
             {/* Revenue Summary */}
             <div className="card">
               <div className="card-body">
-                <h4 className="section-title mb-3">Revenue Summary</h4>
+                <h4 className="section-title mb-3">{t('courses.revenueSummary')}</h4>
 
                 <div className="text-center mb-3">
                   <h3 className="section-title text-accent">
                     {course.total_revenue}
                   </h3>
-                  <p className="profile-joined">Total Revenue</p>
+                  <p className="profile-joined">{t('courses.totalRevenue')}</p>
                 </div>
 
                 <div className="mb-2">
                   <div className="d-flex justify-content-between">
-                    <span className="about-subtitle">Price per student</span>
+                    <span className="about-subtitle">{t('courses.pricePerStudent')}</span>
                     <span className="profile-joined">{course.price}</span>
                   </div>
                 </div>
 
                 <div className="mb-2">
                   <div className="d-flex justify-content-between">
-                    <span className="about-subtitle">Total enrollments</span>
+                    <span className="about-subtitle">{t('courses.totalEnrollments')}</span>
                     <span className="profile-joined">
                       {course.total_enrollments}
                     </span>
@@ -1250,7 +1252,7 @@ const {
 
                 <div className="mb-2">
                   <div className="d-flex justify-content-between">
-                    <span className="about-subtitle">Total Revenue</span>
+                    <span className="about-subtitle">{t('courses.totalRevenue')}</span>
                     <span className="profile-joined">
                       {course.total_revenue}
                     </span>

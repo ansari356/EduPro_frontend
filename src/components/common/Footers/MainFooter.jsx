@@ -1,4 +1,5 @@
 import React from "react";
+import { useTranslation } from 'react-i18next';
 import {
   Linkedin,
   Twitter,
@@ -9,6 +10,8 @@ import {
 } from "lucide-react";
 
 export default function EducatorFooter() {
+  const { t } = useTranslation();
+
   return (
     <footer
       className="mt-auto py-4"
@@ -26,18 +29,18 @@ export default function EducatorFooter() {
           <div className="col-12 col-md-6 mb-3 mb-md-0 d-flex flex-column align-items-center justify-content-center justify-content-md-start">
             <div className="d-flex align-items-center mb-2">
               <Mail style={{ width: 18, height: 18, color: "var(--color-primary-dark)" }} className="me-1" />
-              <span className="fw-medium">contact@eduplatform.com</span>
+              <span className="fw-medium">{t('footer.contactEmail')}</span>
             </div>
             <div className="d-flex align-items-center">
               <Phone style={{ width: 18, height: 18, color: "var(--color-primary-dark)" }} className="me-1" />
-              <span className="fw-medium">+123 456 7890</span>
+              <span className="fw-medium">{t('footer.contactPhone')}</span>
             </div>
           </div>
 
           {/* Social media links right side centered */}
           <div className="col-12 col-md-6 mb-3 mb-md-0 d-flex flex-column align-items-center justify-content-center text-center text-md-end">
             <div className="fw-bold mb-2" style={{ color: "var(--color-primary-dark)" }}>
-              Connect with us:
+              {t('footer.connectWithUs')}
             </div>
             <div className="d-flex gap-3 justify-content-center justify-content-md-end">
               <a
@@ -90,7 +93,7 @@ export default function EducatorFooter() {
                 color: "var(--color-text-muted)"
               }}
             >
-              &copy; {new Date().getFullYear()} EduPlatform. All rights reserved.
+              &copy; {new Date().getFullYear()} EduPlatform. {t('footer.allRightsReserved')}
             </div>
           </div>
         </div>

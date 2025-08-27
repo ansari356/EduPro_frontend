@@ -7,7 +7,7 @@ import useListEnrolledCourses from "../../apis/hooks/student/useListEnrolledCour
 import useEducatorPublicData from "../../apis/hooks/student/useEducatorPublicData";
 import useListCourseModules, { useModuleLessons } from "../../apis/hooks/student/useListCourseModules";
 import baseApi from "../../apis/base";
-import { useLanguage } from "../../contexts/LanguageContext";
+import { useTranslation } from "react-i18next";
 
 
 // Hook to fetch assessment attempts
@@ -44,7 +44,7 @@ const useAssessmentAttempts = (educatorUsername) => {
  */
 function StudentProfile() {
   const { educatorUsername } = useParams();
-  const { t } = useLanguage();
+  const { t } = useTranslation();
 
   const { data: studentData, isLoading, error, mutate } = useStudentProfileData();
   const { enrolledInCourses, isLoading: coursesLoading } = useListEnrolledCourses();
@@ -116,7 +116,7 @@ function StudentProfile() {
       // Add overall timeout for the entire operation
       const overallTimeout = setTimeout(() => {
         abortController.abort();
-        setProgressError('Progress calculation timed out. Please try again.');
+        setProgressError(t('student.progressCalculationTimedOut'));
       }, 30000); // 30 second timeout
       
       try {
@@ -254,7 +254,7 @@ function StudentProfile() {
            console.log('Progress calculation aborted');
          } else {
            console.error('Error in progress calculation:', error);
-           setProgressError('Failed to calculate progress. Please try again.');
+           setProgressError(t('student.failedToCalculateProgress'));
          }
        } finally {
          clearTimeout(overallTimeout);
@@ -288,11 +288,11 @@ function StudentProfile() {
   // Prepare next lesson data
   const nextCourseData = courseProgressData[nextCourse?.id];
   const upcomingLessons = nextCourse ? [{
-    topic: nextCourseData?.nextLesson?.title || "Continue learning",
-    course: nextCourse.title || nextCourse.name,
-    instructor: educatorData?.full_name || educatorUsername,
-    date: new Date().toDateString(),
-    time: nextCourseData?.nextLesson?.title ? "Next lesson available" : "Continue with your courses"
+          topic: nextCourseData?.nextLesson?.title || t('student.continueLearning'),
+      course: nextCourse.title || nextCourse.name,
+      instructor: educatorData?.full_name || educatorUsername,
+      date: new Date().toDateString(),
+      time: nextCourseData?.nextLesson?.title ? t('student.nextLessonAvailable') : t('student.continueWithYourCourses')
   }] : [];
 
   // ===== FORM DATA INITIALIZATION =====
@@ -348,10 +348,10 @@ function StudentProfile() {
       if (mutate) {
         mutate();
       }
-      alert("Your profile has been updated successfully!");
+      alert(t('student.profileUpdatedSuccessfully'));
       setShowEditForm(false);
     } catch {
-      alert("Failed to update profile. Please try again.");
+      alert(t('student.failedToUpdateProfile'));
     }
   };
 
@@ -361,9 +361,9 @@ function StudentProfile() {
       <div className="profile-root min-vh-100 d-flex align-items-center justify-content-center">
         <div className="text-center">
           <div className="loading-spinner mb-3" role="status">
-            <span className="visually-hidden">Loading...</span>
+            <span className="visually-hidden">{t('common.loading')}</span>
           </div>
-          <p className="profile-joined">Loading student profile...</p>
+          <p className="profile-joined">{t('student.loadingStudentProfile')}</p>
         </div>
       </div>
     );
@@ -374,8 +374,8 @@ function StudentProfile() {
       <div className="profile-root min-vh-100 d-flex align-items-center justify-content-center">
         <div className="text-center">
           <p className="text-danger">
-            {error ? 'Error loading profile data.' : 'Error loading analytics data.'} 
-            Please try again later.
+            {error ? t('student.errorLoadingProfileData') : t('student.errorLoadingAnalyticsData')} 
+            {t('student.pleaseTryAgainLater')}
           </p>
         </div>
       </div>
@@ -386,23 +386,23 @@ function StudentProfile() {
     return (
       <div className="profile-root min-vh-100 d-flex align-items-center justify-content-center">
         <div className="text-center">
-          <p className="profile-joined">No student data available.</p>
+          <p className="profile-joined">{t('student.noStudentDataAvailable')}</p>
         </div>
       </div>
     );
   }
 
   return (
-		<div className="min-vh-100 profile-root p-4">
+		<div className="min-vh-100 profile-root p-4 student-profile">
 			{showEditForm ? (
 				<div className="container w-75 d-flex justify-content-center">
 					<div className="mt-4 card card-body ">
-						<h5 className="fw-bold mb-3 section-title">Edit Profile</h5>
+						<h5 className="fw-bold mb-3 section-title">{t('student.editProfile')}</h5>
 						<form onSubmit={handleSubmitRequest}>
 							{/* Full Name */}
 							<div className="mb-3">
 								<label className="form-label about-subtitle fw-medium">
-									Full Name
+									{t('student.fullName')}
 								</label>
 								<input
 									type="text"
@@ -417,7 +417,7 @@ function StudentProfile() {
 							{/* Bio */}
 							<div className="mb-3">
 								<label className="form-label about-subtitle fw-medium">
-									Bio
+									{t('student.bio')}
 								</label>
 								<textarea
 									className="form-control"
@@ -431,7 +431,7 @@ function StudentProfile() {
 							{/* Profile Picture Upload */}
 							<div className="mb-3">
 								<label className="form-label about-subtitle fw-medium">
-									Profile Picture
+									{t('student.profilePicture')}
 								</label>
 								<input
 									type="file"
@@ -442,7 +442,7 @@ function StudentProfile() {
 								/>
 								{profilePicture && (
 									<div className="mt-2">
-										<small className="text-muted">Preview:</small>
+										<small className="text-muted">{t('common.preview')}:</small>
 										<div className="mt-1">
 											<img
 												src={profilePicture}
@@ -458,7 +458,7 @@ function StudentProfile() {
 							{/* Date of Birth */}
 							<div className="mb-3">
 								<label className="form-label about-subtitle fw-medium">
-									Date of Birth
+									{t('student.dateOfBirth')}
 								</label>
 								<input
 									type="date"
@@ -472,7 +472,7 @@ function StudentProfile() {
 							{/* Address */}
 							<div className="mb-3">
 								<label className="form-label about-subtitle fw-medium">
-									Address
+									{t('student.address')}
 								</label>
 								<input
 									type="text"
@@ -486,7 +486,7 @@ function StudentProfile() {
 							{/* Country */}
 							<div className="mb-3">
 								<label className="form-label about-subtitle fw-medium">
-									Country
+									{t('student.country')}
 								</label>
 								<input
 									type="text"
@@ -500,7 +500,7 @@ function StudentProfile() {
 							{/* City */}
 							<div className="mb-3">
 								<label className="form-label about-subtitle fw-medium">
-									City
+									{t('student.city')}
 								</label>
 								<input
 									type="text"
@@ -514,7 +514,7 @@ function StudentProfile() {
 							{/* Gender */}
 							<div className="mb-3">
 								<label className="form-label about-subtitle fw-medium">
-									Gender
+									{t('student.gender')}
 								</label>
 								<select
 									className="form-control"
@@ -522,22 +522,22 @@ function StudentProfile() {
 									value={formData.gender}
 									onChange={handleInputChange}
 								>
-									<option value="">Select Gender</option>
-									<option value="Male">Male</option>
-									<option value="Female">Female</option>
-									<option value="Other">Other</option>
+									<option value="">{t('student.selectGender')}</option>
+									<option value="Male">{t('student.male')}</option>
+									<option value="Female">{t('student.female')}</option>
+									<option value="Other">{t('student.other')}</option>
 								</select>
 							</div>
 
 							<button type="submit" className="px-4 btn-edit-profile">
-								Submit
+								{t('student.submit')}
 							</button>
 							<button
 								type="button"
 								onClick={() => setShowEditForm(false)}
 								className="ms-2 px-4 btn-edit-profile"
 							>
-								Cancel
+								{t('student.cancel')}
 							</button>
 						</form>
 					</div>
@@ -546,16 +546,16 @@ function StudentProfile() {
 				<div className="container-fluid">
 					{/* Header */}
 					<div className="d-flex justify-content-between align-items-center mb-4">
-						<h2 className="fw-bold main-title" tabIndex={0}>
-							Student Profile
-						</h2>
-						<button
-							className="px-4 btn-edit-profile me-2"
-							aria-label="Edit Profile"
-							onClick={() => setShowEditForm(true)}
-						>
-							Edit Profile
-						</button>
+											<h2 className="fw-bold main-title" tabIndex={0}>
+						{t('student.studentProfile')}
+					</h2>
+					<button
+						className="px-4 btn-edit-profile me-2"
+						aria-label={t('student.editProfile')}
+						onClick={() => setShowEditForm(true)}
+					>
+						{t('student.editProfile')}
+					</button>
 					</div>
 
 					<div className="row g-4">
@@ -582,9 +582,9 @@ function StudentProfile() {
 											<h4 className="fw-bold mb-1 section-title">
 												{studentData.student?.full_name}
 											</h4>
-											<div className="small section-title">Student</div>
+											<div className="small section-title">{t('student.student')}</div>
 											<div className="small section-title">
-												Joined{" "}
+												{t('student.joined')}{" "}
 												{new Date(
 													studentData.student?.user?.created_at
 												).getFullYear()}
@@ -593,26 +593,26 @@ function StudentProfile() {
 									</div>
 
 									{/* About Section */}
-									<h5 className="fw-bold section-title mb-3">About</h5>
+									<h5 className="fw-bold section-title mb-3">{t('student.about')}</h5>
 									<div className="row">
 										<div className="col-xl-8">
 											<div className="d-flex flex-column gap-2">
 												{/* ===== REAL DATA FROM HOOK ===== */}
 												<div className="d-flex align-items-center px-3">
-													<i className="bi bi-person-badge me-2 section-title"></i>
+													<i className="bi bi-person-badge me-2 section-title mb-1"></i>
 													<div>
 														<strong className="me-2 section-title">
-															Professor:
+															{t('student.professor')}:
 														</strong>
 														<span className="small section-title">
-															{educatorData?.full_name || "Loading..."}
+															{educatorData?.full_name || t('common.loading')}
 														</span>
 													</div>
 												</div>
 												{/* ===== REAL DATA FROM HOOK ===== */}
 												<div className="d-flex align-items-center px-3">
 													<i className="bi bi-hash me-2 section-title"></i>
-													<strong className="me-2 section-title">Code:</strong>
+													<strong className="me-2 section-title">{t('student.code')}:</strong>
 													<span className="small section-title">
 														{studentData.student?.user?.slug || "N/A"}
 													</span>
@@ -620,7 +620,7 @@ function StudentProfile() {
 												<div className="d-flex align-items-center px-3">
 													<i className="bi bi-telephone me-2 section-title"></i>
 													<strong className="me-2 section-title">
-														Phone 1:
+														{t('student.phone1')}:
 													</strong>
 													<span className="small section-title">
 														{studentData.student?.user?.phone || "N/A"}
@@ -629,7 +629,7 @@ function StudentProfile() {
 												<div className="d-flex align-items-center px-3 ">
 													<i className="bi bi-telephone-plus me-2 section-title"></i>
 													<strong className="me-2 section-title">
-														Phone 2:
+														{t('student.phone2')}:
 													</strong>
 													<span className="small section-title">
 														{studentData.student?.user?.parent_phone || "N/A"}
@@ -642,7 +642,7 @@ function StudentProfile() {
 										<div className="col-xl-4 d-flex flex-column align-items-center justify-content-center">
 											<div className="text-center mb-2">
 												<small className="fw-bold fw-medium section-title">
-													Student QR
+													{t('student.studentQR')}
 												</small>
 											</div>
 											<div className="qr-container">
@@ -664,11 +664,11 @@ function StudentProfile() {
 							<div className="card shadow-sm mb-4">
 								<div className="card-body p-4">
 									<div className="d-flex justify-content-between align-items-center mb-3">
-										<h5 className="fw-bold section-title mb-0">Progress</h5>
+										<h5 className="fw-bold section-title mb-0">{t('student.progress')}</h5>
 									</div>
 									                    <div className="d-flex justify-content-between mb-2">
                       <small className="fw-medium section-title">
-                        Progress Across All Courses
+                        {t('student.progressAcrossAllCourses')}
                       </small>
                       <small className="fw-medium">{progress}%</small>
                     </div>
@@ -690,12 +690,12 @@ function StudentProfile() {
                       aria-live="polite"
                     >
                       {totalLessons === 0
-                        ? "No lessons available yet. Visit your courses to start learning!"
+                        ? t('student.noLessonsAvailableYet')
                         : progress === 100
-                        ? "Excellent! You've completed all available lessons across all courses."
+                        ? t('student.excellentCompletedAllLessons')
                         : progress > 50
-                        ? `Great progress! You're ${progress}% through your learning journey (${totalCompletedLessons}/${totalLessons} lessons).`
-                        : `Keep going! You're ${progress}% through your enrolled courses (${totalCompletedLessons}/${totalLessons} lessons).`}
+                        ? t('student.greatProgress', { progress, completed: totalCompletedLessons, total: totalLessons })
+                        : t('student.keepGoing', { progress, completed: totalCompletedLessons, total: totalLessons })}
                     </small>
 								</div>
 							</div>
@@ -703,14 +703,14 @@ function StudentProfile() {
 							{/* Next Lessons Card */}
 							<div className="card shadow-sm">
 								<div className="card-body">
-									<h5 className="fw-bold section-title mb-3">Next Lessons</h5>
+									<h5 className="fw-bold section-title mb-3">{t('student.nextLessons')}</h5>
 									                  {upcomingLessons.length === 0 ? (
                     <div className="alert alert-info">
                       {enrolledInCourses.length === 0 
-                        ? "Not enrolled in any courses yet!" 
+                        ? t('student.notEnrolledInAnyCoursesYet') 
                         : totalLessons === 0
-                        ? "No lessons available yet. Visit your courses to start learning!"
-                        : "All lessons completed! Great job!"}
+                        ? t('student.noLessonsAvailableYet')
+                        : t('student.allLessonsCompleted')}
                     </div>
                   ) : (
 										upcomingLessons.map((lesson, idx) => (
@@ -727,7 +727,7 @@ function StudentProfile() {
 															className="text-muted"
 															style={{ fontSize: 13 }}
 														>
-															with Professor : {lesson.instructor}
+															{t('student.withProfessor', { instructor: lesson.instructor })}
 														</span>
 													</div>
 												)}
@@ -741,7 +741,7 @@ function StudentProfile() {
 															)}
 															className="btn-secondary-action"
 														>
-															Continue Learning
+															{t('student.continueLearning')}
 														</NavLink>
 													</div>
 												)}
@@ -757,16 +757,16 @@ function StudentProfile() {
 					<div className="row mt-4">
 						<div className="col-12">
 							<h5 className="fw-bold section-title mb-4">
-								Your Learning Analytics
+								{t('student.yourLearningAnalytics')}
 							</h5>
 							<div className="card shadow-sm">
 								<div className="card-body text-center">
 									{isCalculatingProgress ? (
 										<div className="py-3">
 											                    <div className="spinner-border text-main" role="status">
-												<span className="visually-hidden">Calculating progress...</span>
+												<span className="visually-hidden">{t('student.calculatingProgress')}</span>
 											</div>
-											<p className="text-muted">Calculating your learning progress...</p>
+											<p className="text-muted">{t('student.calculatingYourLearningProgress')}</p>
 										</div>
 									) : progressError ? (
 										<div className="py-3">
@@ -779,7 +779,7 @@ function StudentProfile() {
 												onClick={retryProgressCalculation}
 											>
 												<i className="bi bi-arrow-clockwise me-2"></i>
-												Retry
+												{t('student.retry')}
 											</button>
 										</div>
 									) : (
@@ -788,15 +788,15 @@ function StudentProfile() {
 												{/* ===== REAL DATA FROM HOOKS ===== */}
 												<div className="col-md-4 section-title border-end">
 													<h4>{totalCompletedLessons}</h4>
-													<small>Total Lessons Completed</small>
+													<small>{t('student.totalLessonsCompleted')}</small>
 												</div>
 												<div className="col-md-4 section-title border-end">
 													<h4>{totalSessionsLeft}</h4>
-													<small>Total Lessons Remaining</small>
+													<small>{t('student.totalLessonsRemaining')}</small>
 												</div>
 												<div className="col-md-4 section-title">
 													<h4>{totalCourses}</h4>
-													<small>Courses Enrolled</small>
+													<small>{t('student.coursesEnrolled')}</small>
 												</div>
 											</div>
 										</>
@@ -807,16 +807,18 @@ function StudentProfile() {
 							<div className="row mt-4">
 								{/* Enrolled Courses Section */}
 								<div className="col-lg-6">
-									<h5 className="fw-bold section-title mb-3">Enrolled Courses</h5>
+									<h5 className="fw-bold section-title mb-3">{t('student.enrolledCourses')}</h5>
 									<div className="row g-4">
 										{enrolledInCourses.length === 0 ? (
 											<div className="alert alert-info">
-												Not enrolled in any courses yet!
+												{t('student.notEnrolledInAnyCoursesYet')}
 											</div>
 										) : (
 											enrolledInCourses.map((course) => (
-												<div className="col-12" key={course.id}>
-													<div className="card h-100 shadow-sm d-flex flex-column">
+												<div className="col-md-6" key={course.id}>
+													<div className="card h-100 shadow-sm d-flex flex-column course-card">
+														{/* Hover Overlay */}
+														<div className="course-card-overlay"></div>
 														{/* Course Image */}
 														{course.thumbnail && (
 															<img
@@ -845,7 +847,7 @@ function StudentProfile() {
 															</h5>
 															
 															<p className="text-muted mb-3 flex-grow-1">
-																{course.description || "No description available"}
+																{course.description || t('student.noDescriptionAvailable')}
 															</p>
 															
 															<NavLink
@@ -855,7 +857,7 @@ function StudentProfile() {
 																)}
 																className="btn-edit-profile mt-auto"
 															>
-																View Course
+																{t('student.viewCourse')}
 															</NavLink>
 														</div>
 													</div>
@@ -867,15 +869,15 @@ function StudentProfile() {
 
 								{/* Assessment Attempts Section */}
 								<div className="col-lg-6">
-									<h5 className="fw-bold section-title mb-3">Assessment History</h5>
+									<h5 className="fw-bold section-title mb-3">{t('student.assessmentHistory')}</h5>
 									<div className="card shadow-sm">
 										<div className="card-body">
 											{attemptsLoading ? (
 												<div className="text-center py-3">
 													                        <div className="spinner-border spinner-border-sm text-main" role="status">
-														<span className="visually-hidden">Loading...</span>
+														<span className="visually-hidden">{t('common.loading')}</span>
 													</div>
-													<small className="text-muted">Loading assessments...</small>
+													<small className="text-muted">{t('student.loadingAssessments')}</small>
 												</div>
 											) : attemptsError ? (
 												<div className="text-center py-3">
@@ -886,14 +888,14 @@ function StudentProfile() {
 												</div>
 											) : assessmentAttempts.length === 0 ? (
 												<div className="text-center py-3">
-													<small className="text-muted">No assessment attempts yet</small>
+													<small className="text-muted">{t('student.noAssessmentAttemptsYet')}</small>
 												</div>
 											) : (
 												<div className="assessment-list">
 													{assessmentAttempts.slice(0, 5).map((attempt) => (
 														<div key={attempt.id} className="about-bubble mb-3 p-3 rounded" 
 															 style={{ 
-																backgroundColor: attempt.is_passed ? '#d4edda' : '#f8d7da',
+																backgroundColor: attempt.is_passed ? '' : '#f8d7da',
 																border: `1px solid ${attempt.is_passed ? '#c3e6cb' : '#f5c6cb'}`
 															 }}>
 															<div className="d-flex justify-content-between align-items-start mb-2">
@@ -901,19 +903,19 @@ function StudentProfile() {
 																	{attempt.assessment_title}
 																</h6>
 																<span className={`badge ${attempt.is_passed ? 'bg-success' : 'bg-danger'}`} style={{ fontSize: '0.7rem' }}>
-																	{attempt.is_passed ? 'Passed' : 'Failed'}
+																	{attempt.is_passed ? t('student.passed') : t('student.failed')}
 																</span>
 															</div>
 															
 															<div className="mb-2">
 																<small className="text-muted d-block">
-																	<strong>Type:</strong> {attempt.assessment_type.replace('_', ' ').replace(/\b\w/g, l => l.toUpperCase())}
+																	<strong>{t('student.type')}:</strong> {attempt.assessment_type.replace('_', ' ').replace(/\b\w/g, l => l.toUpperCase())}
 																</small>
 																<small className="text-muted d-block">
-																	<strong>Score:</strong> {attempt.score}/{attempt.percentage}%
+																	<strong>{t('student.score')}:</strong> {attempt.score}/{attempt.percentage}%
 																</small>
 																<small className="text-muted d-block">
-																	<strong>Time:</strong> {attempt.time_taken}s
+																	<strong>{t('student.time')}:</strong> {attempt.time_taken}s
 																</small>
 															</div>
 															
@@ -926,7 +928,7 @@ function StudentProfile() {
 													{assessmentAttempts.length > 5 && (
 														<div className="text-center mt-3">
 															<small className="text-muted">
-																+{assessmentAttempts.length - 5} more attempts
+																{t('student.moreAttempts', { count: assessmentAttempts.length - 5 })}
 															</small>
 														</div>
 													)}

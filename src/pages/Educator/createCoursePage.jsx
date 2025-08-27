@@ -12,14 +12,14 @@ import { useState } from "react";
 import createCourse from "../../apis/actions/educator/createCoure"; // Import the createCourse API
 import { pagePaths } from "../../pagePaths";
 import useCategoryList from "../../apis/actions/educator/useCategoryList";
-import { useLanguage } from "../../contexts/LanguageContext";
+import { useTranslation } from "react-i18next";
 import { useAutoTranslate } from "../../hooks/useAutoTranslate";
 
 export default function CreateCourse() {
   const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
   const [errors, setErrors] = useState({});
-  const { t } = useLanguage();
+  const { t } = useTranslation();
   const { translate } = useAutoTranslate();
   
   // Fetch categories using the hook
@@ -103,12 +103,12 @@ export default function CreateCourse() {
 
       await createCourse(dataToSubmit); // Call the createCourse API
       
-      alert('Course created successfully!');
+      alert(t('courses.courseCreatedSuccessfully'));
       navigate(pagePaths.educator.courses); // Navigate to courses list after creation
       
     } catch (error) {
       console.error("Error creating course:", error);
-      alert('Failed to create course. Please try again.');
+      alert(t('courses.failedToCreateCourse'));
     } finally {
       setLoading(false);
     }
@@ -125,8 +125,8 @@ export default function CreateCourse() {
                 <BookOpen size={20} />
               </div>
               <div>
-                <span className="section-title mb-0">Create New Course</span>
-                <p className="profile-role mb-0">Add new course content and settings</p>
+                <span className="section-title mb-0">{t('courses.createNewCourse')}</span>
+                <p className="profile-role mb-0">{t('courses.addNewCourseContentAndSettings')}</p>
               </div>
             </div>
           </div>
@@ -171,7 +171,7 @@ export default function CreateCourse() {
                     <div className="col-md-6">
                       <label className="form-label d-flex align-items-center gap-2">
                         <Tag size={16} />
-                        Category
+                        {t('courses.category')}
                       </label>
                       <select
                         className="form-control"
@@ -180,9 +180,9 @@ export default function CreateCourse() {
                         onChange={handleChange}
                         disabled={loading || categoriesLoading}
                       >
-                        <option value="">Select Category</option>
-                        {categoriesLoading && <option disabled>Loading categories...</option>}
-                        {categoriesError && <option disabled>Error loading categories</option>}
+                        <option value="">{t('courses.selectCategory')}</option>
+                        {categoriesLoading && <option disabled>{t('courses.loadingCategories')}</option>}
+                        {categoriesError && <option disabled>{t('courses.errorLoadingCategories')}</option>}
                         {categories && categories.map((cat) => (
                           <option key={cat.id} value={cat.id}>
                             {cat.name}
@@ -195,7 +195,7 @@ export default function CreateCourse() {
                     <div className="col-md-6">
                       <label className="form-label d-flex align-items-center gap-2">
                         <Tag size={16} />
-                        Price ($)
+                        {t('courses.price')}
                       </label>
                       <input
                         type="number"
@@ -203,7 +203,7 @@ export default function CreateCourse() {
                         name="price"
                         value={formData.price || ''}
                         onChange={handleChange}
-                        placeholder="Enter course price"
+                        placeholder={t('courses.enterCoursePrice')}
                         disabled={loading}
                         min="0"
                         step="0.01"
@@ -232,7 +232,7 @@ export default function CreateCourse() {
                     <div className="col-12">
                       <label className="form-label d-flex align-items-center gap-2">
                         <i className="bi bi-camera-video" size={16}></i>
-                        Trailer Video URL
+                        {t('courses.trailerVideoURL')}
                       </label>
                       <input
                         type="url"
@@ -240,7 +240,7 @@ export default function CreateCourse() {
                         name="trailer_video"
                         value={formData.trailer_video}
                         onChange={handleChange}
-                        placeholder="Enter trailer video URL"
+                        placeholder={t('courses.enterTrailerVideoURL')}
                         disabled={loading}
                       />
                     </div>
@@ -249,7 +249,7 @@ export default function CreateCourse() {
                     <div className="col-12">
                       <label className="form-label d-flex align-items-center gap-2">
                         <i className="bi bi-image" size={16}></i>
-                        Course Thumbnail
+                        {t('courses.courseThumbnail')}
                       </label>
                       <input
                         type="file"
@@ -260,7 +260,7 @@ export default function CreateCourse() {
                         disabled={loading}
                       />
                       <small className="form-text text-muted">
-                        Upload an image for the course thumbnail
+                        {t('courses.uploadImageForThumbnail')}
                       </small>
                     </div>
 
@@ -276,7 +276,7 @@ export default function CreateCourse() {
                           disabled={loading}
                         />
                         <label className="form-check-label">
-                          Free Course
+                          {t('courses.freeCourse')}
                         </label>
                       </div>
                     </div>
@@ -302,7 +302,7 @@ export default function CreateCourse() {
                           disabled={loading}
                         >
                           <i className="bi bi-x-circle me-2"></i>
-                          Cancel
+                          {t('courses.cancel')}
                         </button>
                       </div>
                     </div>

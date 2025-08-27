@@ -3,7 +3,7 @@ import { Eye, EyeOff, User, Lock, Mail, UserPlus, GraduationCap } from 'lucide-r
 import { useNavigate } from 'react-router-dom';
 import registerEducator from '../../apis/actions/educator/registerEducator';
 import { pagePaths } from '../../pagePaths';
-import { useLanguage } from '../../contexts/LanguageContext';
+import { useTranslation } from 'react-i18next';
 
 export default function EducatorSignupPage() {
   const [formData, setFormData] = useState({
@@ -20,7 +20,7 @@ export default function EducatorSignupPage() {
   const [loading, setLoading] = useState(false);
 
   const navigate = useNavigate();
-  const { t } = useLanguage();
+  const { t } = useTranslation();
 
 
 
@@ -67,7 +67,7 @@ export default function EducatorSignupPage() {
     return newErrors;
   };
 
-  const handleSubmit = async(e) => {
+  const handleSubmit = async (e) => {
     console.log(formData);
     e.preventDefault();
     const validationErrors = validateForm();
@@ -86,41 +86,41 @@ export default function EducatorSignupPage() {
       password2: formData.confirmPassword,
       phone: formData.phone
     })
-    .then((res) => {
-      console.log(res);
-      navigate(pagePaths.educator.login);
-      setLoading(false);
-    })
-    .catch((err) => {
-      console.log(err);
-      setLoading(false);
-    });
-    
+      .then((res) => {
+        console.log(res);
+        navigate(pagePaths.educator.login);
+        setLoading(false);
+      })
+      .catch((err) => {
+        console.log(err);
+        setLoading(false);
+      });
+
   };
 
   return (
     <div className="min-vh-100 profile-root p-4">
       <div className="container">
-      {/* Header */}
-      <div className="card border-0 shadow-sm">
-        <div className="container py-3">
-          <div className="d-flex align-items-center justify-content-between">
-            <div className="d-flex align-items-center">
-              <div className="header-avatar">
-                <span>🎓</span>
-              </div>
-              <div>
-                <span className="section-title mb-0">
-                  {t('auth.registerAs')} Educator
-                </span>
-                <p className="profile-role mb-0">
-                  {t('auth.createAccount')} {t('common.your')} educator account
-                </p>
+        {/* Header */}
+        <div className="card border-0 shadow-sm">
+          <div className="container py-3">
+            <div className="d-flex align-items-center justify-content-between">
+              <div className="d-flex align-items-center">
+                <div className="header-avatar">
+                  <span>🎓</span>
+                </div>
+                <div>
+                  <span className="section-title mb-0">
+                    {t('auth.registerAs')} Educator
+                  </span>
+                  <p className="profile-role mb-0">
+                    {t('auth.createAccount')} {t('common.your')} educator account
+                  </p>
+                </div>
               </div>
             </div>
           </div>
         </div>
-      </div>
       </div>
 
       {/* Main Content */}
@@ -132,7 +132,7 @@ export default function EducatorSignupPage() {
               <div className="card-body">
                 <div className="text-center mb-4">
                   <div className="avatar-circle">
-                  <GraduationCap size={40} />
+                    <GraduationCap size={40} />
                   </div>
                   <h1 className="section-title mb-2">
                     {t('auth.registerAs')} Educator
@@ -156,7 +156,7 @@ export default function EducatorSignupPage() {
                           className={`form-control ${errors.firstName ? 'is-invalid' : ''}`}
                           value={formData.firstName}
                           onChange={handleInputChange}
-                          placeholder="Enter your first name"
+                          placeholder={t('auth.enterFirstName')}
                           disabled={loading}
                         />
                         <User className="position-absolute top-50 translate-middle-y input-icon" size={20} />
@@ -174,7 +174,7 @@ export default function EducatorSignupPage() {
                           className={`form-control ${errors.lastName ? 'is-invalid' : ''}`}
                           value={formData.lastName}
                           onChange={handleInputChange}
-                          placeholder="Enter your last name"
+                          placeholder={t('auth.enterLastName')}
                           disabled={loading}
                         />
                         <User className="position-absolute top-50 translate-middle-y input-icon" size={20} />
@@ -195,7 +195,7 @@ export default function EducatorSignupPage() {
                         className={`form-control ${errors.username ? 'is-invalid' : ''}`}
                         value={formData.username}
                         onChange={handleInputChange}
-                        placeholder="Choose a username"
+                        placeholder={t('auth.chooseUsername')}
                         disabled={loading}
                       />
                       <User className="position-absolute top-50 translate-middle-y input-icon" size={20} />
@@ -215,7 +215,7 @@ export default function EducatorSignupPage() {
                         className={`form-control ${errors.email ? 'is-invalid' : ''}`}
                         value={formData.email}
                         onChange={handleInputChange}
-                        placeholder="Enter your email address"
+                        placeholder={t('auth.enterEmailAddress')}
                         disabled={loading}
                       />
                       <Mail className="position-absolute top-50 translate-middle-y input-icon" size={20} />
@@ -235,7 +235,7 @@ export default function EducatorSignupPage() {
                         className={`form-control ${errors.phone ? 'is-invalid' : ''}`}
                         value={formData.phone}
                         onChange={handleInputChange}
-                        placeholder="Enter your phone number"
+                        placeholder={t('auth.enterPhoneNumber')}
                         disabled={loading}
                       />
                       <User className="position-absolute top-50 translate-middle-y input-icon" size={20} />
@@ -334,7 +334,7 @@ export default function EducatorSignupPage() {
                     disabled={loading}
                   >
                     {loading && (
-                      <div className="loading-spinner me-2" style={{width: '1rem', height: '1rem', display: 'inline-block'}}></div>
+                      <div className="loading-spinner me-2" style={{ width: '1rem', height: '1rem', display: 'inline-block' }}></div>
                     )}
                     <UserPlus size={20} className="me-2" />
                     {t('auth.registerAs')} Educator
@@ -372,7 +372,7 @@ export default function EducatorSignupPage() {
                 </p>
               </div>
 
-              <div className="position-relative mx-auto mb-4 illustration-container">
+              <div className="position-relative mb-4 illustration-container">
                 <div className="card h-100 d-flex align-items-center justify-content-center">
                   <div className="text-center">
                     <div className="display-1 mb-3">🎓</div>
@@ -381,13 +381,12 @@ export default function EducatorSignupPage() {
                     <div className="progress-bar-accent"></div>
                   </div>
                 </div>
-
+                {/* Floating Elements */}
                 <div className="floating-element">
                   <UserPlus size={24} />
                 </div>
                 <div className="floating-pulse"></div>
               </div>
-
               <div className="card p-4 mb-4">
                 <div className="row text-center">
                   <div className="col-6">

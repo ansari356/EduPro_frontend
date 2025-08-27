@@ -17,6 +17,7 @@ import {
   SortDesc
 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 import useEducatorAssessmentsData from "../../apis/hooks/educator/useEducatorAssessmentsData";
 import useEducatorAllAttempts from "../../apis/hooks/educator/useEducatorAllAttempts";
 import useEducatorPendingGradingData from "../../apis/hooks/educator/useEducatorPendingGradingData";
@@ -61,8 +62,8 @@ function StudentAvatar({ studentName, attemptId }) {
         {firstLetter}
       </div>
       <div>
-        <div className="fw-bold">{studentName || "Unknown Student"}</div>
-        <small className="text-muted">Attempt: {attemptId?.slice(-8) || "N/A"}</small>
+        <div className="fw-bold">{studentName || t('assessments.unknownStudent')}</div>
+        <small className="text-muted">{t('assessments.attempt')}: {attemptId?.slice(-8) || "N/A"}</small>
       </div>
     </div>
   );
@@ -70,6 +71,7 @@ function StudentAvatar({ studentName, attemptId }) {
 
 export default function EducatorAssessmentsPage() {
   const navigate = useNavigate();
+  const { t } = useTranslation();
   const [activeTab, setActiveTab] = useState("assessments");
   const [showCreateAssessment, setShowCreateAssessment] = useState(false);
   const [showCreateQuestion, setShowCreateQuestion] = useState(false);
@@ -843,7 +845,7 @@ export default function EducatorAssessmentsPage() {
       <div className="profile-root p-4">
         <div className="container text-center py-5">
           <div className="loading-spinner"></div>
-          <p className="mt-3 text-muted">Loading assessments...</p>
+          <p className="mt-3 text-muted">{t('assessments.loadingAssessments')}</p>
         </div>
       </div>
     );
@@ -854,18 +856,18 @@ export default function EducatorAssessmentsPage() {
       <div className="profile-root p-4">
         <div className="container">
           <div className="alert alert-danger">
-            <h5 className="alert-heading">Error Loading Assessments</h5>
+            <h5 className="alert-heading">{t('assessments.errorLoadingAssessments')}</h5>
             <p className="mb-0">
               {assessmentsError.response?.data?.message ||
                 assessmentsError.message ||
-                "Failed to load assessments. Please try refreshing the page."}
+                t('assessments.failedToLoadAssessments')}
             </p>
             <hr />
             <button
               className="btn btn-outline-danger btn-sm"
               onClick={() => window.location.reload()}
             >
-              Refresh Page
+              {t('assessments.refreshPage')}
             </button>
           </div>
         </div>
@@ -885,8 +887,8 @@ export default function EducatorAssessmentsPage() {
                   <FileText size={20} />
                 </div>
                 <div>
-                  <h1 className="main-title mb-0">Assessment Management</h1>
-                  <p className="profile-role mb-0">Create and manage assessments for your courses</p>
+                  <h1 className="main-title mb-0">{t('assessments.assessmentManagement')}</h1>
+                  <p className="profile-role mb-0">{t('assessments.createAndManageAssessments')}</p>
                 </div>
               </div>
               <button
@@ -894,7 +896,7 @@ export default function EducatorAssessmentsPage() {
                 onClick={() => setShowCreateAssessment(true)}
               >
                 <Plus size={18} className="me-2" />
-                Create Assessment
+                {t('assessments.createAssessment')}
               </button>
             </div>
           </div>
@@ -910,7 +912,7 @@ export default function EducatorAssessmentsPage() {
                   onClick={() => setActiveTab("assessments")}
                 >
                   <FileText size={16} className="me-2" />
-                  Assessments
+                  {t('assessments.assessments')}
                 </button>
               </li>
               <li className="nav-item" role="presentation">
@@ -919,7 +921,7 @@ export default function EducatorAssessmentsPage() {
                   onClick={() => setActiveTab("grading")}
                 >
                   <CheckCircle size={16} className="me-2" />
-                  Pending Grading
+                  {t('assessments.pendingGrading')}
                   {pendingGrading && pendingGrading.length > 0 && (
                     <span className="badge bg-warning ms-2">{pendingGrading.length}</span>
                   )}
@@ -934,7 +936,7 @@ export default function EducatorAssessmentsPage() {
                     <div className="card-body text-center">
                       <FileText size={32} className="mb-2" />
                       <h3 className="mb-1">{assessments?.length || 0}</h3>
-                      <p className="mb-0">Total Assessments</p>
+                      <p className="mb-0">{t('assessments.totalAssessments')}</p>
                     </div>
                   </div>
                 </div>
@@ -944,7 +946,7 @@ export default function EducatorAssessmentsPage() {
                     <div className="card-body text-center">
                       <CheckCircle size={32} className="mb-2" />
                       <h3 className="mb-1">{pendingGrading?.length || 0}</h3>
-                      <p className="mb-0">Pending Grading</p>
+                      <p className="mb-0">{t('assessments.pendingGradingCount')}</p>
                     </div>
                   </div>
                 </div>
@@ -954,7 +956,7 @@ export default function EducatorAssessmentsPage() {
                     <div className="card-body text-center">
                       <Users size={32} className="mb-2" />
                       <h3 className="mb-1">0</h3>
-                      <p className="mb-0">Total Attempts</p>
+                      <p className="mb-0">{t('assessments.totalAttempts')}</p>
                     </div>
                   </div>
                 </div>
@@ -964,7 +966,7 @@ export default function EducatorAssessmentsPage() {
                     <div className="card-body text-center">
                       <BarChart3 size={32} className="mb-2" />
                       <h3 className="mb-1">0%</h3>
-                      <p className="mb-0">Avg. Score</p>
+                      <p className="mb-0">{t('assessments.avgScore')}</p>
                     </div>
                   </div>
                 </div>
@@ -974,16 +976,13 @@ export default function EducatorAssessmentsPage() {
           <div className="card border-0 shadow-sm">
             <div className="card-body">
               {/* Search and Filters */}
-              <div className="row mb-4">
-                <div className="col-md-6">
-                  <div className="input-group">
-                    <span className="input-group-text">
-                      <Search size={16} />
-                    </span>
+              <div className="row mb-4 g-3">
+                <div className="col-md-5">
+                  <div className="input-group shadow-sm">
                     <input
                       type="text"
-                      className="form-control"
-                      placeholder="Search assessments..."
+                      className="form-control border-start-0 ps-0"
+                      placeholder={t('assessments.searchAssessments')}
                       value={searchTerm}
                       onChange={(e) => setSearchTerm(e.target.value)}
                     />
@@ -991,25 +990,25 @@ export default function EducatorAssessmentsPage() {
                 </div>
                 <div className="col-md-3">
                   <select
-                    className="form-select"
+                    className="form-select shadow-sm"
                     value={filterStatus}
                     onChange={(e) => setFilterStatus(e.target.value)}
                   >
-                    <option value="all">All Status</option>
-                    <option value="draft">Draft</option>
-                    <option value="published">Published</option>
+                    <option value="all">{t('assessments.allStatus')}</option>
+                    <option value="draft">{t('assessments.draft')}</option>
+                    <option value="published">{t('assessments.published')}</option>
                   </select>
                 </div>
-                <div className="col-md-3">
-                  <div className="input-group">
+                <div className="col-md-4">
+                  <div className="input-group shadow-sm">
                     <select
                       className="form-select"
                       value={sortBy}
                       onChange={(e) => setSortBy(e.target.value)}
                     >
-                      <option value="created_at">Created Date</option>
-                      <option value="title">Title</option>
-                      <option value="assessment_type">Type</option>
+                      <option value="created_at">{t('assessments.createdDate')}</option>
+                      <option value="title">{t('assessments.title')}</option>
+                      <option value="assessment_type">{t('assessments.type')}</option>
                     </select>
                     <button
                       className="btn btn-outline-secondary"
@@ -1026,8 +1025,8 @@ export default function EducatorAssessmentsPage() {
                 {sortedAssessments.length === 0 ? (
                   <div className="col-12 text-center py-5">
                     <FileText size={48} className="text-muted mb-3" />
-                    <h5 className="text-muted">No assessments found</h5>
-                    <p className="text-muted">Create your first assessment to get started</p>
+                    <h5 className="text-muted">{t('assessments.noAssessmentsFound')}</h5>
+                    <p className="text-muted">{t('assessments.createFirstAssessment')}</p>
                   </div>
                 ) : (
                   sortedAssessments.map((assessment) => (
@@ -1068,7 +1067,7 @@ export default function EducatorAssessmentsPage() {
                                     }}
                                   >
                                     <Plus size={16} className="me-2" />
-                                    Add Question
+                                    {t('assessments.addQuestion')}
                                   </button>
                                 </li>
                                 <li>
@@ -1081,7 +1080,7 @@ export default function EducatorAssessmentsPage() {
                                     }}
                                   >
                                     <Trash2 size={16} className="me-2" />
-                                    Delete
+                                    {t('assessments.delete')}
                                   </button>
                                 </li>
                               </ul>
@@ -1090,7 +1089,7 @@ export default function EducatorAssessmentsPage() {
 
                           <h5 className="card-title line-clamp-2">{assessment.title}</h5>
                           <p className="card-text text-muted line-clamp-3">
-                            {assessment.description || "No description provided"}
+                            {assessment.description || t('assessments.noDescriptionProvided')}
                           </p>
 
                           <div className="d-flex justify-content-between align-items-center mb-3">
@@ -1099,7 +1098,7 @@ export default function EducatorAssessmentsPage() {
                               {assessment.created_at ? new Date(assessment.created_at).toLocaleDateString() : "N/A"}
                             </span>
                             <span className="text-muted">
-                              Passing: {assessment.passing_score || assessment.passing_grade || 70}%
+                              {t('assessments.passing')}: {assessment.passing_score || assessment.passing_grade || 70}%
                             </span>
                           </div>
 
@@ -1112,7 +1111,7 @@ export default function EducatorAssessmentsPage() {
                               }}
                             >
                               <Plus size={14} className="me-1" />
-                              Questions
+                              {t('assessments.questions')}
                             </button>
                             <button
                               className="btn-secondary-action btn-sm flex-fill"
@@ -1121,7 +1120,7 @@ export default function EducatorAssessmentsPage() {
                               }}
                             >
                               <Eye size={14} className="me-1" />
-                              View
+                              {t('assessments.view')}
                             </button>
                           </div>
                         </div>
@@ -1138,34 +1137,34 @@ export default function EducatorAssessmentsPage() {
         {activeTab === "grading" && (
           <div className="card border-0 shadow-sm">
             <div className="card-body">
-              <h4 className="section-title mb-4">Pending Grading</h4>
+              <h4 className="section-title mb-4">{t('assessments.pendingGrading')}</h4>
 
               {gradingError ? (
                 <div className="alert alert-warning">
-                  <h6 className="alert-heading">Error Loading Pending Grading</h6>
+                  <h6 className="alert-heading">{t('assessments.errorLoadingPendingGrading')}</h6>
                   <p className="mb-0">
                     {gradingError.response?.data?.message ||
                       gradingError.message ||
-                      "Failed to load pending grading items."}
+                      t('assessments.failedToLoadPendingGrading')}
                   </p>
                 </div>
               ) : gradingLoading ? (
                 <div className="text-center py-5">
                   <div className="loading-spinner"></div>
-                  <p className="mt-3 text-muted">Loading pending grading...</p>
+                  <p className="mt-3 text-muted">{t('assessments.loadingPendingGrading')}</p>
                 </div>
               ) : pendingGrading && pendingGrading.length > 0 ? (
                 <div className="table-responsive custom-table-container">
                   <table className="table">
                     <thead>
                       <tr>
-                        <th>Student</th>
-                        <th>Assessment</th>
-                        <th>Question</th>
-                        <th>Answer</th>
-                        <th>Max Points</th>
-                        <th>Current Marks</th>
-                        <th>Action</th>
+                        <th>{t('assessments.student')}</th>
+                        <th>{t('assessments.assessment')}</th>
+                        <th>{t('assessments.question')}</th>
+                        <th>{t('assessments.answer')}</th>
+                        <th>{t('assessments.maxPoints')}</th>
+                        <th>{t('assessments.currentMarks')}</th>
+                        <th>{t('assessments.action')}</th>
                       </tr>
                     </thead>
                     <tbody>
@@ -1177,15 +1176,15 @@ export default function EducatorAssessmentsPage() {
                               attemptId={item.attempt_id}
                             />
                           </td>
-                          <td>{item.assessment_title || "Unknown Assessment"}</td>
+                          <td>{item.assessment_title || t('assessments.unknownAssessment')}</td>
                           <td>
                             <div className="text-truncate" style={{ maxWidth: "200px" }}>
-                              {item.question_text || "Unknown Question"}
+                              {item.question_text || t('assessments.unknownQuestion')}
                             </div>
                           </td>
                           <td>
                             <div className="text-truncate" style={{ maxWidth: "200px" }}>
-                              {item.text_answer || "No answer provided"}
+                              {item.text_answer || t('assessments.noAnswerProvided')}
                             </div>
                           </td>
                           <td>{item.question_mark || 0}</td>
@@ -1199,7 +1198,7 @@ export default function EducatorAssessmentsPage() {
                               className="btn-edit-profile btn-sm"
                               onClick={() => handleGradeAnswerClick(item)}
                             >
-                              Grade
+                              {t('assessments.grade')}
                             </button>
                           </td>
                         </tr>
@@ -1210,8 +1209,8 @@ export default function EducatorAssessmentsPage() {
               ) : (
                 <div className="text-center py-5">
                   <CheckCircle size={48} className="text-success mb-3" />
-                  <h5 className="text-success">All caught up!</h5>
-                  <p className="text-muted">No pending grading items</p>
+                  <h5 className="text-success">{t('assessments.allCaughtUp')}</h5>
+                  <p className="text-muted">{t('assessments.noPendingGradingItems')}</p>
                 </div>
               )}
             </div>
@@ -1227,7 +1226,7 @@ export default function EducatorAssessmentsPage() {
             <div className="modal-content">
               <div className="modal-header">
                 <h5 className="modal-title">
-                  {selectedAssessment ? "Edit Assessment" : "Create New Assessment"}
+                  {selectedAssessment ? t('assessments.editAssessment') : t('assessments.createNewAssessment')}
                 </h5>
                 <button
                   type="button"
@@ -1256,7 +1255,7 @@ export default function EducatorAssessmentsPage() {
                   <div className="row">
                     <div className="col-md-8">
                       <div className="mb-3">
-                        <label className="form-label">Title *</label>
+                        <label className="form-label">{t('assessments.titleRequired')}</label>
                         <input
                           type="text"
                           className="form-control"
@@ -1268,22 +1267,22 @@ export default function EducatorAssessmentsPage() {
                     </div>
                     <div className="col-md-4">
                       <div className="mb-3">
-                        <label className="form-label">Type</label>
+                        <label className="form-label">{t('assessments.type')}</label>
                         <select
                           className="form-select"
                           value={assessmentForm.assessment_type}
                           onChange={(e) => setAssessmentForm(prev => ({ ...prev, assessment_type: e.target.value }))}
                         >
-                          <option value="quiz">Quiz (Lesson)</option>
-                          <option value="assignment">Assignment (Module)</option>
-                          <option value="course_exam">Course Exam</option>
+                          <option value="quiz">{t('assessments.quizLesson')}</option>
+                          <option value="assignment">{t('assessments.assignmentModule')}</option>
+                          <option value="course_exam">{t('assessments.courseExam')}</option>
                         </select>
                       </div>
                     </div>
                   </div>
 
                   <div className="mb-3">
-                    <label className="form-label">Description</label>
+                    <label className="form-label">{t('assessments.description')}</label>
                     <textarea
                       className="form-control"
                       rows="3"
@@ -1298,7 +1297,7 @@ export default function EducatorAssessmentsPage() {
                       <div className="mb-3">
                         {assessmentForm.assessment_type === "quiz" && (
                           <>
-                            <label className="form-label">Lesson *</label>
+                            <label className="form-label">{t('assessments.lessonRequired')}</label>
                             <select
                               className="form-select"
                               value={assessmentForm.lesson}
@@ -1307,7 +1306,7 @@ export default function EducatorAssessmentsPage() {
                               disabled={lessonsLoading}
                             >
                               <option value="">
-                                {lessonsLoading ? "Loading lessons..." : "Select Lesson"}
+                                {lessonsLoading ? t('assessments.loadingLessons') : t('assessments.selectLesson')}
                               </option>
                               {lessons?.map(lesson => (
                                 <option key={lesson.id} value={lesson.id}>
@@ -1316,14 +1315,14 @@ export default function EducatorAssessmentsPage() {
                               ))}
                             </select>
                             {lessonsLoading && (
-                              <small className="text-muted">Loading lessons from your courses...</small>
+                              <small className="text-muted">{t('assessments.loadingLessonsFromCourses')}</small>
                             )}
                           </>
                         )}
 
                         {assessmentForm.assessment_type === "assignment" && (
                           <>
-                            <label className="form-label">Module *</label>
+                            <label className="form-label">{t('assessments.moduleRequired')}</label>
                             <select
                               className="form-select"
                               value={assessmentForm.module}
@@ -1332,7 +1331,7 @@ export default function EducatorAssessmentsPage() {
                               disabled={modulesLoading}
                             >
                               <option value="">
-                                {modulesLoading ? "Loading modules..." : "Select Module"}
+                                {modulesLoading ? t('assessments.loadingModules') : t('assessments.selectModule')}
                               </option>
                               {modules?.map(module => (
                                 <option key={module.id} value={module.id}>
@@ -1341,14 +1340,14 @@ export default function EducatorAssessmentsPage() {
                               ))}
                             </select>
                             {modulesLoading && (
-                              <small className="text-muted">Loading modules from your courses...</small>
+                              <small className="text-muted">{t('assessments.loadingModulesFromCourses')}</small>
                             )}
                           </>
                         )}
 
                         {assessmentForm.assessment_type === "course_exam" && (
                           <>
-                            <label className="form-label">Course *</label>
+                            <label className="form-label">{t('assessments.courseRequired')}</label>
                             <select
                               className="form-select"
                               value={assessmentForm.course}
@@ -1357,14 +1356,14 @@ export default function EducatorAssessmentsPage() {
                               disabled={coursesLoading}
                             >
                               <option value="">
-                                {coursesLoading ? "Loading courses..." : "Select Course"}
+                                {coursesLoading ? t('assessments.loadingCourses') : t('assessments.selectCourse')}
                               </option>
                               {courses?.map(course => (
                                 <option key={course.id} value={course.id}>{course.title}</option>
                               ))}
                             </select>
                             {coursesLoading && (
-                              <small className="text-muted">Loading your courses...</small>
+                              <small className="text-muted">{t('assessments.loadingCourses')}</small>
                             )}
                           </>
                         )}
@@ -1372,7 +1371,7 @@ export default function EducatorAssessmentsPage() {
                     </div>
                     <div className="col-md-6">
                       <div className="mb-3">
-                        <label className="form-label">Passing Score (%)</label>
+                        <label className="form-label">{t('assessments.passingScore')}</label>
                         <input
                           type="number"
                           className="form-control"
@@ -1389,7 +1388,7 @@ export default function EducatorAssessmentsPage() {
                   <div className="row">
                     <div className="col-md-4">
                       <div className="mb-3">
-                        <label className="form-label">Max Attempts</label>
+                        <label className="form-label">{t('assessments.maxAttempts')}</label>
                         <input
                           type="number"
                           className="form-control"
@@ -1410,7 +1409,7 @@ export default function EducatorAssessmentsPage() {
                             onChange={(e) => setAssessmentForm(prev => ({ ...prev, is_timed: e.target.checked }))}
                           />
                           <label className="form-check-label" htmlFor="isTimedCheck">
-                            Time Limited
+                            {t('assessments.timeLimited')}
                           </label>
                         </div>
                       </div>
@@ -1418,7 +1417,7 @@ export default function EducatorAssessmentsPage() {
                     <div className="col-md-4">
                       {assessmentForm.is_timed && (
                         <div className="mb-3">
-                          <label className="form-label">Time Limit (minutes)</label>
+                          <label className="form-label">{t('assessments.timeLimitMinutes')}</label>
                           <input
                             type="number"
                             className="form-control"
@@ -1441,7 +1440,7 @@ export default function EducatorAssessmentsPage() {
                         onChange={(e) => setAssessmentForm(prev => ({ ...prev, is_published: e.target.checked }))}
                       />
                       <label className="form-check-label" htmlFor="isPublishedCheck">
-                        Publish immediately
+                        {t('assessments.publishImmediately')}
                       </label>
                     </div>
                   </div>
@@ -1468,10 +1467,10 @@ export default function EducatorAssessmentsPage() {
                       });
                     }}
                   >
-                    Cancel
+                    {t('assessments.cancel')}
                   </button>
                   <button type="submit" className="btn-edit-profile">
-                    {selectedAssessment ? "Update Assessment" : "Create Assessment"}
+                    {selectedAssessment ? t('assessments.updateAssessment') : t('assessments.createAssessment')}
                   </button>
                 </div>
               </form>
@@ -1501,7 +1500,7 @@ export default function EducatorAssessmentsPage() {
           <div className="modal-dialog">
             <div className="modal-content">
               <div className="modal-header">
-                <h5 className="modal-title">Grade Answer</h5>
+                <h5 className="modal-title">{t('assessments.gradeAnswer')}</h5>
                 <button
                   type="button"
                   className="btn-close"
@@ -1515,21 +1514,21 @@ export default function EducatorAssessmentsPage() {
               <form onSubmit={handleGradeSubmit}>
                 <div className="modal-body">
                   <div className="mb-3">
-                    <label className="form-label">Student Answer</label>
+                    <label className="form-label">{t('assessments.studentAnswer')}</label>
                     <div className="form-control-plaintext bg-light p-3">
-                      {selectedAnswer?.text_answer || "No answer provided"}
+                      {selectedAnswer?.text_answer || t('assessments.noAnswerProvided')}
                     </div>
                   </div>
 
                   <div className="mb-3">
-                    <label className="form-label">Question</label>
+                    <label className="form-label">{t('assessments.question')}</label>
                     <div className="form-control-plaintext bg-light p-3">
-                      {selectedAnswer?.question_text || "No question text"}
+                      {selectedAnswer?.question_text || t('assessments.noQuestionText')}
                     </div>
                   </div>
 
                   <div className="mb-3">
-                    <label className="form-label">Marks Awarded</label>
+                    <label className="form-label">{t('assessments.marksAwarded')}</label>
                     <input
                       type="number"
                       step="0.01"
@@ -1540,12 +1539,12 @@ export default function EducatorAssessmentsPage() {
                       onChange={(e) => setGradingForm(prev => ({ ...prev, marks_awarded: e.target.value }))}
                     />
                     <small className="text-muted">
-                      Maximum marks: {selectedAnswer?.question_mark || 0}
+                      {t('assessments.maximumMarks')}: {selectedAnswer?.question_mark || 0}
                     </small>
                   </div>
 
                   <div className="mb-3">
-                    <label className="form-label">Is Correct</label>
+                    <label className="form-label">{t('assessments.isCorrect')}</label>
                     <div className="form-check">
                       <input
                         type="checkbox"
@@ -1555,19 +1554,19 @@ export default function EducatorAssessmentsPage() {
                         onChange={(e) => setGradingForm(prev => ({ ...prev, is_correct: e.target.checked }))}
                       />
                       <label className="form-check-label" htmlFor="isCorrect">
-                        Mark this answer as correct
+                        {t('assessments.markAnswerAsCorrect')}
                       </label>
                     </div>
                   </div>
 
                   <div className="mb-3">
-                    <label className="form-label">Teacher Feedback (Optional)</label>
+                    <label className="form-label">{t('assessments.teacherFeedbackOptional')}</label>
                     <textarea
                       className="form-control"
                       rows="3"
                       value={gradingForm.teacher_feedback}
                       onChange={(e) => setGradingForm(prev => ({ ...prev, teacher_feedback: e.target.value }))}
-                      placeholder="Provide feedback to the student..."
+                      placeholder={t('assessments.provideFeedbackToStudent')}
                     ></textarea>
                   </div>
                 </div>
@@ -1581,10 +1580,10 @@ export default function EducatorAssessmentsPage() {
                       setGradingForm({ marks_awarded: "", teacher_feedback: "", is_correct: false });
                     }}
                   >
-                    Cancel
+                    {t('assessments.cancel')}
                   </button>
                   <button type="submit" className="btn-edit-profile">
-                    Submit Grade
+                    {t('assessments.submitGrade')}
                   </button>
                 </div>
               </form>

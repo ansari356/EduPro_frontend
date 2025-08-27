@@ -1,11 +1,13 @@
 import React, { useState, useEffect } from 'react';
 import { Eye, EyeOff, User, Lock, Phone, Mail, BookOpen, ArrowRight, UserPlus } from 'lucide-react';
 import { useNavigate, useParams } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import useEducatorPublicData from '../../apis/hooks/student/useEducatorPublicData';
 import { pagePaths } from '../../pagePaths';
 import registerStudent from '../../apis/actions/student/registerStudent';
 
 const StudentSignupPage = () => {
+  const { t } = useTranslation();
   const [formData, setFormData] = useState({
     firstName: '',
     lastName: '',
@@ -32,70 +34,70 @@ const StudentSignupPage = () => {
 
     // First Name validation
     if (!formData.firstName.trim()) {
-      newErrors.firstName = 'First name is required';
+      newErrors.firstName = t('student.firstNameRequired');
     } else if (formData.firstName.trim().length < 2) {
-      newErrors.firstName = 'First name must be at least 2 characters';
+      newErrors.firstName = t('student.firstNameMinLength');
     } else if (!/^[a-zA-Z\s]+$/.test(formData.firstName.trim())) {
-      newErrors.firstName = 'First name can only contain letters and spaces';
+      newErrors.firstName = t('student.firstNameLettersOnly');
     }
 
     // Last Name validation
     if (!formData.lastName.trim()) {
-      newErrors.lastName = 'Last name is required';
+      newErrors.lastName = t('student.lastNameRequired');
     } else if (formData.lastName.trim().length < 2) {
-      newErrors.lastName = 'Last name must be at least 2 characters';
+      newErrors.lastName = t('student.lastNameMinLength');
     } else if (!/^[a-zA-Z\s]+$/.test(formData.lastName.trim())) {
-      newErrors.lastName = 'Last name can only contain letters and spaces';
+      newErrors.lastName = t('student.lastNameLettersOnly');
     }
 
     // Username validation
     if (!formData.username.trim()) {
-      newErrors.username = 'Username (Student ID) is required';
+      newErrors.username = t('student.usernameRequired');
     } else if (formData.username.trim().length < 3) {
-      newErrors.username = 'Username must be at least 3 characters';
+      newErrors.username = t('student.usernameMinLength');
     } else if (!/^[a-zA-Z0-9_-]+$/.test(formData.username.trim())) {
-      newErrors.username = 'Username can only contain letters, numbers, underscores, and hyphens';
+      newErrors.username = t('student.usernameFormat');
     }
 
     // Phone validation
     if (!formData.phone.trim()) {
-      newErrors.phone = 'Phone number is required';
+      newErrors.phone = t('student.phoneRequired');
     } else if (!/^01[0125][0-9]{8}$/.test(formData.phone.trim())) {
-      newErrors.phone = 'Please enter a valid Egyptian phone number (e.g., 01012345678)';
+      newErrors.phone = t('student.phoneInvalid');
     }
 
     // Email validation
     if (!formData.email.trim()) {
-      newErrors.email = 'Email is required';
+      newErrors.email = t('student.emailRequired');
     } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email.trim())) {
-      newErrors.email = 'Please enter a valid email address';
+      newErrors.email = t('student.emailInvalid');
     }
 
     // Password validation
     if (!formData.password) {
-      newErrors.password = 'Password is required';
+      newErrors.password = t('student.passwordRequired');
     } else if (formData.password.length < 8) {
-      newErrors.password = 'Password must be at least 8 characters long';
+      newErrors.password = t('student.passwordMinLength');
     } else if (!/(?=.*[a-z])/.test(formData.password)) {
-      newErrors.password = 'Password must contain at least one lowercase letter';
+      newErrors.password = t('student.passwordLowercase');
     } else if (!/(?=.*[A-Z])/.test(formData.password)) {
-      newErrors.password = 'Password must contain at least one uppercase letter';
+      newErrors.password = t('student.passwordUppercase');
     } else if (!/(?=.*\d)/.test(formData.password)) {
-      newErrors.password = 'Password must contain at least one number';
+      newErrors.password = t('student.passwordNumber');
     }
 
     // Confirm Password validation
     if (!formData.confirmPassword) {
-      newErrors.confirmPassword = 'Please confirm your password';
+      newErrors.confirmPassword = t('student.confirmPasswordRequired');
     } else if (formData.password !== formData.confirmPassword) {
-      newErrors.confirmPassword = 'Passwords do not match';
+      newErrors.confirmPassword = t('profile.passwordsMismatch');
     }
 
     // Parent Phone validation
     if (!formData.parentPhone.trim()) {
-      newErrors.parentPhone = 'Parent phone number is required';
+      newErrors.parentPhone = t('student.parentPhoneRequired');
     } else if (!/^01[0125][0-9]{8}$/.test(formData.parentPhone.trim())) {
-      newErrors.parentPhone = 'Please enter a valid Egyptian phone number (e.g., 01012345678)';
+      newErrors.parentPhone = t('student.parentPhoneInvalid');
     }
 
     return newErrors;
@@ -174,7 +176,7 @@ const StudentSignupPage = () => {
       console.log('Student registration successful:', response.data);
 
       // Show success message
-      setSuccessMessage(`Registration successful! Welcome to ${educatorData.full_name}'s ${educatorData.specialization} class!`);
+      setSuccessMessage(t('student.registrationSuccessful', { name: educatorData.full_name, specialization: educatorData.specialization }));
       setShowSuccess(true);
 
       // Reset form
@@ -224,14 +226,14 @@ const StudentSignupPage = () => {
         if (Object.keys(newErrors).length > 0) {
           setErrors(newErrors);
         } else {
-          setErrors({ general: err.response?.data?.detail || err.message || 'Registration failed. Please try again.' });
+          setErrors({ general: err.response?.data?.detail || err.message || t('student.registrationFailed') });
         }
       } else if (err.response?.status === 500) {
-        setErrors({ general: 'Server error. Please try again later.' });
+        setErrors({ general: t('student.serverError') });
       } else if (err.message === 'Network Error') {
-        setErrors({ general: 'Connection error. Please check your internet connection.' });
+        setErrors({ general: t('student.connectionError') });
       } else {
-        setErrors({ general: err.response?.data?.detail || err.message || 'Registration failed. Please try again.' });
+        setErrors({ general: err.response?.data?.detail || err.message || t('student.registrationFailed') });
       }
     } finally {
       setRegisterLoading(false);
@@ -243,9 +245,9 @@ const StudentSignupPage = () => {
       <div className="profile-root min-vh-100 d-flex align-items-center justify-content-center">
         <div className="text-center">
           <div className="loading-spinner mb-3" role="status">
-            <span className="visually-hidden">Loading...</span>
+            <span className="visually-hidden">{t('common.loading')}</span>
           </div>
-          <p className="profile-joined">Loading teacher's page...</p>
+          <p className="profile-joined">{t('student.loadingTeachersPage')}</p>
         </div>
       </div>
     );
@@ -255,7 +257,7 @@ const StudentSignupPage = () => {
     return (
       <div className="profile-root min-vh-100 d-flex align-items-center justify-content-center">
         <div className="text-center">
-          <p className="profile-joined text-danger">Error loading teacher data: {error.message}</p>
+          <p className="profile-joined text-danger">{t('student.errorLoadingTeacherData', { error: error.message })}</p>
         </div>
       </div>
     );
@@ -266,16 +268,15 @@ const StudentSignupPage = () => {
       <div className="profile-root min-vh-100 d-flex align-items-center justify-content-center">
         <div className="text-center">
           <div className="display-1 mb-4">❌</div>
-          <h1 className="main-title mb-4">Teacher Not Found</h1>
+          <h1 className="main-title mb-4">{t('student.teacherNotFound')}</h1>
           <p className="profile-joined mb-4">
-            Sorry, we couldn't find this teacher's page.
-            Please check the link or contact platform administration.
+            {t('student.teacherNotFoundMessage')}
           </p>
           <button
             className="btn-edit-profile"
             onClick={() => navigate('/')} // Navigate to a default homepage or error page
           >
-            Back to Homepage
+            {t('student.backToHomepage')}
           </button>
         </div>
       </div>
@@ -290,11 +291,11 @@ const StudentSignupPage = () => {
           <div className="d-flex align-items-center justify-content-between">
             <div className="d-flex align-items-center">
               <div className="header-avatar">
-                <img src={educatorData.profile_picture || 'https://placehold.co/50x50?text=Profile'} alt="Educator Profile" style={{ borderRadius: '10px', width: '50px', height: '50px', objectFit: 'cover' }} />
+                <img src={educatorData.profile_picture || 'https://placehold.co/50x50?text=Profile'} alt={t('student.educatorProfile')} style={{ borderRadius: '10px', width: '50px', height: '50px', objectFit: 'cover' }} />
               </div>
               <div>
                 <span className="section-title mb-0">
-                  {educatorData.full_name}'s Class
+                  {educatorData.full_name}'s {t('student.class')}
                 </span>
                 <p className="profile-role mb-0">
                   {educatorData.specialization}
@@ -308,7 +309,7 @@ const StudentSignupPage = () => {
                 onClick={() => navigate(pagePaths.student.login(educatorUsername))}
               >
                 <ArrowRight size={16} className="me-2" />
-                Student Login
+                {t('student.studentLogin')}
               </button>
             </div>
           </div>
@@ -325,16 +326,16 @@ const StudentSignupPage = () => {
               <div className="card-body">
                 <div className="text-center mb-4">
                   <div className="avatar-rectangle">
-                    <img src={educatorData.profile_picture || 'https://placehold.co/400x300?text=Profile'} alt="Educator Profile" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                    <img src={educatorData.profile_picture || 'https://placehold.co/400x300?text=Profile'} alt={t('student.educatorProfile')} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
                   </div>
                   <h1 className="section-title mb-2">
-                    Join
+                    {t('student.join')}
                   </h1>
                   <h2 className="profile-name text-accent mb-2">
-                    {educatorData.full_name}'s Class
+                    {educatorData.full_name}'s {t('student.class')}
                   </h2>
                   <p className="profile-joined">
-                    {educatorData.experiance || 0} years experience • {educatorData.number_of_students || 0} registered students
+                    {educatorData.experiance || 0} {t('student.yearsExperience')} • {educatorData.number_of_students || 0} {t('student.registeredStudents')}
                   </p>
                 </div>
 
@@ -367,7 +368,7 @@ const StudentSignupPage = () => {
                   {/* First Name */}
                   <div className="mb-3">
                     <label className="form-label">
-                      First Name *
+                      {t('profile.firstName')} *
                     </label>
                     <div className="position-relative">
                       <input
@@ -376,7 +377,7 @@ const StudentSignupPage = () => {
                         className={`form-control ${errors.firstName ? 'is-invalid' : ''}`}
                         value={formData.firstName}
                         onChange={handleInputChange}
-                        placeholder="Enter your first name"
+                        placeholder={t('student.enterFirstName')}
                       />
                       <User className="position-absolute top-50 translate-middle-y input-icon" size={20} />
                       {errors.firstName && <div className="invalid-feedback">{errors.firstName}</div>}
@@ -386,7 +387,7 @@ const StudentSignupPage = () => {
                   {/* Last Name */}
                   <div className="mb-3">
                     <label className="form-label">
-                      Last Name *
+                      {t('profile.lastName')} *
                     </label>
                     <div className="position-relative">
                       <input
@@ -395,7 +396,7 @@ const StudentSignupPage = () => {
                         className={`form-control ${errors.lastName ? 'is-invalid' : ''}`}
                         value={formData.lastName}
                         onChange={handleInputChange}
-                        placeholder="Enter your last name"
+                        placeholder={t('student.enterLastName')}
                       />
                       <User className="position-absolute top-50 translate-middle-y input-icon" size={20} />
                       {errors.lastName && <div className="invalid-feedback">{errors.lastName}</div>}
@@ -405,7 +406,7 @@ const StudentSignupPage = () => {
                   {/* Username (Student ID) */}
                   <div className="mb-3">
                     <label className="form-label">
-                      Username (Student ID) *
+                      {t('profile.username')} ({t('student.studentId')}) *
                     </label>
                     <div className="position-relative">
                       <input
@@ -414,7 +415,7 @@ const StudentSignupPage = () => {
                         className={`form-control ${errors.username ? 'is-invalid' : ''}`}
                         value={formData.username}
                         onChange={handleInputChange}
-                        placeholder="Enter your student ID or desired username"
+                        placeholder={t('student.enterStudentId')}
                       />
                       <BookOpen className="position-absolute top-50 translate-middle-y input-icon" size={20} />
                       {errors.username && <div className="invalid-feedback">{errors.username}</div>}
@@ -424,7 +425,7 @@ const StudentSignupPage = () => {
                   {/* Phone */}
                   <div className="mb-3">
                     <label className="form-label">
-                      Phone Number *
+                      {t('profile.phone')} *
                     </label>
                     <div className="position-relative">
                       <input
@@ -433,7 +434,7 @@ const StudentSignupPage = () => {
                         className={`form-control ${errors.phone ? 'is-invalid' : ''}`}
                         value={formData.phone}
                         onChange={handleInputChange}
-                        placeholder="Enter your phone number"
+                        placeholder={t('student.enterPhoneNumber')}
                       />
                       <Phone className="position-absolute top-50 translate-middle-y input-icon" size={20} />
                       {errors.phone && <div className="invalid-feedback">{errors.phone}</div>}
@@ -443,7 +444,7 @@ const StudentSignupPage = () => {
                   {/* Email */}
                   <div className="mb-3">
                     <label className="form-label">
-                      Email Address *
+                      {t('profile.email')} *
                     </label>
                     <div className="position-relative">
                       <input
@@ -452,7 +453,7 @@ const StudentSignupPage = () => {
                         className={`form-control ${errors.email ? 'is-invalid' : ''}`}
                         value={formData.email}
                         onChange={handleInputChange}
-                        placeholder="Enter your email address"
+                        placeholder={t('student.enterEmailAddress')}
                       />
                       <Mail className="position-absolute top-50 translate-middle-y input-icon" size={20} />
                       {errors.email && <div className="invalid-feedback">{errors.email}</div>}
@@ -462,7 +463,7 @@ const StudentSignupPage = () => {
                   {/* Parent Phone */}
                   <div className="mb-3">
                     <label className="form-label">
-                      Parent Phone Number *
+                      {t('student.parentPhone')} *
                     </label>
                     <div className="position-relative">
                       <input
@@ -471,7 +472,7 @@ const StudentSignupPage = () => {
                         className={`form-control ${errors.parentPhone ? 'is-invalid' : ''}`}
                         value={formData.parentPhone}
                         onChange={handleInputChange}
-                        placeholder="Enter parent's phone number"
+                        placeholder={t('student.enterParentPhone')}
                       />
                       <Phone className="position-absolute top-50 translate-middle-y input-icon" size={20} />
                       {errors.parentPhone && <div className="invalid-feedback">{errors.parentPhone}</div>}
@@ -481,7 +482,7 @@ const StudentSignupPage = () => {
                   {/* Password */}
                   <div className="mb-3">
                     <label className="form-label">
-                      Password *
+                      {t('auth.password')} *
                     </label>
                     <div className="position-relative">
                       <input
@@ -504,10 +505,10 @@ const StudentSignupPage = () => {
                       {passwordStrength && (
                         <div className={`password-strength ${passwordStrength} mt-2`}>
                           <small>
-                            Password strength: <strong className="text-capitalize">{passwordStrength}</strong>
-                            {passwordStrength === 'weak' && ' - Add more characters and complexity'}
-                            {passwordStrength === 'medium' && ' - Good, but could be stronger'}
-                            {passwordStrength === 'strong' && ' - Excellent password strength!'}
+                            {t('student.passwordStrength')} <strong className="text-capitalize">{passwordStrength}</strong>
+                            {passwordStrength === 'weak' && t('student.passwordStrengthWeak')}
+                            {passwordStrength === 'medium' && t('student.passwordStrengthMedium')}
+                            {passwordStrength === 'strong' && t('student.passwordStrengthStrong')}
                           </small>
                         </div>
                       )}
@@ -517,7 +518,7 @@ const StudentSignupPage = () => {
                   {/* Confirm Password */}
                   <div className="mb-4">
                     <label className="form-label">
-                      Confirm Password *
+                      {t('auth.confirmPassword')} *
                     </label>
                     <div className="position-relative">
                       <input
@@ -543,7 +544,7 @@ const StudentSignupPage = () => {
                   <div className="form-check mb-4">
                     <input className="form-check-input" type="checkbox" id="terms" required />
                     <label className="form-check-label" htmlFor="terms">
-                      I agree to the terms and conditions and privacy policy
+                      {t('student.agreeTerms')}
                     </label>
                   </div>
 
@@ -557,18 +558,18 @@ const StudentSignupPage = () => {
                     ) : (
                       <UserPlus size={20} className="me-2" />
                     )}
-                    {registerLoading ? 'Registering...' : `Register for ${educatorData.specialization} Class`}
+                    {registerLoading ? t('student.registering') : t('student.registerForClass', { specialization: educatorData.specialization })}
                   </button>
                 </form>
 
                 <div className="text-center">
                   <p className="profile-joined">
-                    Already have an account?
+                    {t('student.alreadyHaveAccount')}
                     <button
                       className="btn-link-custom text-accent ms-1"
                       onClick={() => navigate(pagePaths.student.login(educatorUsername))}
                     >
-                      Login here
+                      {t('student.loginHere')}
                     </button>
                   </p>
                 </div>
@@ -581,31 +582,38 @@ const StudentSignupPage = () => {
             <div className="illustration-card">
               <div className="text-center mb-4">
                 <h2 className="section-title text-white mb-2">
-                  Register for {educatorData.specialization}
+                  {t('student.registerFor')} {educatorData.specialization}
                 </h2>
                 <p className="profile-name text-white mb-2">
-                  with {educatorData.full_name}
+                  {t('common.with')} {educatorData.full_name}
                 </p>
                 <p className="text-white opacity-75">
                   {educatorData.bio}
                 </p>
               </div>
 
-              <div className="position-relative mx-auto mb-4 illustration-container">
+              <div className="position-relative mb-4 illustration-container">
                 <div className="card h-100 d-flex align-items-center justify-content-center">
                   <div className="text-center">
-                    <img src={educatorData.logo || 'https://placehold.co/200x100?text=Logo'} alt="Educator Logo" className="img-fluid" style={{ maxHeight: '150px' }} />
+                    <img
+                      src={educatorData.logo || 'https://placehold.co/200x100?text=Logo'}
+                      alt={t('student.educatorLogo')}
+                      className="img-fluid"
+                      style={{ maxHeight: '150px' }}
+                    />
                     <div className="progress-bar-primary"></div>
                     <div className="progress-bar-light"></div>
                     <div className="progress-bar-accent"></div>
                   </div>
                 </div>
 
+                {/* Floating Elements */}
                 <div className="floating-element">
                   <UserPlus size={24} />
                 </div>
                 <div className="floating-pulse"></div>
               </div>
+
 
               <div className="card p-4 mb-4">
                 <div className="row text-center">
@@ -613,13 +621,13 @@ const StudentSignupPage = () => {
                     <div className="section-title text-accent">
                       {educatorData.number_of_students}
                     </div>
-                    <div className="profile-joined">Current Students</div>
+                    <div className="profile-joined">{t('student.currentStudents')}</div>
                   </div>
                   <div className="col-6">
                     <div className="section-title text-accent">
                       {educatorData.number_of_courses}
                     </div>
-                    <div className="profile-joined">Available Courses</div>
+                    <div className="profile-joined">{t('student.availableCourses')}</div>
                   </div>
                 </div>
               </div>

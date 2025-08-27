@@ -9,13 +9,13 @@ import useEducatorCoursesData from "../../apis/hooks/educator/useEducatorCourses
 import { pagePaths } from "../../pagePaths";
 import { QRCodeSVG } from "qrcode.react";
 import { CircleUserRound } from "lucide-react";
-import { useLanguage } from "../../contexts/LanguageContext";
+import { useTranslation } from 'react-i18next';
 
 
 function EducatorProfile() {
   const [showEditForm, setShowEditForm] = useState(false);
   const navigate = useNavigate();
-  const { t } = useLanguage();
+  const { t } = useTranslation();
 
 
   const {
@@ -500,13 +500,13 @@ function EducatorProfile() {
                   <div>
                     <span className="section-title">{t('profile.personalInfo')}</span>
                     <p className="profile-role">
-                      Manage your profile and quick actions
+                      {t('educator.manageProfile')}
                     </p>
                   </div>
                 </div>
                 <button
                   className="px-4 btn-edit-profile me-2"
-                  aria-label="Edit Profile"
+                  aria-label={t('educator.editProfile')}
                   onClick={() => setShowEditForm(true)}
                 >
                   {t('profile.editProfile')}
@@ -534,7 +534,7 @@ function EducatorProfile() {
                           marginRight: 'auto',
                           display: 'block'
                         }}
-                        aria-label="Educator avatar"
+                        aria-label={`${t('header.educator')} avatar`}
                       />
                     </div>
                     <div>
@@ -590,9 +590,9 @@ function EducatorProfile() {
                         <div className="d-flex">
                           <i className="bi bi-calendar-event"></i>
                           <div className="d-flex flex-sm-row flex-column px-3">
-                            <strong className="me-2">Experience:</strong>
+                            <strong className="me-2">{t('educator.experience')}:</strong>
                             <span className="small">
-                              {educatorData?.experiance || "__"} Years
+                              {educatorData?.experiance || "__"} {t('educator.years')}
                             </span>
                           </div>
                         </div>
@@ -611,7 +611,7 @@ function EducatorProfile() {
                     {/* QR Code */}
                     <div className="col-xl-4 d-flex flex-column mt-4 align-items-center justify-content-center">
                       <div className="text-center mb-2">
-                        <small className="fw-bold fw-medium">Educator QR</small>
+                        <small className="fw-bold fw-medium">{t('educator.educatorQR')}</small>
                       </div>
                       <div className="qr-container">
                         <QRCodeSVG
@@ -626,13 +626,13 @@ function EducatorProfile() {
 
                   {/* Bio Section */}
                   <div className="mt-4">
-                    <h6 className="fw-bold mb-2">Bio</h6>
+                    <h6 className="fw-bold mb-2">{t('educator.bio')}</h6>
                     <div className="about-bubble px-3 py-2">
                       <p
                         className="mb-0 fw-medium"
                         style={{ fontSize: "0.9rem", lineHeight: "1.5" }}
                       >
-                        {educatorData?.bio || "edit your profile to add a bio"}
+                        {educatorData?.bio || t('educator.editYourProfileToAddBio')}
                       </p>
                     </div>
                   </div>
@@ -645,7 +645,7 @@ function EducatorProfile() {
               <div className="card shadow-sm mb-4">
                 <div className="card-body p-4">
                   <h5 className="fw-bold section-title mb-3">
-                    Teaching Statistics
+                    {t('educator.teachingStatistics')}
                   </h5>
 
                   <div className="row text-center">
@@ -655,7 +655,7 @@ function EducatorProfile() {
                           {educatorData?.number_of_courses ?? "__"}
                         </h4>
                         <small className="about-subtitle fw-medium">
-                          Total Courses
+                          {t('educator.totalCourses')}
                         </small>
                       </div>
                     </div>
@@ -665,7 +665,7 @@ function EducatorProfile() {
                           {educatorData?.rating ?? "__"}
                         </h4>
                         <small className="about-subtitle fw-medium">
-                          Rating
+                          {t('common.rating')}
                         </small>
                       </div>
                     </div>
@@ -675,7 +675,7 @@ function EducatorProfile() {
                           {educatorData?.number_of_students ?? "__"}
                         </h4>
                         <small className="about-subtitle fw-medium">
-                          Total Students
+                          {t('educator.totalStudents')}
                         </small>
                       </div>
                     </div>
@@ -686,7 +686,7 @@ function EducatorProfile() {
               {/* Quick Actions Card */}
               <div className="card shadow-sm">
                 <div className="card-body p-4">
-                  <h5 className="fw-bold section-title mb-3">Quick Actions</h5>
+                  <h5 className="fw-bold section-title mb-3">{t('educator.quickActions')}</h5>
                   <div className="d-flex flex-column gap-2">
                     <Link
                       to={pagePaths.educator.createCourse}
@@ -698,7 +698,7 @@ function EducatorProfile() {
                           style={{ fontSize: "1.2rem" }}
                         ></i>
                         <div className="flex-grow-1">
-                          <span className="fw-medium">Create New Course</span>
+                          <span className="fw-medium">{t('educator.createNewCourse')}</span>
                         </div>
                         <i className="bi bi-chevron-right"></i>
                       </div>
@@ -713,7 +713,7 @@ function EducatorProfile() {
                           style={{ fontSize: "1.2rem" }}
                         ></i>
                         <div className="flex-grow-1">
-                          <span className="fw-medium">Manage Students</span>
+                          <span className="fw-medium">{t('educator.manageStudents')}</span>
                         </div>
                         <i className="bi bi-chevron-right"></i>
                       </div>
@@ -728,7 +728,7 @@ function EducatorProfile() {
                           style={{ fontSize: "1.2rem" }}
                         ></i>
                         <div className="flex-grow-1">
-                          <span className="fw-medium">Manage Coupons</span>
+                          <span className="fw-medium">{t('educator.manageCoupons')}</span>
                         </div>
                         <i className="bi bi-chevron-right"></i>
                       </div>
@@ -742,21 +742,40 @@ function EducatorProfile() {
           {/* Courses Taught Section */}
           <div className="row mt-4">
             <div className="col-12">
-              <h5 className="fw-bold section-title mb-3">Courses Taught</h5>
+              <h5 className="fw-bold section-title mb-3">{t('educator.coursesTaught')}</h5>
               <div className="row g-4">
-                {courses.length === 0 ? (
-                  <div className="alert alert-info">
-                    No courses available yet!
+                {coursesLoading ? (
+                  <div className="col-12 text-center py-4">
+                    <div className="spinner-border text-primary" role="status">
+                      <span className="visually-hidden">{t('educator.loadingCourses')}</span>
+                    </div>
+                    <p className="mt-3 text-muted">{t('educator.loadingYourCourses')}</p>
+                  </div>
+                ) : coursesError ? (
+                  <div className="col-12">
+                    <div className="alert alert-danger">
+                      <i className="bi bi-exclamation-triangle me-2"></i>
+                      {t('educator.failedToLoadCourses')}
+                    </div>
+                  </div>
+                ) : !coursesData || coursesData.length === 0 ? (
+                  <div className="col-12">
+                    <div className="alert alert-info">
+                      <i className="bi bi-info-circle me-2"></i>
+                      {t('educator.noCoursesAvailableYet')}
+                    </div>
                   </div>
                 ) : (
-                  courses.map((course, idx) => (
+                  coursesData.map((course, idx) => (
                     <div className="col-md-6 col-lg-4" key={idx}>
-                      <div className="card h-100 shadow-sm d-flex flex-column">
+                      <div className="card h-100 shadow-sm d-flex flex-column course-card">
+                        {/* Hover Overlay */}
+                        <div className="course-card-overlay"></div>
                         {/* Course Image */}
                         {course.thumbnail && (
                           <img
                             src={course.thumbnail}
-                            alt={course.name}
+                            alt={course.title}
                             className="card-img-top"
                             style={{ height: '200px', objectFit: 'cover' }}
                           />
@@ -776,7 +795,7 @@ function EducatorProfile() {
                         
                         <div className="card-body d-flex flex-column">
                           <h5 className="section-title mb-2">
-                            {course.name}
+                            {course.title}
                           </h5>
                           
                           {/* Course Description */}
@@ -796,7 +815,7 @@ function EducatorProfile() {
                                 <div className="d-flex align-items-center">
                                   <i className="bi bi-people me-2 text-main"></i>
                                   <span className="text-muted small">
-                                    <strong>{course.students || 0}</strong> Students
+                                    <strong>{course.total_enrollments || 0}</strong> Students
                                   </span>
                                 </div>
                               </div>
@@ -827,7 +846,7 @@ function EducatorProfile() {
                                   <div className="d-flex align-items-center">
                                     <i className="bi bi-tag me-2 text-secondary"></i>
                                     <span className="text-muted small">
-                                      {course.category}
+                                      {course.category.name}
                                     </span>
                                   </div>
                                 </div>
@@ -838,13 +857,13 @@ function EducatorProfile() {
                             <div className="d-flex justify-content-between align-items-center mb-2">
                               <span
                                 className={`badge ${
-                                  course.status === "Active"
+                                  course.is_published
                                     ? "bg-success"
                                     : "bg-secondary"
                                 }`}
                                 style={{ fontSize: '0.8rem' }}
                               >
-                                {course.status}
+                                {course.is_published ? "Published" : "Draft"}
                               </span>
                               {course.is_free ? (
                                 <span className="badge bg-success">Free</span>

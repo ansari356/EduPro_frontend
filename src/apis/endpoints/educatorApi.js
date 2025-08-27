@@ -29,6 +29,7 @@ export const educatorEndpoints = {
 		list: "/teacher/get_students/",
 		remove: (studentId) => `/teacher/students/remove/${studentId}/`,
 		block: (studentId) => `/teacher/students/toggle-block/${studentId}/`,
+		enrollments: (studentId) => `/teacher/students/${studentId}/enrollments/`,
 	},
 	coupon: {
 		used: "/coupon/used-coupons/",

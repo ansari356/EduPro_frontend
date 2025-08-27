@@ -1,34 +1,37 @@
 import React, { useState } from "react";
 import { DollarSign, Plus, Copy, Eye, EyeOff } from "lucide-react";
 import { useNavigate } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 import useEducatorCouponsListData from "../../apis/hooks/educator/useEducatorCouponsListData";
 import useEducatorUsedCouponsListData from "../../apis/hooks/educator/useEducatorUsedCouponsListData";
 import useEducatorTotalRevenue from "../../apis/hooks/educator/useEducatorTotalRevenue";
-import createCoupon from "../../apis/actions/educator/createCoupon"; 
-const COUPONS_PER_PAGE = 5; 
+import createCoupon from "../../apis/actions/educator/createCoupon";
+const COUPONS_PER_PAGE = 5;
 
 export default function ManageCouponsPage() {
-  const navigate = useNavigate();
-  const [pageNumber, setPageNumber] = useState(1);
-  const [viewMode, setViewMode] = useState('active'); // 'active' or 'used'
-  const { totalRevenue } = useEducatorTotalRevenue();
-  const { data: activeCoupons, isLoading: activeLoading, error: activeError, couponsCount: activeCouponsCount, mutate: mutateActive } = useEducatorCouponsListData(pageNumber);
-  const { data: usedCoupons, isLoading: usedLoading, error: usedError, usedCouponsCount, mutate: mutateUsed } = useEducatorUsedCouponsListData(pageNumber);
-  
-  // Determine current data based on view mode
-  const currentCoupons = viewMode === 'active' ? activeCoupons : usedCoupons;
-  const currentLoading = viewMode === 'active' ? activeLoading : usedLoading;
-  const currentError = viewMode === 'active' ? activeError : usedError;
-  const currentCount = viewMode === 'active' ? activeCouponsCount : usedCouponsCount;
-  const currentMutate = viewMode === 'active' ? mutateActive : mutateUsed;
+	const navigate = useNavigate();
+	const { t } = useTranslation();
+	const [pageNumber, setPageNumber] = useState(1);
+	const [viewMode, setViewMode] = useState('active'); // 'active' or 'used'
+	const { totalRevenue } = useEducatorTotalRevenue();
+	const { data: activeCoupons, isLoading: activeLoading, error: activeError, couponsCount: activeCouponsCount, mutate: mutateActive } = useEducatorCouponsListData(pageNumber);
+	const { data: usedCoupons, isLoading: usedLoading, error: usedError, usedCouponsCount, mutate: mutateUsed } = useEducatorUsedCouponsListData(pageNumber);
 
-  const [showAddForm, setShowAddForm] = useState(false);
-  const [formData, setFormData] = useState({
+	// Determine current data based on view mode
+	const currentCoupons = viewMode === 'active' ? activeCoupons : usedCoupons;
+	const currentLoading = viewMode === 'active' ? activeLoading : usedLoading;
+	const currentError = viewMode === 'active' ? activeError : usedError;
+	const currentCount = viewMode === 'active' ? activeCouponsCount : usedCouponsCount;
+	const currentMutate = viewMode === 'active' ? mutateActive : mutateUsed;
+
+	const [showAddForm, setShowAddForm] = useState(false);
+	  const [formData, setFormData] = useState({
     price: 10,
     numberOfCoupons: 1,
   });
+  const [isLoading, setIsLoading] = useState(false);
 
-  const handleInputChange = (e) => {
+	  const handleInputChange = (e) => {
     const { name, value } = e.target;
     if ((name === "price" || name === "numberOfCoupons") && value !== "") {
       if (!/^\d*$/.test(value)) return;
@@ -36,51 +39,58 @@ export default function ManageCouponsPage() {
     setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
-  const handleViewModeChange = (mode) => {
-    setViewMode(mode);
-    setPageNumber(1); // Reset to first page when switching views
+  const resetForm = () => {
+    setFormData({ price: 10, numberOfCoupons: 1 });
+    setShowAddForm(false);
   };
 
-  const handleAddCouponSubmit = async (e) => {
+	const handleViewModeChange = (mode) => {
+		setViewMode(mode);
+		setPageNumber(1); // Reset to first page when switching views
+	};
+
+	  const handleAddCouponSubmit = async (e) => {
     e.preventDefault();
     const { price, numberOfCoupons } = formData;
     if (price === "" || numberOfCoupons === "") {
-      alert("Please fill out all fields.");
+      alert(t('educatorCoupons.pleaseFillAllFields'));
       return;
     }
     if (Number(numberOfCoupons) <= 0 || Number(price) < 0) {
-      alert("Number of coupons must be positive and price non-negative.");
+      alert(t('educatorCoupons.numberOfCouponsMustBePositive'));
       return;
     }
     try {
+      setIsLoading(true);
       await createCoupon({ n: Number(numberOfCoupons), price: Number(price) });
       mutateActive(); // Revalidate active coupons cache
-      alert("Coupon created successfully!");
-      setFormData({ price: "", numberOfCoupons: "" });
-      setShowAddForm(false);
+      alert(t('educatorCoupons.couponCreatedSuccessfully'));
+      resetForm();
     } catch (err) {
-      alert(`Error creating coupon: ${err.message}`);
+      alert(t('educatorCoupons.errorCreatingCoupon', { error: err.message }));
+    } finally {
+      setIsLoading(false);
     }
   };
 
-  if (currentLoading) {
-    return (
-      <div className="min-vh-100 profile-root p-4 d-flex justify-content-center align-items-center">
-        <p>Loading coupons data...</p>
-      </div>
-    );
-  }
+	if (currentLoading) {
+		return (
+			<div className="min-vh-100 profile-root p-4 d-flex justify-content-center align-items-center">
+				<p>{t('educatorCoupons.loadingCouponsData')}</p>
+			</div>
+		);
+	}
 
-  if (currentError) {
-    return (
-      <div className="min-vh-100 profile-root p-4 d-flex justify-content-center align-items-center">
-        <p>Error loading coupons: {currentError.message}</p>
-      </div>
-    );
-  }
+	if (currentError) {
+		return (
+			<div className="min-vh-100 profile-root p-4 d-flex justify-content-center align-items-center">
+				<p>{t('educatorCoupons.errorLoadingCoupons', { error: currentError.message })}</p>
+			</div>
+		);
+	}
 
 
-  return (
+	return (
 		<div className="min-vh-100 profile-root p-4">
 			<div className="container">
 				{/* Header */}
@@ -88,28 +98,28 @@ export default function ManageCouponsPage() {
 					<div className="container py-3">
 						<div className="d-flex justify-content-between align-items-center">
 							<div className="d-flex align-items-center gap-2">
-								<div className="header-avatar">
+								<div className="header-avatar me-2">
 									<DollarSign size={20} />
 								</div>
 								<div>
-									<span className="section-title">Manage Coupons</span>
+									<span className="section-title">{t('educatorCoupons.manageCoupons')}</span>
 									<p className="profile-role">
-										Manage your active coupons and promotions
+										{t('educatorCoupons.manageActiveCouponsAndPromotions')}
 									</p>
 								</div>
 							</div>
 
 							<button
 								className=" btn-edit-profile"
-								onClick={() => setShowAddForm((prev) => !prev)}
+								onClick={() => showAddForm ? resetForm() : setShowAddForm(true)}
 								aria-expanded={showAddForm}
 								aria-controls="add-coupon-form"
 							>
 								{showAddForm ? (
-									"Cancel"
+									t('educatorCoupons.cancel')
 								) : (
 									<>
-										<Plus size={16} /> Add Coupon
+										<Plus size={16} /> {t('educatorCoupons.addCoupon')}
 									</>
 								)}
 							</button>
@@ -128,7 +138,7 @@ export default function ManageCouponsPage() {
 							<div className="row g-3">
 								<div className="col-md-6">
 									<label htmlFor="price" className="form-label fw-semibold">
-										Price ($)
+										{t('educatorCoupons.price')}
 									</label>
 									<input
 										type="number"
@@ -147,7 +157,7 @@ export default function ManageCouponsPage() {
 										htmlFor="numberOfCoupons"
 										className="form-label fw-semibold"
 									>
-										Number of Coupons
+										{t('educatorCoupons.numberOfCoupons')}
 									</label>
 									<input
 										type="number"
@@ -167,7 +177,7 @@ export default function ManageCouponsPage() {
 									className="btn btn-edit-profile"
 									disabled={isLoading}
 								>
-									{isLoading ? "Creating..." : "Create Coupon"}
+									{isLoading ? t('educatorCoupons.creating') : t('educatorCoupons.createCoupon')}
 								</button>
 							</div>
 						</form>
@@ -179,11 +189,11 @@ export default function ManageCouponsPage() {
 					<div className="col-md-4">
 						<div className="card">
 							<div className="card-body text-center">
-								<div className="avatar-circle mx-auto">
+								<div className="avatar-circle mb-4 d-flex justify-content-center w-fit">
 									<DollarSign size={24} />
 								</div>
 								<h4 className="profile-role mt-2">{activeCouponsCount || 0}</h4>
-								<p className="profile-role">Active Coupons</p>
+								<p className="profile-role">{t('educatorCoupons.activeCoupons')}</p>
 							</div>
 						</div>
 					</div>
@@ -191,11 +201,11 @@ export default function ManageCouponsPage() {
 					<div className="col-md-4">
 						<div className="card">
 							<div className="card-body text-center">
-								<div className="avatar-circle mx-auto">
+								<div className="avatar-circle mb-4 d-flex justify-content-center w-fit">
 									<Plus size={24} />
 								</div>
 								<h4 className="profile-role mt-2">{usedCouponsCount || 0}</h4>
-								<p className="profile-role">Used Coupons</p>
+								<p className="profile-role">{t('educatorCoupons.usedCoupons')}</p>
 							</div>
 						</div>
 					</div>
@@ -203,11 +213,11 @@ export default function ManageCouponsPage() {
 					<div className="col-md-4">
 						<div className="card">
 							<div className="card-body text-center">
-								<div className="avatar-circle mx-auto">
+								<div className="avatar-circle mb-4 d-flex justify-content-center w-fit">
 									<DollarSign size={24} />
 								</div>
 								<h4 className="profile-role mt-2">${totalRevenue}</h4>
-								<p className="profile-role">Total Value</p>
+								<p className="profile-role">{t('educatorCoupons.totalValue')}</p>
 							</div>
 						</div>
 					</div>
@@ -224,7 +234,7 @@ export default function ManageCouponsPage() {
 									onClick={() => handleViewModeChange('active')}
 								>
 									<Eye size={16} className="me-2" />
-									Active Coupons ({activeCouponsCount || 0})
+									{t('educatorCoupons.activeCoupons')} : {( activeCouponsCount || 0)}
 								</button>
 								<button
 									type="button"
@@ -232,7 +242,7 @@ export default function ManageCouponsPage() {
 									onClick={() => handleViewModeChange('used')}
 								>
 									<EyeOff size={16} className="me-2" />
-									Used Coupons ({usedCouponsCount || 0})
+									{t('educatorCoupons.usedCoupons')} : {( usedCouponsCount || 0)}
 								</button>
 							</div>
 						</div>
@@ -243,9 +253,9 @@ export default function ManageCouponsPage() {
 				<section>
 					<div className="row g-4">
 						{!currentCoupons || currentCoupons.length === 0 ? (
-							<div className="alert alert-primary">
-								No {viewMode} coupons available.
-							</div>
+													<div className="alert alert-primary">
+							{viewMode === 'active' ? t('educatorCoupons.noActiveCouponsAvailable') : t('educatorCoupons.noUsedCouponsAvailable')}
+						</div>
 						) : (
 							currentCoupons.map((coupon) => (
 								<div key={coupon.id} className="col-md-6 col-xl-4">
@@ -257,24 +267,23 @@ export default function ManageCouponsPage() {
 												</h5>
 												<div className="d-flex align-items-center gap-2">
 													<span
-														className={`badge ${
-															viewMode === 'used' 
-																? "badge-warning-custom" 
+														className={`badge ${viewMode === 'used'
+																? "badge-warning-custom"
 																: coupon.is_active
-																? "badge-success-custom"
-																: "badge-warning-custom"
-														}`}
+																	? "badge-success-custom"
+																	: "badge-warning-custom"
+															}`}
 													>
-														{viewMode === 'used' ? "Used" : (coupon.is_active ? "Active" : "Inactive")}
+														{viewMode === 'used' ? t('common.used') : (coupon.is_active ? t('common.active') : t('common.inactive'))}
 													</span>
 													<button
 														className=" btn-edit-profile p-0"
 														onClick={() => {
 															const code = viewMode === 'used' ? coupon.coupon?.code : coupon.code;
 															navigator.clipboard.writeText(code);
-															alert("Coupon code copied!");
+															alert(t('educatorCoupons.couponCodeCopied'));
 														}}
-														aria-label={`Copy coupon code ${viewMode === 'used' ? coupon.coupon?.code : coupon.code}`}
+														aria-label={t('educatorCoupons.copyCouponCode', { code: viewMode === 'used' ? coupon.coupon?.code : coupon.code })}
 													>
 														<Copy size={16} />
 													</button>
@@ -282,49 +291,40 @@ export default function ManageCouponsPage() {
 											</div>
 
 											<p className="profile-role mb-1">
-												Value: ${viewMode === 'used' ? (coupon.coupon?.price ? coupon.coupon.price.toFixed(2) : '0.00') : (coupon.price ? coupon.price.toFixed(2) : '0.00')}
+												{t('educatorCoupons.value')} {viewMode === 'used' ? (coupon.coupon?.price ? coupon.coupon.price.toFixed(2) : '0.00') : (coupon.price ? coupon.price.toFixed(2) : '0.00')}
 											</p>
 											{viewMode === 'used' && coupon.student && (
 												<p className="profile-joined mb-1">
-													Used by: {coupon.student}
+													{t('educatorCoupons.usedBy')} {coupon.student}
 												</p>
 											)}
 											{viewMode === 'used' && coupon.course && (
 												<p className="profile-joined mb-1">
-													Course: {coupon.course}
+													{t('educatorCoupons.course')} {coupon.course}
 												</p>
 											)}
 											{viewMode === 'used' && coupon.used_at && (
 												<p className="profile-joined mb-1">
-													Used on: {new Date(coupon.used_at).toLocaleDateString()}
+													{t('educatorCoupons.usedOn')} {new Date(coupon.used_at).toLocaleDateString()}
 												</p>
 											)}
 
 											<div className="d-flex justify-content-between align-items-center mb-3">
 												<p className="profile-joined mb-0">
-													Created: {new Date(viewMode === 'used' ? coupon.coupon?.date : coupon.date).toLocaleDateString()}
+													{t('educatorCoupons.created')} {new Date(viewMode === 'used' ? coupon.coupon?.date : coupon.date).toLocaleDateString()}
 												</p>
 												<p className="profile-joined mb-0">
-													Expires:{" "}
-													{viewMode === 'used' 
+													{t('educatorCoupons.expires')} {" "}
+													{viewMode === 'used'
 														? (coupon.coupon?.expiration_date
 															? new Date(coupon.coupon.expiration_date).toLocaleDateString()
-															: "N/A")
+															: t('educatorCoupons.notApplicable'))
 														: (coupon.expiration_date
 															? new Date(coupon.expiration_date).toLocaleDateString()
-															: "N/A")
+															: t('educatorCoupons.notApplicable'))
 													}
 												</p>
 											</div>
-
-											{/* <div className="d-flex gap-2 mt-auto pt-3 border-top">
-												<button
-													className="btn btn-edit-profile"
-
-												>
-													View
-												</button>
-											</div> */}
 										</div>
 									</div>
 								</div>
@@ -345,7 +345,7 @@ export default function ManageCouponsPage() {
 											setPageNumber((prev) => Math.max(1, prev - 1))
 										}
 									>
-										Previous
+										{t('educatorCoupons.previous')}
 									</button>
 								</li>
 								{Array.from(
@@ -353,9 +353,8 @@ export default function ManageCouponsPage() {
 									(_, i) => (
 										<li
 											key={i + 1}
-											className={`page-item ${
-												pageNumber === i + 1 ? "active" : ""
-											}`}
+											className={`page-item ${pageNumber === i + 1 ? "active" : ""
+												}`}
 										>
 											<button
 												className="page-link"
@@ -367,11 +366,10 @@ export default function ManageCouponsPage() {
 									)
 								)}
 								<li
-									className={`page-item ${
-										pageNumber === Math.ceil(currentCount / COUPONS_PER_PAGE)
+									className={`page-item ${pageNumber === Math.ceil(currentCount / COUPONS_PER_PAGE)
 											? "disabled"
 											: ""
-									}`}
+										}`}
 								>
 									<button
 										className="page-link"
@@ -384,7 +382,7 @@ export default function ManageCouponsPage() {
 											)
 										}
 									>
-										Next
+										{t('educatorCoupons.next')}
 									</button>
 								</li>
 							</ul>

@@ -1,5 +1,6 @@
 import React from "react";
 import { useParams } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 import { 
   User, 
   Mail, 
@@ -18,6 +19,7 @@ import useEducatorPublicData from "../../apis/hooks/student/useEducatorPublicDat
 import MainLoader from "../../components/common/MainLoader";
 
 function StudentHome() {
+  const { t } = useTranslation();
   const { educatorUsername } = useParams();
   const { isLoading, error, data: educatorData } = useEducatorPublicData();
 
@@ -35,8 +37,8 @@ function StudentHome() {
     return (
       <div className="min-vh-100 d-flex justify-content-center align-items-center">
         <div className="text-center">
-          <h3 className="text-danger">Error Loading Educator Data</h3>
-          <p className="text-muted">Unable to load educator information. Please try again later.</p>
+          <h3 className="text-danger">{t('student.errorLoadingEducatorData')}</h3>
+          <p className="text-muted">{t('student.unableToLoadEducatorInfo')}</p>
         </div>
       </div>
     );
@@ -47,8 +49,8 @@ function StudentHome() {
     return (
       <div className="min-vh-100 d-flex justify-content-center align-items-center">
         <div className="text-center">
-          <h3 className="text-muted">No Educator Found</h3>
-          <p className="text-muted">The requested educator profile could not be found.</p>
+          <h3 className="text-muted">{t('student.noEducatorFound')}</h3>
+          <p className="text-muted">{t('student.educatorProfileNotFound')}</p>
         </div>
       </div>
     );
@@ -61,9 +63,9 @@ function StudentHome() {
         <div className="row mb-4">
           <div className="col-12">
             <div className="text-center">
-              <h1 className="main-title mb-2">Welcome to EduPlatform</h1>
+              <h1 className="main-title mb-2">{t('student.welcomeToEduPlatform')}</h1>
               <p className="section-title">
-                Your journey to knowledge starts here with {educatorData.full_name}
+                {t('student.journeyToKnowledgeStarts', { name: educatorData.full_name })}
               </p>
             </div>
           </div>
@@ -76,7 +78,7 @@ function StudentHome() {
               <div className="card-body p-4">
                 <div className="d-flex align-items-center mb-4">
                   <User size={24} className="me-2 text-main" />
-                  <h3 className="section-title mb-0">Meet Your Educator</h3>
+                  <h3 className="section-title mb-0">{t('student.meetYourEducator')}</h3>
                 </div>
 
                 <div className="row">
@@ -95,45 +97,45 @@ function StudentHome() {
                         />
                       </div>
                       <h4 className="profile-main-title mb-1">{educatorData.full_name || educatorData.username}</h4>
-                      <p className="about-subtitle mb-3">{educatorData.specialization || "Educator"}</p>
+                      <p className="about-subtitle mb-3">{educatorData.specialization || t('common.educator')}</p>
                       
                       <div className="d-flex justify-content-center align-items-center mb-2">
                         <Star size={16} className="text-warning me-1" fill="currentColor" />
                         <span className="fw-bold me-2">{educatorData.rating || 0}</span>
-                        <small className="text-muted">({educatorData.number_of_students || 0} students)</small>
+                        <small className="text-muted">({educatorData.number_of_students || 0} {t('student.students')})</small>
                       </div>
                     </div>
                   </div>
 
                   {/* Educator Details */}
                   <div className="col-md-8">
-                    <h5 className="section-title mb-3">About Your Instructor</h5>
-                    <p className="profile-joined mb-3">{educatorData.bio || "No bio available."}</p>
+                    <h5 className="section-title mb-3">{t('student.aboutYourInstructor')}</h5>
+                    <p className="profile-joined mb-3">{educatorData.bio || t('student.noBioAvailable')}</p>
 
                     <div className="row mb-3">
                       <div className="col-sm-6 mb-3">
                         <div className="about-bubble p-3">
                           <div className="d-flex align-items-center mb-2">
                             <BookOpen size={16} className="me-2 text-main" />
-                            <strong>Specialization</strong>
+                            <strong>{t('student.specialization')}</strong>
                           </div>
-                          <small className="text-muted">{educatorData.specialization || "Not specified"}</small>
+                          <small className="text-muted">{educatorData.specialization || t('student.notSpecified')}</small>
                         </div>
                       </div>
                       <div className="col-sm-6 mb-3">
                         <div className="about-bubble p-3">
                           <div className="d-flex align-items-center mb-2">
                             <Clock size={16} className="me-2 text-main" />
-                            <strong>Experience</strong>
+                            <strong>{t('student.experience')}</strong>
                           </div>
-                          <small className="text-muted">{educatorData.experiance || "Not specified"}+</small>
+                          <small className="text-muted">{educatorData.experiance || t('student.notSpecified')}+</small>
                         </div>
                       </div>
                       <div className="col-sm-6 mb-3">
                         <div className="about-bubble p-3">
                           <div className="d-flex align-items-center mb-2">
                             <Users size={16} className="me-2 text-main" />
-                            <strong>Students Taught</strong>
+                            <strong>{t('student.studentsTaught')}</strong>
                           </div>
                           <small className="text-muted">{educatorData.number_of_students || 0}+</small>
                         </div>
@@ -142,7 +144,7 @@ function StudentHome() {
                         <div className="about-bubble p-3">
                           <div className="d-flex align-items-center mb-2">
                             <Award size={16} className="me-2 text-main" />
-                            <strong>Courses Created</strong>
+                            <strong>{t('student.coursesCreated')}</strong>
                           </div>
                           <small className="text-muted">{educatorData.number_of_courses || 0}</small>
                         </div>
@@ -151,7 +153,7 @@ function StudentHome() {
 
                     {educatorData.achievements && educatorData.achievements.length > 0 && (
                       <div>
-                        <h6 className="about-subtitle mb-2">Achievements & Qualifications</h6>
+                        <h6 className="about-subtitle mb-2">{t('student.achievementsQualifications')}</h6>
                         <div className="row">
                           {educatorData.achievements.map((achievement, index) => (
                             <div key={index} className="col-sm-6 mb-2">
@@ -176,7 +178,7 @@ function StudentHome() {
               <div className="card-body p-4">
                 <div className="d-flex align-items-center mb-4">
                   <Phone size={24} className="me-2 text-main" />
-                  <h3 className="section-title mb-0">Contact Information</h3>
+                  <h3 className="section-title mb-0">{t('student.contactInformation')}</h3>
                 </div>
 
                 <div className="space-y-3">
@@ -185,7 +187,7 @@ function StudentHome() {
                     <div className="about-bubble p-3 mb-3">
                       <div className="d-flex align-items-center mb-2">
                         <Mail size={16} className="me-2 text-main" />
-                        <strong className="about-subtitle">Email</strong>
+                        <strong className="about-subtitle">{t('student.email')}</strong>
                       </div>
                       <a 
                         href={`mailto:${educatorData.user.email}`}
@@ -201,7 +203,7 @@ function StudentHome() {
                     <div className="about-bubble p-3 mb-3">
                       <div className="d-flex align-items-center mb-2">
                         <Phone size={16} className="me-2 text-main" />
-                        <strong className="about-subtitle">Phone</strong>
+                        <strong className="about-subtitle">{t('student.phone')}</strong>
                       </div>
                       <div className="mb-1">
                         <a 
@@ -219,7 +221,7 @@ function StudentHome() {
                     <div className="about-bubble p-3 mb-3">
                       <div className="d-flex align-items-center mb-2">
                         <MapPin size={16} className="me-2 text-main" />
-                        <strong className="about-subtitle">Location</strong>
+                        <strong className="about-subtitle">{t('student.location')}</strong>
                       </div>
                       <div className="small">
                         <div className="mb-1 text-muted">{educatorData.city && educatorData.country ? `${educatorData.city}, ${educatorData.country}` : educatorData.city || educatorData.country}</div>
@@ -233,7 +235,7 @@ function StudentHome() {
                   {/* Show message if no contact info */}
                   {!educatorData.user?.email && !educatorData.user?.phone && !educatorData.city && !educatorData.country && (
                     <div className="text-center text-muted">
-                      <p>Contact information not available</p>
+                      <p>{t('student.contactInfoNotAvailable')}</p>
                     </div>
                   )}
                 </div>
@@ -248,8 +250,8 @@ function StudentHome() {
             <div className="card shadow-sm">
               <div className="card-body p-4">
                 <div className="text-center mb-4">
-                  <h3 className="section-title mb-2">About EduPlatform</h3>
-                  <p className="about-subtitle">Empowering minds, shaping futures</p>
+                  <h3 className="section-title mb-2">{t('student.aboutEduPlatform')}</h3>
+                  <p className="about-subtitle">{t('student.empoweringMindsShapingFutures')}</p>
                 </div>
 
                 <div className="row">
@@ -257,12 +259,9 @@ function StudentHome() {
                   <div className="col-md-4 mb-4">
                     <div className="text-center about-bubble p-4 h-100">
                       <Heart size={32} className="text-main mb-3" />
-                      <h4 className="about-subtitle mb-3">Who We Are</h4>
+                      <h4 className="about-subtitle mb-3">{t('student.whoWeAre')}</h4>
                       <p className="profile-joined">
-                        We are a passionate team of educators and technology enthusiasts 
-                        dedicated to revolutionizing online learning. Our platform connects 
-                        students with expert instructors from around the world, creating 
-                        meaningful learning experiences that transcend geographical boundaries.
+                        {t('student.whoWeAreDesc')}
                       </p>
                     </div>
                   </div>
@@ -271,12 +270,9 @@ function StudentHome() {
                   <div className="col-md-4 mb-4">
                     <div className="text-center about-bubble p-4 h-100">
                       <Target size={32} className="text-main mb-3" />
-                      <h4 className="about-subtitle mb-3">What We Do</h4>
+                      <h4 className="about-subtitle mb-3">{t('student.whatWeDo')}</h4>
                       <p className="profile-joined">
-                        EduPlatform provides a comprehensive learning management system 
-                        that enables personalized education journeys. We offer interactive 
-                        courses, real-time collaboration tools, progress tracking, and 
-                        direct communication channels between students and educators.
+                        {t('student.whatWeDoDesc')}
                       </p>
                     </div>
                   </div>
@@ -285,12 +281,9 @@ function StudentHome() {
                   <div className="col-md-4 mb-4">
                     <div className="text-center about-bubble p-4 h-100">
                       <Shield size={32} className="text-main mb-3" />
-                      <h4 className="about-subtitle mb-3">Our Mission</h4>
+                      <h4 className="about-subtitle mb-3">{t('student.ourMission')}</h4>
                       <p className="profile-joined">
-                        To democratize quality education by making it accessible, 
-                        affordable, and engaging for learners everywhere. We believe 
-                        that everyone deserves the opportunity to learn, grow, and 
-                        achieve their full potential regardless of their background.
+                        {t('student.ourMissionDesc')}
                       </p>
                     </div>
                   </div>
@@ -299,23 +292,23 @@ function StudentHome() {
                 {/* Platform Stats */}
                 <div className="row mt-4 pt-4 border-top">
                   <div className="col-12 text-center mb-3">
-                    <h5 className="about-subtitle">Platform Statistics</h5>
+                    <h5 className="about-subtitle">{t('student.platformStatistics')}</h5>
                   </div>
                   <div className="col-md-3 col-6 text-center mb-3">
                     <div className="fw-bold fs-3 text-main">10,000+</div>
-                    <small className="text-muted">Students</small>
+                    <small className="text-muted">{t('student.students')}</small>
                   </div>
                   <div className="col-md-3 col-6 text-center mb-3">
                     <div className="fw-bold fs-3 text-main">500+</div>
-                    <small className="text-muted">Expert Instructors</small>
+                    <small className="text-muted">{t('student.expertInstructors')}</small>
                   </div>
                   <div className="col-md-3 col-6 text-center mb-3">
                     <div className="fw-bold fs-3 text-main">2,000+</div>
-                    <small className="text-muted">Courses Available</small>
+                    <small className="text-muted">{t('student.coursesAvailable')}</small>
                   </div>
                   <div className="col-md-3 col-6 text-center mb-3">
                     <div className="fw-bold fs-3 text-main">95%</div>
-                    <small className="text-muted">Student Satisfaction</small>
+                    <small className="text-muted">{t('student.studentSatisfaction')}</small>
                   </div>
                 </div>
               </div>
