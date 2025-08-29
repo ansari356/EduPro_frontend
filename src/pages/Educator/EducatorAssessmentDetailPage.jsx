@@ -2288,7 +2288,6 @@ export default function EducatorAssessmentDetailPage() {
 															placeholder={t('assessments.minimumScoreToPass')}
 															style={{
 																borderRadius: "var(--border-radius-sm)",
-																border: "var(--border-radius-sm)",
 																border: "1px solid var(--color-border)",
 																padding: "var(--spacing-sm) var(--spacing-md)",
 															}}

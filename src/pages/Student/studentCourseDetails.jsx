@@ -47,7 +47,7 @@ function StudentCourseDetails() {
   const { enrolledInCourses, isLoading: enrolledLoading } = useListEnrolledCourses();
   // Call the hook and get assessments data
   const { assessments, isLoading: assessmentsLoading } = useAvailableAssessments(educatorUsername, courseId);
-  
+  console.log('Enrolled courses :', enrolledInCourses);
   // Get student's review for this course
   const { studentReview, hasReview, isLoading: reviewLoading } = useStudentReview(courseId);
   
@@ -327,21 +327,16 @@ function StudentCourseDetails() {
 
   // Check if student has access to course content (enrolled or course is free)
   const studentEnrollment = enrolledInCourses?.find(course => course.id === courseId);
-  
   // Check if student has active enrollment with proper access
-  const hasActiveEnrollment = studentEnrollment && 
-    studentEnrollment.status === 'active' && 
-    studentEnrollment.access_type === 'full_access' && 
-    studentEnrollment.is_active === true;
-  
+  const hasActiveEnrollment = studentEnrollment  
   // Check if student has any enrollment (including pending)
   const hasAnyEnrollment = !!studentEnrollment;
   
   // Student has access if course is free OR they have active enrollment
   const hasCourseAccess = courseDetails?.is_free || hasActiveEnrollment;
   
-  // Show enrollment message if no access and no lessons error
-  const showEnrollmentMessage = !hasCourseAccess && !lessonsError;
+  // Show enrollment message if no access
+  const showEnrollmentMessage = !hasCourseAccess;
   
   // Debug logging
   console.log('🔍 Enrollment Debug:', {

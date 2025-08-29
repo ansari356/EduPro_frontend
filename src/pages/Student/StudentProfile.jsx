@@ -8,6 +8,7 @@ import useEducatorPublicData from "../../apis/hooks/student/useEducatorPublicDat
 import useListCourseModules, { useModuleLessons } from "../../apis/hooks/student/useListCourseModules";
 import baseApi from "../../apis/base";
 import { useTranslation } from "react-i18next";
+import { BookOpen } from "lucide-react";
 
 
 // Hook to fetch assessment attempts

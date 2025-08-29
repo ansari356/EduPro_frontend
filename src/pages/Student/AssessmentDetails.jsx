@@ -1321,6 +1321,16 @@ function AssessmentDetails() {
                 </button>
               </div>
             </div>
+            {/* Back to Courses button */}
+            <div className="text-center mt-4">
+              <button
+                className="btn-edit-profile"
+                onClick={() => navigate(-1)}
+              >
+                <ArrowLeft size={16} className="me-2" />
+                Back to Courses
+              </button>
+            </div>
           </div>
         </div>
       )}
